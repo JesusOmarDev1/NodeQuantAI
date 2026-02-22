@@ -3,7 +3,7 @@ import os
 
 # 1. DÓNDE ESTÁN TUS DATOS AHORA (La carpeta con números raros)
 # Asegúrate de que este nombre coincida con tu carpeta de descarga
-carpeta_origen = ".\Mediastinal_Data_Sample"
+carpeta_origen = ".\Mediastinal_Data"
 
 # 2. DÓNDE QUIERES QUE APAREZCAN LOS NIFTI
 carpeta_destino = ".\Dataset_Entrenamiento"

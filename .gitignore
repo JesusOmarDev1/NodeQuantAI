@@ -1,0 +1,128 @@
+# === Python ===
+# Archivos compilados / optimizados / DLL
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribución / empaquetado
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+env/
+.virtualenv
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# === Datos de Imágenes Médicas ===
+# Datos DICOM crudos (muy grandes)
+Mediastinal_Data/
+**/DICOM/
+**/dicom/
+
+# Volúmenes NIfTI procesados (grandes)
+Dataset_Entrenamiento/
+Dataset_Validacion/
+Dataset_Test/
+**/nifti/
+**/*.nii
+**/*.nii.gz
+
+# Archivos de manifiesto TCIA (opcional, mantener o eliminar)
+# *.tcia
+
+# === Machine Learning ===
+# Checkpoints y pesos del modelo
+*.pt
+*.pth
+*.h5
+*.hdf5
+*.ckpt
+*.pb
+checkpoints/
+models/
+saved_models/
+weights/
+
+# Logs de entrenamiento y métricas
+logs/
+tensorboard/
+runs/
+wandb/
+mlruns/
+
+# Predicciones y resultados
+predictions/
+results/
+outputs/
+
+# Datos en caché
+*.cache
+*.pkl
+*.pickle
+cache/
+
+# === Sistema Operativo ===
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# === Específico del Proyecto ===
+# Archivos temporales grandes
+temp/
+tmp/
+*.tmp
+
+# Archivos de configuración con datos sensibles
+config/local_*.py
+secrets.yaml
+.env
+
+# Archivos de respaldo
+*.bak
+*.backup
+
+# Workflows y acciones de GitHub (opcional, mantener o eliminar)
+.github/
