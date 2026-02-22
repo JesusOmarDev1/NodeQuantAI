@@ -4,86 +4,50 @@
 import SimpleITK as sitk # Para manejar imágenes médicas
 import pandas as pd # Para manejar dataframes y guardar resultados
 import numpy as np # Para operaciones numéricas
-from radiomics import featureextractor # Para extraer características radiómicas
 import os # Para manejar rutas de archivos
 from tqdm import tqdm # Para mostrar barras de progreso
-import warnings as w # Para manejar advertencias
-
-# 0.5 - Filtrar advertencias para mejorar la legibilidad de la salida
-w.filterwarnings('ignore', message='GLCM is symmetrical')
  
 # 1 - Configuración de la carpeta de datos y salida
-# Asegúrate de que este nombre coincida con tu carpeta de descarga
+# Asegúrate de que este nombre coincida con tu carpeta del dataset y de salida
 carpeta_dataset = r"C:\Users\omar\OneDrive\Escritorio\Lymph-Node\Dataset_Entrenamiento"
 carpeta_salida = r"C:\Users\omar\OneDrive\Escritorio\Lymph-Node\resultados\caracteristicas_radiomicas.csv"
 
-# 2 - Funcion para extraer características radiómicas de un caso
-def extraer_features_caso(imagen_path, mascara_path, caso_id):
+# 5 Casos a omitir para pruebas a futuro
+casos_omitidos = {"case_0002", "case_0005", "case_0006", "case_0009", "case_0012"}
+
+# 2 - Funcion para extraer características SOLO de la máscara
+def extraer_features_caso(mascara_path, caso_id):
    try:
-      # Cargar imagen y máscara
-      imagen = sitk.ReadImage(imagen_path)
+      # Cargar máscara
       mascara = sitk.ReadImage(mascara_path)
 
-      # Configurar extractor de características radiómicas
-      extractor = featureextractor.RadiomicsFeatureExtractor()
+      # Convertir máscara a array numpy
+      mascara_vector = sitk.GetArrayFromImage(mascara)
 
-      # Extraer características
-      extractor.enableAllFeatures() # Habilitar todas las características disponibles
-
-      # Configuracion de hiperparametros optimizada para CT medicos
-      ajustes = {
-         "binWidth": 25, # Ancho de bin para discretización
-         "resampledPixelSpacing": None, # No re-muestrear
-         "interpolator": sitk.sitkBSpline, # Interpolación para re-muestreo
-         "normalize": True, # Normalizar intensidades
-         "normalizeScale": 100, # Escala de normalización
-         "removeOutliers": 3, # Eliminar outliers extremos
-         "label": 255, # CRÍTICO: Las máscaras tienen valores 0-255, no 0-1
-      }
-
-      # Aplicar ajustes al extractor
-      for key, value in ajustes.items():
-         extractor.settings[key] = value
-
-      # Extraer características
-      caracteristicas = extractor.execute(imagen, mascara)
-
-      # Convertir a diccionario y agregar ID del caso
-      caracteristicas_dic = {"case_id": caso_id}
-
-      for key, value in caracteristicas.items():
-         # Filtrar solo características (ignorar metadatos)
-         if not key.startswith("diagnostics_"):
-            try:
-               # Intentar convertir a float, si falla dejar como string
-               caracteristicas_dic[key] = float(value)
-            except:
-               # Si falla, guardar como string
-               caracteristicas_dic[key] = str(value)
-
-      # ¿Que es un voxel? Es la unidad más pequeña de una imagen 3D, similar a un píxel en 2D pero con volumen.
-
-      espaceado = imagen.GetSpacing() # Obtener espacio entre voxeles
-      mascara_vector = sitk.GetArrayFromImage(mascara) # Convertir máscara a array numpy
-      voxel_volumen = espaceado[0] * espaceado[1] * espaceado[2] # Volumen de un voxel en mm^3
+      # Calcular volumen en mm^3 usando spacing de la máscara
+      espaceado = mascara.GetSpacing() # Obtener espacio entre voxeles
+      voxel_volumen = espaceado[0] * espaceado[1] * espaceado[2] # Volumen de un voxel en mm^3S
       num_voxeles = np.sum(mascara_vector > 0) # Contar voxeles dentro de la máscara
-      volumen_mm3 = num_voxeles * voxel_volumen # Calcular volumen total en mm^3
+      volumen_mm3 = num_voxeles * voxel_volumen # Volumen total en mm^3
 
-      caracteristicas_dic["volumen_calculado_mm3"] = volumen_mm3
-      caracteristicas_dic["num_voxeles"] = int(num_voxeles)
+      # Estadísticas de forma usando SimpleITK
+      label_stats = sitk.LabelShapeStatisticsImageFilter()
+      label_stats.Execute(mascara)
+      label = 255
 
-      # ¿Que es HU? Hounsfield Units, es una escala de medida de densidad utilizada en imagenes de tomografia computarizada.
-      # ¿Que es ROI? Region of Interest, es la zona específica de la imagen que se analiza, en este caso el ganglio linfático.
-
-      # Estadisticas de intensidad HU del ROI
-      imagen_vector = sitk.GetArrayFromImage(imagen) # Convertir imagen a array numpy
-      roi_intensidades = imagen_vector[mascara_vector > 0] # Extraer intensidades dentro del ROI
-
-      caracteristicas_dic["hu_media"] = float(np.mean(roi_intensidades)) # Intensidad media en HU
-      caracteristicas_dic["hu_desviacion"] = float(np.std(roi_intensidades)) # Desviación estándar en HU
-      caracteristicas_dic["hu_minimo"] = float(np.min(roi_intensidades)) # Intensidad mínima en HU
-      caracteristicas_dic["hu_maximo"] = float(np.max(roi_intensidades)) # Intensidad máxima en HU
-      caracteristicas_dic["hu_mediana"] = float(np.median(roi_intensidades)) # Intensidad mediana en HU
+      caracteristicas_dic = {
+         "case_id": caso_id,
+         "num_voxeles": int(num_voxeles),
+         "volumen_calculado_mm3": float(volumen_mm3),
+         "caja_delimitadora": str(label_stats.GetBoundingBox(label)) if label_stats.HasLabel(label) else "",
+         "centroide": str(label_stats.GetCentroid(label)) if label_stats.HasLabel(label) else "",
+         "diametro_feret": float(label_stats.GetFeretDiameter(label)) if label_stats.HasLabel(label) else 0.0,
+         "elongacion": float(label_stats.GetElongation(label)) if label_stats.HasLabel(label) else 0.0,
+         "redondez": float(label_stats.GetRoundness(label)) if label_stats.HasLabel(label) else 0.0,
+         "espaciado_x": float(espaceado[0]),
+         "espaciado_y": float(espaceado[1]),
+         "espaciado_z": float(espaceado[2]),
+      }
 
       return caracteristicas_dic
    
@@ -114,14 +78,18 @@ def procesar_dataset():
    
    # Extraer características de cada caso y almacenar en una lista
    lista_caracteristicas = []
+   omitidos_en_ejecucion = []
 
    for caso_folder in tqdm(casos, desc="Procesando casos", unit="caso"):
+      if caso_folder in casos_omitidos:
+         omitidos_en_ejecucion.append(caso_folder)
+         continue
+
       caso_path = os.path.join(carpeta_dataset, caso_folder)
-      imagen_path = os.path.join(caso_path, "image.nii.gz")
       mascara_path = os.path.join(caso_path, "mask.nii.gz")
 
-      # Extraer caracteristicas
-      caracteristicas = extraer_features_caso(imagen_path, mascara_path, caso_folder)
+      # Extraer caracteristicas solo de la mascara
+      caracteristicas = extraer_features_caso(mascara_path, caso_folder)
 
       if caracteristicas is not None:
          lista_caracteristicas.append(caracteristicas)
@@ -143,6 +111,12 @@ def procesar_dataset():
    # Guardar DataFrame a CSV
    df.to_csv(carpeta_salida, index=False, encoding="utf-8")
 
+   # Reportar casos omitidos
+   if omitidos_en_ejecucion:
+      omitidos_en_ejecucion = sorted(omitidos_en_ejecucion)
+      print("\nCasos omitidos:")
+      print(" - " + "\n - ".join(omitidos_en_ejecucion))
+
    # Mostrar resultados
    print(f"\nTasa de exito: {len(df)}/{len(casos)} casos procesados correctamente.")
 
@@ -152,7 +126,7 @@ def procesar_dataset():
    print(f"   Mediana:  {df['volumen_calculado_mm3'].median():.2f} mm³")
    print(f"   Mínimo:   {df['volumen_calculado_mm3'].min():.2f} mm³")
    print(f"   Máximo:   {df['volumen_calculado_mm3'].max():.2f} mm³")
-   print(f"   Std Dev:  {df['volumen_calculado_mm3'].std():.2f} mm³")
+   print(f"   Desviación estándar:  {df['volumen_calculado_mm3'].std():.2f} mm³")
 
    print(f"\n¡Extracción de características radiómicas completada! Resultados guardados en: {carpeta_salida}")
 
