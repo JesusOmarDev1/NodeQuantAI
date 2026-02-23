@@ -1,7 +1,0 @@
-Todo se ejecutará en Python 3.11
-
-Pipeline:
-1. extraer_features_radiomicas
-2. preparar_datos_limpios para la carpeta /db
-3. entrenar_modelos_regression
-4. prediccion_volumen_nuevos_casos u omitidos antes del entrenamiento

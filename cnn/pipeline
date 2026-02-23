@@ -1,7 +1,0 @@
-Todo se ejecutará en Python 3.11
-
-Pipeline:
-1. Descargar Mediastinal-Lymph-Node-SEG-DA-RAD.tcia
-2. descargar_data_completa
-3. convertir_dcm_niiz
-4. alinear_mascaras

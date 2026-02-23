@@ -1,0 +1,31 @@
+PIPELINE PREPROCESAMIENTO
+
+Ejecutar en Python 3.11
+1. Descargar Mediastinal-Lymph-Node-SEG-DA-RAD.tcia
+2. descargar_data_completa	- Descarga el dataset
+3. convertir_dcm_niiz		- Convierte los datos de dcm a niiz para poder usarlos
+4. alinear_mascaras		- Alinea las máscaras con la imagen original
+5. visualizar_conversion	- Comprobar que la máscara esté bien alienada
+6. resambling_isotropico	- Escalar la imagen 1:1
+7. verificar_resambling		- Comprobar el escalado 
+
+Ejecutar en Python 3.9
+8. extraccion_radiomica		- Extraer las características
+
+El .cvs deberá contener las siguientes columnas:
+Paciente_ID, shape_Elongation, shape_Flatness, shape_LeastAxisLength, shape_MajorAxisLength, shape_Maximum2DDiameterColumn, shape_Maximum2DDiameterRow, shape_Maximum2DDiameterSlice, shape_Maximum3DDiameter, shape_MeshVolume, shape_MinorAxisLength, shape_Sphericity, shape_SurfaceArea, shape_SurfaceVolumeRatio, shape_VoxelVolume, firstorder_10Percentile, firstorder_90Percentile, firstorder_Energy, firstorder_Entropy, firstorder_InterquartileRange, firstorder_Kurtosis, firstorder_Maximum, firstorder_MeanAbsoluteDeviation, firstorder_Mean, firstorder_Median, firstorder_Minimum, firstorder_Range, firstorder_RobustMeanAbsoluteDeviation, firstorder_RootMeanSquared, firstorder_Skewness, firstorder_TotalEnergy, firstorder_Uniformity, firstorder_Variance, glcm_Autocorrelation, glcm_ClusterProminence, glcm_ClusterShade, glcm_ClusterTendency, glcm_Contrast, glcm_Correlation, glcm_DifferenceAverage, glcm_DifferenceEntropy, glcm_DifferenceVariance, glcm_Id, glcm_Idm, glcm_Idmn, glcm_Idn, glcm_Imc1, glcm_Imc2, glcm_InverseVariance, glcm_JointAverage, glcm_JointEnergy, glcm_JointEntropy, glcm_MCC, glcm_MaximumProbability, glcm_SumAverage, glcm_SumEntropy, glcm_SumSquares.
+
+Ejecutar en Python 3.11
+9. preparar_dataset		- Divide los datos originales en dos datasets adecuados para class y reg
+
+Para clasificación:
+Paciente_ID, shape_Elongation, shape_Flatness, shape_LeastAxisLength, shape_MajorAxisLength, shape_Maximum2DDiameterColumn, shape_Maximum2DDiameterRow, shape_Maximum2DDiameterSlice, shape_Maximum3DDiameter, shape_MeshVolume, shape_MinorAxisLength, shape_Sphericity, shape_SurfaceArea, shape_SurfaceVolumeRatio, shape_VoxelVolume, firstorder_10Percentile, firstorder_90Percentile, firstorder_Energy, firstorder_Entropy, firstorder_InterquartileRange, firstorder_Kurtosis, firstorder_Maximum, firstorder_MeanAbsoluteDeviation, firstorder_Mean, firstorder_Median, firstorder_Minimum, firstorder_Range, firstorder_RobustMeanAbsoluteDeviation, firstorder_RootMeanSquared, firstorder_Skewness, firstorder_TotalEnergy, firstorder_Uniformity, firstorder_Variance, glcm_Autocorrelation, glcm_ClusterProminence, glcm_ClusterShade, glcm_ClusterTendency, glcm_Contrast, glcm_Correlation, glcm_DifferenceAverage, glcm_DifferenceEntropy, glcm_DifferenceVariance, glcm_Id, glcm_Idm, glcm_Idmn, glcm_Idn, glcm_Imc1, glcm_Imc2, glcm_InverseVariance, glcm_JointAverage, glcm_JointEnergy, glcm_JointEntropy, glcm_MCC, glcm_MaximumProbability, glcm_SumAverage, glcm_SumEntropy, glcm_SumSquares, target_clasificacion
+
+Para regresión:
+Paciente_ID, firstorder_10Percentile, firstorder_90Percentile, firstorder_Energy, firstorder_Entropy, firstorder_InterquartileRange, firstorder_Kurtosis, firstorder_Maximum, firstorder_MeanAbsoluteDeviation, firstorder_Mean, firstorder_Median, firstorder_Minimum, firstorder_Range, firstorder_RobustMeanAbsoluteDeviation, firstorder_RootMeanSquared, firstorder_Skewness, firstorder_TotalEnergy, firstorder_Uniformity, firstorder_Variance, glcm_Autocorrelation, glcm_ClusterProminence, glcm_ClusterShade, glcm_ClusterTendency, glcm_Contrast, glcm_Correlation, glcm_DifferenceAverage, glcm_DifferenceEntropy, glcm_DifferenceVariance, glcm_Id, glcm_Idm, glcm_Idmn, glcm_Idn, glcm_Imc1, glcm_Imc2, glcm_InverseVariance, glcm_JointAverage, glcm_JointEnergy, glcm_JointEntropy, glcm_MCC, glcm_MaximumProbability, glcm_SumAverage, glcm_SumEntropy, glcm_SumSquares, target_regresion
+
+
+
+
+Ir a la carpeta class, reg o cnn, dentro de este mismo repositorio
+
