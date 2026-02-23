@@ -6,9 +6,14 @@
 ![GitHub Stars](https://img.shields.io/github/stars/JesusOmarDev1/Lymph-Node)
 ![GitHub Issues](https://img.shields.io/github/issues/JesusOmarDev1/Lymph-Node)
 
-# Lymph-Node
+# NodeQuant AI
 
-NodeQuant AI
+Mediastinal-Lymph-Node-SEG | Mediastinal Lymph Node Quantification (LNQ): Segmentation of Heterogeneous CT Data
+
+https://www.cancerimagingarchive.net/collection/mediastinal-lymph-node-seg/
+
+Idris, T., Somarouthu, S., Jacene, H., LaCasce, A., Ziegler, E., Pieper, S., Khajavi, R., Dorent, R., Pujol, S., Kikinis, R., & Harris, G. (2024). Mediastinal Lymph Node Quantification (LNQ): Segmentation of Heterogeneous CT Data (Version 1) [Data set]. The Cancer Imaging Archive. https://doi.org/10.7937/QVAZ-JA09
+
 
 ---
 
