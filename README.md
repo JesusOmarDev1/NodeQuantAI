@@ -8,20 +8,20 @@
 
 # Lymph-Node
 
-Sistema de segmentación volumétrica de ganglios linfáticos mediastínicos en tomografías computarizadas mediante una arquitectura **3D Attention U‑Net**, con análisis radiómico, clasificación automática y dashboard interactivo.
+NodeQuant AI
 
 ---
 
 ## 📌 Descripción
 
-Este proyecto utiliza inteligencia artificial para segmentar automáticamente ganglios linfáticos mediastínicos en tomografías computarizadas (TC). Emplea una red 3D Attention U‑Net para procesar volúmenes de TC completos y generar máscaras de segmentación. A partir de estas segmentaciones se calcula el volumen de los ganglios, se extraen características radiómicas, se realiza clasificación (Normal / Sospechoso) y se visualiza todo en un dashboard interactivo.
+Desarrollar una plataforma analítica inteligente para el soporte a decisiones clínicas en oncología, capaz de cuantificar biomarcadores de tomografías computarizadas de nodos linfáticos mediante radiómica avanzada y predecir el riesgo de adenopatías mediastínicas a través de modelos de clasificación y regresión integrados en un dashboard interactivo.
 
 ---
 
 ## 🧠 Características principales
 
-- Segmentación 3D automática de ganglios linfáticos mediastínicos.
-- Arquitectura **Attention U‑Net 3D** para detección robusta en volúmenes heterogéneos.
+- Segmentación 3D automática de ganglios linfáticos mediastínicos (opcional).
+- Arquitectura Attention U‑Net 3D para detección robusta en volúmenes heterogéneos (opcional).
 - Cálculo automático de volumen ganglionar en mm³.
 - Extracción de características radiómicas para análisis secundario.
 - Clasificación binaria (Normal / Sospechoso) mediante modelos de ML.
@@ -30,12 +30,6 @@ Este proyecto utiliza inteligencia artificial para segmentar automáticamente ga
 ---
 
 ## 📁 Estructura del repositorio
-
-- `descargar_data_completa.py` — Organiza o descarga el dataset.
-- `convertir_dcm_niigz.py` — Convierte DICOM a volumétrico.
-- `alinear_mascaras.py` — Ajusta y prepara máscaras 3D.
-- `pipeline/` — Flujo de procesamiento, entrenamiento e inferencia.
-- Referencias de dataset de ganglios para entrenamiento y evaluación.
 
 ---
 
