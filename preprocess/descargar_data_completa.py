@@ -2,7 +2,7 @@ from tcia_utils import nbia
 import time
 
 # Reemplaza con la ruta real de tu archivo .tcia
-archivo_manifiesto = r"C:\Users\omar\OneDrive\Escritorio\Lymph-Node\Mediastinal-Lymph-Node-SEG-DA-RAD.tcia"
+archivo_manifiesto = r"C:\Users\korev\Downloads\Mediastinal-Lymph-Node-SEG-DA-RAD.tcia"
 nombre_coleccion = "Mediastinal-Lymph-Node-SEG"
 carpeta_destino = './Mediastinal_Data'
 
@@ -28,4 +28,4 @@ while True:
 
 print("Descarga completa.")
 
-print(f"\n¡Descarga completada! Revisa la carpeta '{carpeta_destino}'.")
+print("\n¡Descarga completada! Revisa la carpeta 'Mediastinal_Data'.")

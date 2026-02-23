@@ -3,10 +3,10 @@ import os
 
 # 1. DÓNDE ESTÁN TUS DATOS AHORA (La carpeta con números raros)
 # Asegúrate de que este nombre coincida con tu carpeta de descarga
-carpeta_origen = ".\Mediastinal_Data"
+carpeta_origen = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Mediastinal_Data_Sample"
 
 # 2. DÓNDE QUIERES QUE APAREZCAN LOS NIFTI
-carpeta_destino = ".\Dataset_Entrenamiento"
+carpeta_destino = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_NIFIT"
 
 if not os.path.exists(carpeta_destino):
     os.makedirs(carpeta_destino)
@@ -53,4 +53,4 @@ for root, dirs, files in os.walk(carpeta_origen):
     except Exception as e:
         print(f"    [Error] No se pudo convertir: {e}")
 
-print("\n¡Conversión terminada! AHORA SÍ revisa la carpeta 'Dataset_Entrenamiento'.")
+print("\n¡Conversión terminada! AHORA SÍ revisa la carpeta 'Dataset_NIFIT'.")
