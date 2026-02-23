@@ -1,7 +1,0 @@
-Todo se ejecutará en Python 3.11
-
-Pipeline:
-1. Extraer caracteristicas radiomicas
-2. Preparar datos limpios para la carpeta /db
-3. Entrenar modelos de regression y gurdarlos
-4. Prediccion de volumen de ganglios de casos nuevos u omitidos antes del entrenamiento
