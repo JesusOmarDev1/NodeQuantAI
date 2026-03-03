@@ -70,7 +70,13 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
 # EJECUCIÓN
 # ==========================================
 if __name__ == "__main__":
-    carpeta_preprocesada = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_Preprocesado"
-    csv_salida = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\ganglios_radiomica.csv"
+    # Raíz del proyecto (Lymph-Node/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+    # Carpeta con los NIfTI resampleados a 1×1×1 mm (entrada para PyRadiomics)
+    carpeta_preprocesada = os.path.join(base_dir, "Dataset_Preprocesado")
+
+    # CSV de salida con las 57 features radiómicas por paciente
+    csv_salida = os.path.join(base_dir, "db", "ganglios_radiomica.csv")
 
     extraer_radiomica(carpeta_preprocesada, csv_salida)

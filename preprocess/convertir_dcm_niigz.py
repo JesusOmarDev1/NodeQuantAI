@@ -1,12 +1,14 @@
 import SimpleITK as sitk
 import os
 
-# 1. DÓNDE ESTÁN TUS DATOS AHORA (La carpeta con números raros)
-# Asegúrate de que este nombre coincida con tu carpeta de descarga
-carpeta_origen = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Mediastinal_Data_Sample"
+# Raíz del proyecto (Lymph-Node/)
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-# 2. DÓNDE QUIERES QUE APAREZCAN LOS NIFTI
-carpeta_destino = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_NIFIT"
+# 1. Carpeta con los DICOM crudos descargados desde TCIA
+carpeta_origen = os.path.join(base_dir, "Mediastinal_Data")
+
+# 2. Carpeta destino donde se guardan los NIfTI convertidos (image.nii.gz + mask.nii.gz por paciente)
+carpeta_destino = os.path.join(base_dir, "Dataset_NIFIT")
 
 if not os.path.exists(carpeta_destino):
     os.makedirs(carpeta_destino)
@@ -53,4 +55,4 @@ for root, dirs, files in os.walk(carpeta_origen):
     except Exception as e:
         print(f"    [Error] No se pudo convertir: {e}")
 
-print("\n¡Conversión terminada! AHORA SÍ revisa la carpeta 'Dataset_NIFIT'.")
+print("\n¡Conversión terminada! AHORA SÍ revisa la carpeta 'Dataset_Entrenamiento'.")

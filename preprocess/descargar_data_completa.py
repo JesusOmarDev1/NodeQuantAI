@@ -1,10 +1,15 @@
 from tcia_utils import nbia
 import time
+import os
 
-# Reemplaza con la ruta real de tu archivo .tcia
-archivo_manifiesto = r"C:\Users\korev\Downloads\Mediastinal-Lymph-Node-SEG-DA-RAD.tcia"
+# Raíz del proyecto (Lymph-Node/)
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Archivo manifiesto TCIA (.tcia) ubicado en preprocess/
+archivo_manifiesto = os.path.join(base_dir, "preprocess", "Mediastinal-Lymph-Node-SEG-DA-RAD.tcia")
 nombre_coleccion = "Mediastinal-Lymph-Node-SEG"
-carpeta_destino = './Mediastinal_Data'
+# Carpeta donde se descargan los DICOM crudos desde TCIA
+carpeta_destino = os.path.join(base_dir, "Mediastinal_Data")
 
 # Obtenemos la lista total de series
 todas_las_series = nbia.getSeries(collection=nombre_coleccion)

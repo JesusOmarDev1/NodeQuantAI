@@ -37,8 +37,8 @@ def resamplear_isotropico(imagen, es_mascara=False, espaciado_objetivo=(1.0, 1.0
 
 
 # --- EJECUCIÓN DEL PIPELINE ---
-carpeta_origen = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_NIFIT"
-carpeta_salida = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_Preprocesado" # Carpeta lista para PyTorch
+carpeta_origen = r"C:\Users\omar\OneDrive\Escritorio\Lymph-Node\Dataset_NIFIT"
+carpeta_salida = r"C:\Users\omar\OneDrive\Escritorio\Lymph-Node\Dataset_Preprocesado" # Carpeta lista para PyTorch
 
 if not os.path.exists(carpeta_salida):
     os.makedirs(carpeta_salida)

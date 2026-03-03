@@ -2,7 +2,7 @@ import SimpleITK as sitk
 import os
 
 # Apuntamos a la carpeta donde ya tienes tus NIfTIs generados
-carpeta_dataset = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_NIFIT"
+carpeta_dataset = r"C:\Users\omar\OneDrive\Escritorio\Lymph-Node\Dataset_NIFIT"
 
 print("Iniciando alineación espacial (Resampling)...")
 

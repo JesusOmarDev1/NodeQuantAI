@@ -14,7 +14,7 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 import matplotlib
-matplotlib.use("TkAgg") # Para evitar errores de backend en algunos sistemas
+matplotlib.use("TkAgg") # Para evitar errores
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -193,9 +193,11 @@ def ejecutar_evaluacion():
     df = pd.read_csv(RUTA_CSV)
     X = df.drop(columns=["Paciente_ID"] + COLS_TARGET)
     N = df.shape[0]
-    print(f"Dataset: {N} muestras × {X.shape[1]} features")
-    print(f"Fuente: ganglios_regresion.csv")
-    print(f"Validación: Nested LOO-CV (outer LOO={N} folds, inner GridSearchCV LOO={N-1} folds)\n")
+    print("\n" + "═" * 80)
+    print(f"EVALUACIÓN DE MODELOS DE REGRESIÓN")
+    print("═" * 80)
+    print(f"  Dataset: {N} muestras × {X.shape[1]} features | Validación: Nested LOO-CV")
+    print()
 
     loo = LeaveOneOut()
     todos = {}
@@ -210,12 +212,9 @@ def ejecutar_evaluacion():
 
         modelos = definir_modelos(mejor_feat)
 
-        print("=" * 80)
-        print(f"TARGET: {t['nombre']} ({u})")
-        print(f"  Rango: {y.min():.2f} — {y.max():.2f}  |  Media: {y.mean():.2f} {u}")
-        print(f"  Mejor feature simple: '{mejor_feat}' (|r| = {corr[mejor_feat]:.4f})")
-        print(f"  Modelos: {len(modelos)} | Grids: {sum(1 for v in modelos.values() if v['params'])} con tuning")
-        print("-" * 80)
+        print(f"\n▶ {t['nombre']} ({u})")
+        print(f"  Rango: {y.min():.2f} – {y.max():.2f} mm | Media: {y.mean():.2f} {u} | Mejor feature: {mejor_feat} (r={corr[mejor_feat]:.3f})")
+        print()
 
         resultados = []
         for nombre, cfg in modelos.items():
@@ -252,13 +251,7 @@ def ejecutar_evaluacion():
                 m = calcular_metricas(y, y_pred)
                 resultados.append({"Modelo": nombre, **m})
 
-                if mejores_params:
-                    freq = _params_mas_frecuentes(mejores_params)
-                    print(f"  {nombre:18s} | R²={m['R²']:>8.4f} | MAE={m['MAE']:>10.2f} {u}"
-                          f" | MAPE={m['MAPE %']:>7.2f}% | Best: {freq}")
-                else:
-                    print(f"  {nombre:18s} | R²={m['R²']:>8.4f} | MAE={m['MAE']:>10.2f} {u}"
-                          f" | MAPE={m['MAPE %']:>7.2f}%")
+                pass  # No print individual, mostrar tabla después
 
             except Exception as e:
                 print(f"  {nombre:18s} | ERROR: {e}")
@@ -268,16 +261,18 @@ def ejecutar_evaluacion():
                     "MaxErr": np.nan, "MAPE %": np.nan, "EVS": np.nan,
                 })
 
-        # Tabla
+        # Tabla compacta
         df_res = pd.DataFrame(resultados).sort_values("MAE")
-        print(f"\n  Tabla ({t['nombre']}, ordenada por MAE):")
-        print(df_res.to_string(index=False))
+        print(f"\n  {'Modelo':<18} {'R²':>8} {'MAE':>12} {'MAPE':>8}")
+        print("  " + "=" * 50)
+        for idx, row in df_res.iterrows():
+            if pd.notna(row["MAE"]):
+                print(f"  {row['Modelo']:<18} {row['R²']:>8.3f} {row['MAE']:>10.1f} {u:>2} {row['MAPE %']:>7.1f}%")
 
         validos = [r for r in resultados if not np.isnan(r["MAE"])]
         if validos:
             mejor = min(validos, key=lambda r: r["MAE"])
-            print(f"\n  MEJOR: {mejor['Modelo']} — MAE={mejor['MAE']:.2f} {u}, "
-                  f"R²={mejor['R²']:.4f}, MAPE={mejor['MAPE %']:.2f}%")
+            print(f"\n  ✓ Mejor: {mejor['Modelo']} | MAE={mejor['MAE']:.1f} {u} | R²={mejor['R²']:.3f} | MAPE={mejor['MAPE %']:.1f}%")
 
         todos[t["slug"]] = {"cfg": t, "resultados": resultados, "df": df_res}
         print()
@@ -291,7 +286,8 @@ def ejecutar_evaluacion():
     df_all = pd.concat(frames, ignore_index=True)
     csv_path = os.path.join(CARPETA_METRICAS, "comparativa_general.csv")
     df_all.to_csv(csv_path, index=False)
-    print(f"Guardado: metrics/comparativa_general.csv ({len(df_all)} filas)")
+    print(f"\nResultados: metrics/comparativa_general.csv")
+    print("═" * 80)
 
     return todos
 
@@ -387,28 +383,23 @@ def generar_graficas(todos):
     ax2.set_yticklabels(ax2.get_yticklabels(), rotation=0, fontsize=10)
     fig2.tight_layout()
 
-    print("\nMostrando 2 gráficas. Cierra las ventanas para terminar.")
+    print("\nMostrando gráficas interactivas...\n")
     plt.show()
 
 
 # ── Glosario ──
 def imprimir_glosario():
-    print("\n" + "=" * 80)
-    print("GLOSARIO DE MÉTRICAS")
-    print("=" * 80)
-    print("""
-  MAE    Error Absoluto Medio. Promedio de |real - pred|. [0,∞) Menor=mejor.
-  MSE    Error Cuadrático Medio. Promedio de (real-pred)². [0,∞) Menor=mejor.
-  RMSE   √MSE. Misma unidad que el target. [0,∞) Menor=mejor.
-  R²     Varianza explicada. 1=perfecto, 0=media, <0=peor. (-∞,1] Mayor=mejor.
-  MedAE  Mediana del error absoluto. Robusto a outliers. [0,∞) Menor=mejor.
-  MaxErr Peor predicción individual. [0,∞) Menor=mejor.
-  MAPE   Error porcentual medio. [0,∞) Menor=mejor.
-  EVS    Varianza explicada (sin penalizar bias). (-∞,1] Mayor=mejor.
-  GridSearchCV  Búsqueda exhaustiva de hiperparámetros por validación cruzada.
-  Nested CV     CV externo (evaluación) + CV interno (tuning) → sin data leakage.
-  Pipeline      StandardScaler + Modelo encapsulados para evitar leakage en CV.
-""")
+    print("\nGLOSARIO DE MÉTRICAS:")
+    print("━" * 80)
+    metricas = [
+        ("R²", "Varianza explicada: 1=perfecto, >0=bueno, ≤0=malo"),
+        ("MAE", "Error absoluto medio (mismas unidades que el target)"),
+        ("RMSE", "Raíz del error cuadrático medio"),
+        ("MAPE", "Error porcentual medio (%)"),
+    ]
+    for metrica, desc in metricas:
+        print(f"  {metrica:6s} → {desc}")
+    print()
 
 
 # ============================================================

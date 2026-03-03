@@ -47,8 +47,28 @@ def auditar_resampling(ruta_original, ruta_preprocesada):
     plt.tight_layout()
     plt.show()
 
-# --- USO ---
-carpeta_orig = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_NIFIT\case_0626"
-carpeta_prep = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_Preprocesado\case_0626"
+if __name__ == "__main__":
+    # Raíz del proyecto (Lymph-Node/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-auditar_resampling(carpeta_orig, carpeta_prep)
+    # Carpeta con los NIfTI originales sin resampling
+    carpeta_nifit = os.path.join(base_dir, "Dataset_NIFIT")
+
+    # Carpeta con los NIfTI resampleados a 1×1×1 mm isotrópico
+    carpeta_preprocesado = os.path.join(base_dir, "Dataset_Preprocesado")
+
+    # ID del paciente a auditar (puedes cambiarlo o usar variable de entorno)
+    paciente = os.environ.get("PACIENTE_ID", "case_0093")
+    carpeta_orig = os.path.join(carpeta_nifit, paciente)
+    carpeta_prep = os.path.join(carpeta_preprocesado, paciente)
+
+    if not os.path.isdir(carpeta_orig):
+        candidatos = sorted([d for d in os.listdir(carpeta_nifit) if os.path.isdir(os.path.join(carpeta_nifit, d))])
+        if not candidatos:
+            raise FileNotFoundError(f"No se encontraron pacientes en: {carpeta_nifit}")
+        paciente = candidatos[0]
+        print(f"Paciente no encontrado. Usando {paciente}.")
+        carpeta_orig = os.path.join(carpeta_nifit, paciente)
+        carpeta_prep = os.path.join(carpeta_preprocesado, paciente)
+
+    auditar_resampling(carpeta_orig, carpeta_prep)

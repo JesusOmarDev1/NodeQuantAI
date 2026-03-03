@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -46,7 +47,10 @@ def entrenar_modelo():
         print("¡ADVERTENCIA! Entrenar 3D en CPU será extremadamente lento.")
 
     # Hiperparámetros
-    CARPETA_DATOS = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Dataset_Preprocesado"
+    # Raíz del proyecto (Lymph-Node/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    # Carpeta con los NIfTI resampleados a 1×1×1 mm (entrada para el entrenamiento de la CNN)
+    CARPETA_DATOS = os.path.join(base_dir, "Dataset_Preprocesado")
     TAMANO_PARCHE = (96, 96, 96)
     BATCH_SIZE = 2
     LEARNING_RATE = 1e-4

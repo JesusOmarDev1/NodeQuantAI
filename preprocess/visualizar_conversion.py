@@ -50,7 +50,22 @@ def visualizar_conversion(ruta_paciente):
 
     plt.show()
 
-# Carpeta del paciente
-carpeta_paciente = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_NIFIT\case_0093"
+if __name__ == "__main__":
+    # Raíz del proyecto (Lymph-Node/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-visualizar_conversion(carpeta_paciente)
+    # Carpeta con los NIfTI originales (CT + máscara alineada por paciente)
+    carpeta_dataset = os.path.join(base_dir, "Dataset_NIFIT")
+
+    # ID del paciente a visualizar (puedes cambiarlo o usar variable de entorno)
+    paciente = os.environ.get("PACIENTE_ID", "case_0093")
+    carpeta_paciente = os.path.join(carpeta_dataset, paciente)
+
+    if not os.path.isdir(carpeta_paciente):
+        candidatos = sorted([d for d in os.listdir(carpeta_dataset) if os.path.isdir(os.path.join(carpeta_dataset, d))])
+        if not candidatos:
+            raise FileNotFoundError(f"No se encontraron pacientes en: {carpeta_dataset}")
+        print(f"Paciente {paciente} no encontrado. Usando {candidatos[0]}.")
+        carpeta_paciente = os.path.join(carpeta_dataset, candidatos[0])
+
+    visualizar_conversion(carpeta_paciente)

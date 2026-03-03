@@ -49,11 +49,13 @@ env/
 Mediastinal_Data/
 **/DICOM/
 **/dicom/
+Dataset_NIFIT/
 
 # Volúmenes NIfTI procesados (grandes)
 Dataset_Entrenamiento/
 Dataset_Validacion/
 Dataset_Test/
+Dataset_Preprocesado/
 **/nifti/
 **/*.nii
 **/*.nii.gz

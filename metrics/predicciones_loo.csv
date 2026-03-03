@@ -1,0 +1,16 @@
+Paciente_ID,Target,Unidad,Real,Nivel_Real,Predicho,Nivel_Predicho,Error,Error %
+case_0093,Volumen Tumoral,mm³,17268.0,Medio-Alto,23559.91,Alto,6291.91,36.44
+case_0140,Volumen Tumoral,mm³,28505.0,Alto,9689.32,Moderado,18815.68,66.01
+case_0281,Volumen Tumoral,mm³,5547.0,Bajo,10483.74,Medio-Alto,4936.74,89.0
+case_0622,Volumen Tumoral,mm³,2468.0,Bajo,9895.98,Moderado,7427.98,300.97
+case_0626,Volumen Tumoral,mm³,10157.0,Moderado,2615.02,Bajo,7541.98,74.25
+case_0093,Diámetro Eje Corto,mm,32.11,Medio-Alto,56.51,Alto,24.4,76.0
+case_0140,Diámetro Eje Corto,mm,65.14,Alto,23.85,Moderado,41.29,63.39
+case_0281,Diámetro Eje Corto,mm,19.58,Bajo,34.37,Alto,14.79,75.53
+case_0622,Diámetro Eje Corto,mm,15.37,Bajo,35.23,Alto,19.85,129.14
+case_0626,Diámetro Eje Corto,mm,26.26,Moderado,8.02,Bajo,18.24,69.46
+case_0093,Diámetro Eje Largo,mm,98.45,Medio-Alto,119.8,Alto,21.35,21.69
+case_0140,Diámetro Eje Largo,mm,113.77,Alto,75.13,Medio-Alto,38.64,33.97
+case_0281,Diámetro Eje Largo,mm,27.98,Bajo,21.09,Bajo,6.9,24.65
+case_0622,Diámetro Eje Largo,mm,20.0,Bajo,33.96,Medio-Alto,13.96,69.79
+case_0626,Diámetro Eje Largo,mm,32.44,Moderado,28.76,Moderado,3.67,11.32

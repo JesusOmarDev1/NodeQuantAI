@@ -66,7 +66,10 @@ class GangliosDataset3D(Dataset):
 # ==========================================
 if __name__ == "__main__":
     # 1. Rutas y configuración
-    carpeta_preprocesada = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_Preprocesado"
+    # Raíz del proyecto (Lymph-Node/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    # Carpeta con los NIfTI resampleados a 1×1×1 mm (CT + máscara por paciente)
+    carpeta_preprocesada = os.path.join(base_dir, "Dataset_Preprocesado")
     tamano_parche = (96, 96, 96)  # Tamaño del cubo 3D
     tamano_batch = 2  # Cuántos cubos procesar al mismo tiempo
 
