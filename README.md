@@ -14,7 +14,6 @@ https://www.cancerimagingarchive.net/collection/mediastinal-lymph-node-seg/
 
 Idris, T., Somarouthu, S., Jacene, H., LaCasce, A., Ziegler, E., Pieper, S., Khajavi, R., Dorent, R., Pujol, S., Kikinis, R., & Harris, G. (2024). Mediastinal Lymph Node Quantification (LNQ): Segmentation of Heterogeneous CT Data (Version 1) [Data set]. The Cancer Imaging Archive. https://doi.org/10.7937/QVAZ-JA09
 
-
 ---
 
 ## 📌 Descripción
@@ -96,7 +95,9 @@ Si utilizas un administrador de paquetes de python puedes usar el comando "py"
 
 ```bash
 py -3.11 -m venv .venv # Configura un entorno virtual con Python 3.11
-.\.venv\Scripts\Activate.ps1 # Activa el entorno virtual (PowerShell)
+.\.venv11\Scripts\Activate.ps1 # Activa el entorno virtual (PowerShell)
+py -3.9 -m venv .venv9 # Configura un entorno virtual con Python 3.9
+.\.venv9\Scripts\Activate.ps1 # Activa el entorno virtual (PowerShell)
 ```
 
 ## 📚 Documentación Completa
