@@ -130,3 +130,14 @@ secrets.yaml
 
 # Workflows y acciones de GitHub (opcional, mantener o eliminar)
 .github/
+
+# Carpetas
+Code/
+Mediastinal_Data_Sample/
+Dataset_NIFIT/
+Dataset_Preprocesado/
+
+# Archivos
+.Mediastinal-Lymph-Node-SEG-DA-RAD-nbia-digest.xlsx
+.Mediastinal-Lymph-Node-SEG-VER1-CLINICAL-1.csv
+
