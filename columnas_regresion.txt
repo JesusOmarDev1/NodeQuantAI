@@ -1,0 +1,9 @@
+COLUMNAS REGRESIÓN
+
+# Target: Volumen de vóxeles
+y = df['shape_VoxelVolume']
+
+# Filtramos para quedarnos solo con First Order y GLCM
+# Eliminamos todas las columnas de shape, ID, shape_VoxelVolume y target_riesgo
+X = df.drop(columns='Paciente_ID', 'shape_VoxelVolume', 'target_riesgo')
+X = X_regresion.loc[:, ~X_regresion.columns.str.startswith('shape_')]
