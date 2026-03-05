@@ -1,7 +1,0 @@
-COLUMNAS CLASIFICACIÓN
-
-# Target: Nivel de riesgo (0, 1, 2, 3)
-y_clasif = df['target_riesgo']
-
-# Eliminamos todas las columnas de shape, ID, shape_VoxelVolume y target_riesgo
-X_clasif = df.drop(columns='Paciente_ID', 'shape_VoxelVolume', 'target_riesgo', 'shape_MinorAxisLength')
