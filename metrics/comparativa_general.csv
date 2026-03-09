@@ -1,37 +1,37 @@
-Target,Modelo,MAE,MSE,RMSE,R²,MedAE,MaxErr,MAPE %,EVS
-Volumen Tumoral,Reg. Simple,2954.28,10783041.19,3283.75,0.8755,2766.62,5373.9,46.63,0.8765
-Volumen Tumoral,Polinomica,3729.32,35315721.34,5942.7,0.5922,1084.95,12298.65,21.64,0.6127
-Volumen Tumoral,Random Forest,6608.68,64567344.48,8035.38,0.2543,4476.1,15343.81,89.61,0.2603
-Volumen Tumoral,KNN,7215.98,63848938.05,7990.55,0.2626,6562.06,13312.06,100.86,0.2688
-Volumen Tumoral,Arbol Decision,7417.3,65764877.05,8109.55,0.2405,6149.5,11237.0,87.74,0.2473
-Volumen Tumoral,Gradient Boost,7743.2,68962493.94,8304.37,0.2036,6141.07,11871.27,88.89,0.2099
-Volumen Tumoral,Ridge,7775.33,83636452.18,9145.3,0.0341,7863.83,15593.89,105.26,0.0471
-Volumen Tumoral,SVR,8176.17,104731074.79,10233.82,-0.2095,6484.96,18916.85,119.04,-0.169
-Volumen Tumoral,XGBoost,9695.43,148158692.57,12172.05,-0.711,6925.73,22958.0,143.65,-0.708
-Volumen Tumoral,ElasticNet,10348.69,160217124.38,12657.69,-0.8503,6357.11,20845.54,99.99,-0.85
-Volumen Tumoral,Reg. Multiple,12509.89,231740155.06,15223.01,-1.6763,7856.25,25576.37,124.02,-1.6735
-Volumen Tumoral,Lasso,23645.67,1099052290.16,33151.96,-11.6926,8052.79,65810.05,188.9,-11.0194
-Diámetro Eje Corto,Polinomica,6.32,52.23,7.23,0.8327,8.41,9.65,23.88,0.8372
-Diámetro Eje Corto,Reg. Simple,10.04,174.5,13.21,0.4412,8.94,23.85,26.65,0.4715
-Diámetro Eje Corto,Random Forest,15.41,380.87,19.52,-0.2197,10.04,37.36,46.24,-0.2139
-Diámetro Eje Corto,KNN,15.86,376.08,19.39,-0.2043,11.96,34.74,50.14,-0.2029
-Diámetro Eje Corto,Arbol Decision,16.72,463.42,21.53,-0.484,8.78,33.03,48.47,-0.484
-Diámetro Eje Corto,Ridge,17.62,491.22,22.16,-0.5731,12.32,37.59,55.05,-0.5561
-Diámetro Eje Corto,Gradient Boost,18.49,472.97,21.75,-0.5146,10.98,34.65,58.82,-0.506
-Diámetro Eje Corto,XGBoost,18.62,542.16,23.28,-0.7362,12.7,45.56,60.87,-0.7357
-Diámetro Eje Corto,SVR,21.78,793.31,28.17,-1.5404,9.61,49.33,66.03,-1.4868
-Diámetro Eje Corto,Lasso,22.4,621.91,24.94,-0.9916,17.31,41.81,73.41,-0.9865
-Diámetro Eje Corto,ElasticNet,24.03,834.94,28.9,-1.6738,13.59,48.37,76.39,-1.6355
-Diámetro Eje Corto,Reg. Multiple,25.03,1019.74,31.93,-2.2655,14.36,51.98,74.58,-2.2641
-Diámetro Eje Largo,Reg. Simple,3.69,17.71,4.21,0.9886,3.04,6.17,11.83,0.9886
-Diámetro Eje Largo,Gradient Boost,11.05,188.4,13.73,0.8783,8.68,26.76,21.87,0.8816
-Diámetro Eje Largo,Polinomica,11.54,210.73,14.52,0.8639,7.56,28.01,37.24,0.9108
-Diámetro Eje Largo,Lasso,11.61,183.91,13.56,0.8812,8.55,21.33,30.89,0.9136
-Diámetro Eje Largo,ElasticNet,13.86,376.35,19.4,0.757,4.11,32.21,18.39,0.7574
-Diámetro Eje Largo,Reg. Multiple,14.54,375.52,19.38,0.7575,5.4,32.81,21.13,0.7589
-Diámetro Eje Largo,KNN,19.36,637.42,25.25,0.5884,10.43,48.33,32.21,0.7373
-Diámetro Eje Largo,Ridge,20.17,507.93,22.54,0.672,20.43,33.04,44.25,0.7213
-Diámetro Eje Largo,Random Forest,20.31,641.76,25.33,0.5856,16.47,48.6,45.15,0.5973
-Diámetro Eje Largo,SVR,22.4,1179.51,34.34,0.2383,3.14,66.19,25.22,0.5121
-Diámetro Eje Largo,Arbol Decision,23.86,1479.01,38.46,0.0449,10.21,83.56,34.48,0.1652
-Diámetro Eje Largo,XGBoost,38.04,2482.38,49.82,-0.603,24.19,85.73,74.27,-0.5714
+Target,Modelo,MAE,MSE,RMSE,R²,MedAE,MaxErr,MAPE %,EVS,Train_MAE,Gap_%,Best_Params,Overfitting
+Volumen Tumoral,Polinomica,5320.17,176400078.19,13281.57,0.7871,2339.83,156202.61,64.38,0.7878,2424.88,56.95,"alpha=10.0, degree=2",OVERFITTING
+Volumen Tumoral,Random Forest,6252.58,186796326.8,13667.35,0.7745,3002.46,122692.63,69.53,0.7746,5377.85,14.84,"max_depth=3, min_samples_leaf=8, n_estimators=100",OK
+Volumen Tumoral,XGBoost,7091.35,179278438.96,13389.49,0.7836,3475.41,105555.61,82.17,0.7836,6040.82,17.01,"learning_rate=0.3, max_depth=1, min_child_weight=10, n_estimators=50, reg_alpha=5, reg_lambda=10",OVERFITTING
+Volumen Tumoral,Arbol Decision,7521.91,195292419.95,13974.71,0.7643,3662.28,106215.13,79.53,0.7643,7166.07,10.76,"max_depth=3, min_samples_leaf=16",OK
+Volumen Tumoral,Ridge,7602.43,170167737.26,13044.84,0.7946,4740.76,140000.96,128.0,0.7946,7135.86,7.57,alpha=10.0,OK
+Volumen Tumoral,ElasticNet,7676.19,174463157.39,13208.45,0.7894,4746.49,138407.03,130.28,0.7894,7218.24,7.14,"alpha=0.1, l1_ratio=0.5",OK
+Volumen Tumoral,Lasso,7806.52,170610196.5,13061.78,0.7941,4959.65,135398.19,143.04,0.7941,7092.66,10.94,alpha=10.0,OK
+Volumen Tumoral,Gradient Boost,7928.23,215677114.04,14685.95,0.7397,4204.49,113542.47,98.92,0.7397,7307.84,10.17,"learning_rate=0.3, max_depth=1, min_samples_leaf=16, min_samples_split=15, n_estimators=15",OK
+Volumen Tumoral,Reg. Multiple,8190.28,181239334.46,13462.52,0.7812,5281.45,134500.86,157.06,0.7812,7133.19,14.5,,OK
+Volumen Tumoral,Reg. Simple,9044.75,318538655.06,17847.65,0.6155,4646.3,175612.3,104.28,0.6155,8941.99,1.24,,OK
+Volumen Tumoral,KNN,9171.95,303398493.34,17418.34,0.6338,4847.14,138589.02,102.65,0.6409,0.0,100.0,"n_neighbors=15, p=2, weights=distance",OVERFITTING
+Volumen Tumoral,SVR,13742.23,872102647.54,29531.38,-0.0526,5060.09,211662.44,112.26,0.0649,13698.21,0.34,"C=1, epsilon=1.0, kernel=linear",OK
+Diámetro Eje Corto,Random Forest,10.32,233.34,15.28,0.6128,6.55,78.76,31.71,0.6128,8.78,15.35,"max_depth=3, min_samples_leaf=8, n_estimators=50",OVERFITTING
+Diámetro Eje Corto,XGBoost,10.78,226.05,15.03,0.6249,7.57,76.8,33.94,0.625,9.21,15.7,"learning_rate=0.3, max_depth=1, min_child_weight=10, n_estimators=50, reg_alpha=5, reg_lambda=10",OVERFITTING
+Diámetro Eje Corto,Gradient Boost,11.13,249.71,15.8,0.5857,7.58,77.55,34.5,0.5857,10.04,11.19,"learning_rate=0.3, max_depth=1, min_samples_leaf=32, min_samples_split=15, n_estimators=25",OK
+Diámetro Eje Corto,Arbol Decision,11.28,276.28,16.62,0.5416,7.01,81.04,34.92,0.5418,9.8,16.42,"max_depth=3, min_samples_leaf=16",OVERFITTING
+Diámetro Eje Corto,Polinomica,11.38,334.78,18.3,0.4445,7.37,207.77,37.63,0.4449,8.91,23.37,"alpha=100.0, degree=2",OVERFITTING
+Diámetro Eje Corto,SVR,11.44,312.25,17.67,0.4819,6.45,81.84,31.57,0.4996,10.73,6.63,"C=1, epsilon=1.0, kernel=linear",OK
+Diámetro Eje Corto,Ridge,11.87,271.9,16.49,0.5489,8.79,98.74,40.01,0.5489,10.85,8.85,alpha=1.0,OK
+Diámetro Eje Corto,ElasticNet,11.9,272.65,16.51,0.5476,8.56,97.03,40.04,0.5476,10.88,8.83,"alpha=0.01, l1_ratio=0.8",OK
+Diámetro Eje Corto,Lasso,11.92,272.4,16.5,0.548,8.54,99.12,40.26,0.5481,10.93,9.04,alpha=0.01,OK
+Diámetro Eje Corto,Reg. Multiple,12.08,276.36,16.62,0.5415,9.06,105.8,42.19,0.5415,10.66,12.52,,OK
+Diámetro Eje Corto,KNN,12.58,299.78,17.31,0.5026,9.08,79.25,42.19,0.5033,0.0,100.0,"n_neighbors=15, p=2, weights=distance",OVERFITTING
+Diámetro Eje Corto,Reg. Simple,14.79,416.45,20.41,0.309,10.46,77.91,47.62,0.309,14.73,0.46,,OK
+Diámetro Eje Largo,XGBoost,26.55,1300.76,36.07,0.4577,19.51,138.64,50.87,0.4578,23.51,12.2,"learning_rate=0.3, max_depth=1, min_child_weight=30, n_estimators=50, reg_alpha=10, reg_lambda=10",OK
+Diámetro Eje Largo,Gradient Boost,26.97,1332.25,36.5,0.4446,19.59,134.73,52.07,0.4446,24.55,9.83,"learning_rate=0.3, max_depth=1, min_samples_leaf=32, min_samples_split=15, n_estimators=25",OK
+Diámetro Eje Largo,Random Forest,27.73,1398.81,37.4,0.4169,19.52,142.9,55.01,0.4169,24.29,12.68,"max_depth=3, min_samples_leaf=8, n_estimators=50",OK
+Diámetro Eje Largo,SVR,28.44,1589.53,39.87,0.3374,19.88,147.29,47.43,0.3676,26.81,6.01,"C=1, epsilon=0.1, kernel=linear",OK
+Diámetro Eje Largo,Arbol Decision,28.92,1591.67,39.9,0.3365,19.88,167.56,56.1,0.3365,25.93,13.41,"max_depth=3, min_samples_leaf=16",OK
+Diámetro Eje Largo,Lasso,28.98,1472.07,38.37,0.3863,22.55,156.63,58.99,0.3863,26.83,7.7,alpha=0.1,OK
+Diámetro Eje Largo,Ridge,29.05,1489.73,38.6,0.379,23.16,156.93,58.82,0.379,26.85,8.03,alpha=1.0,OK
+Diámetro Eje Largo,ElasticNet,29.07,1489.5,38.59,0.3791,23.09,165.91,58.85,0.3791,26.96,7.51,"alpha=0.01, l1_ratio=0.5",OK
+Diámetro Eje Largo,Reg. Multiple,29.1,1577.93,39.72,0.3422,22.72,286.17,59.78,0.3423,25.68,12.17,,OK
+Diámetro Eje Largo,Polinomica,31.1,1782.38,42.22,0.257,24.83,313.19,64.88,0.257,26.78,14.42,"alpha=1000.0, degree=2",OK
+Diámetro Eje Largo,KNN,31.28,1671.41,40.88,0.3032,24.44,151.59,67.47,0.3034,2.97,90.55,"n_neighbors=15, p=1, weights=distance",OVERFITTING
+Diámetro Eje Largo,Reg. Simple,33.19,1798.07,42.4,0.2504,27.14,151.69,70.19,0.2504,33.02,0.57,,OK
