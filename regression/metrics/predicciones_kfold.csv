@@ -1,0 +1,1525 @@
+Paciente_ID,Target,Unidad,Real,Nivel_Real,Predicho,Nivel_Predicho,Error,Error %
+case_0002,Volumen Tumoral,mm³,34790.0,Alto,35995.49,Alto,1205.49,3.47
+case_0005,Volumen Tumoral,mm³,13185.0,Medio-Alto,14574.81,Medio-Alto,1389.81,10.54
+case_0006,Volumen Tumoral,mm³,20001.0,Medio-Alto,24128.61,Alto,4127.61,20.64
+case_0009,Volumen Tumoral,mm³,17920.0,Medio-Alto,16394.81,Medio-Alto,1525.19,8.51
+case_0012,Volumen Tumoral,mm³,2679.0,Bajo,3097.47,Bajo,418.47,15.62
+case_0013,Volumen Tumoral,mm³,29889.0,Alto,28002.1,Alto,1886.9,6.31
+case_0015,Volumen Tumoral,mm³,45074.0,Alto,37877.72,Alto,7196.28,15.97
+case_0017,Volumen Tumoral,mm³,1929.0,Bajo,2873.14,Bajo,944.14,48.94
+case_0018,Volumen Tumoral,mm³,73959.0,Alto,84874.62,Alto,10915.62,14.76
+case_0021,Volumen Tumoral,mm³,36762.0,Alto,29853.4,Alto,6908.6,18.79
+case_0023,Volumen Tumoral,mm³,10994.0,Medio-Alto,13468.83,Medio-Alto,2474.83,22.51
+case_0024,Volumen Tumoral,mm³,7632.0,Moderado,7868.77,Moderado,236.77,3.1
+case_0026,Volumen Tumoral,mm³,3330.0,Bajo,3355.77,Bajo,25.77,0.77
+case_0029,Volumen Tumoral,mm³,9278.0,Medio-Alto,9814.81,Medio-Alto,536.81,5.79
+case_0030,Volumen Tumoral,mm³,60434.0,Alto,61760.43,Alto,1326.43,2.19
+case_0032,Volumen Tumoral,mm³,3936.0,Bajo,3610.84,Bajo,325.16,8.26
+case_0033,Volumen Tumoral,mm³,11249.0,Medio-Alto,10541.08,Medio-Alto,707.92,6.29
+case_0034,Volumen Tumoral,mm³,7494.0,Moderado,8908.99,Moderado,1414.99,18.88
+case_0035,Volumen Tumoral,mm³,10794.0,Medio-Alto,11944.69,Medio-Alto,1150.69,10.66
+case_0039,Volumen Tumoral,mm³,11079.0,Medio-Alto,11177.04,Medio-Alto,98.04,0.88
+case_0040,Volumen Tumoral,mm³,11918.0,Medio-Alto,10536.84,Medio-Alto,1381.16,11.59
+case_0042,Volumen Tumoral,mm³,693.0,Bajo,1005.25,Bajo,312.25,45.06
+case_0044,Volumen Tumoral,mm³,15260.0,Medio-Alto,15842.05,Medio-Alto,582.05,3.81
+case_0048,Volumen Tumoral,mm³,3611.0,Bajo,3198.07,Bajo,412.93,11.44
+case_0050,Volumen Tumoral,mm³,15683.0,Medio-Alto,19294.39,Medio-Alto,3611.39,23.03
+case_0052,Volumen Tumoral,mm³,64506.0,Alto,65542.49,Alto,1036.49,1.61
+case_0053,Volumen Tumoral,mm³,54945.0,Alto,55907.78,Alto,962.78,1.75
+case_0054,Volumen Tumoral,mm³,79290.0,Alto,58339.42,Alto,20950.58,26.42
+case_0055,Volumen Tumoral,mm³,4904.0,Moderado,4851.81,Moderado,52.19,1.06
+case_0057,Volumen Tumoral,mm³,3165.0,Bajo,3536.15,Bajo,371.15,11.73
+case_0058,Volumen Tumoral,mm³,10045.0,Medio-Alto,9790.55,Medio-Alto,254.45,2.53
+case_0061,Volumen Tumoral,mm³,21365.0,Alto,18038.54,Medio-Alto,3326.46,15.57
+case_0064,Volumen Tumoral,mm³,2652.0,Bajo,3101.73,Bajo,449.73,16.96
+case_0065,Volumen Tumoral,mm³,193074.0,Alto,125601.78,Alto,67472.22,34.95
+case_0068,Volumen Tumoral,mm³,2454.0,Bajo,2365.3,Bajo,88.7,3.61
+case_0069,Volumen Tumoral,mm³,5031.0,Moderado,5071.78,Moderado,40.78,0.81
+case_0074,Volumen Tumoral,mm³,25142.0,Alto,26390.8,Alto,1248.8,4.97
+case_0076,Volumen Tumoral,mm³,2808.0,Bajo,3100.08,Bajo,292.08,10.4
+case_0078,Volumen Tumoral,mm³,40998.0,Alto,39210.83,Alto,1787.17,4.36
+case_0088,Volumen Tumoral,mm³,3739.0,Bajo,3436.07,Bajo,302.93,8.1
+case_0089,Volumen Tumoral,mm³,18167.0,Medio-Alto,18229.09,Medio-Alto,62.09,0.34
+case_0092,Volumen Tumoral,mm³,7445.0,Moderado,7485.65,Moderado,40.65,0.55
+case_0093,Volumen Tumoral,mm³,17268.0,Medio-Alto,25585.13,Alto,8317.13,48.17
+case_0098,Volumen Tumoral,mm³,4341.0,Bajo,4750.14,Moderado,409.14,9.43
+case_0101,Volumen Tumoral,mm³,8988.0,Moderado,9078.56,Moderado,90.56,1.01
+case_0102,Volumen Tumoral,mm³,7203.0,Moderado,7996.16,Moderado,793.16,11.01
+case_0109,Volumen Tumoral,mm³,3951.0,Bajo,4012.79,Bajo,61.79,1.56
+case_0110,Volumen Tumoral,mm³,7497.0,Moderado,6639.16,Moderado,857.84,11.44
+case_0111,Volumen Tumoral,mm³,840.0,Bajo,1165.08,Bajo,325.08,38.7
+case_0112,Volumen Tumoral,mm³,96385.0,Alto,82673.82,Alto,13711.18,14.23
+case_0113,Volumen Tumoral,mm³,1413.0,Bajo,1485.54,Bajo,72.54,5.13
+case_0115,Volumen Tumoral,mm³,15699.0,Medio-Alto,15473.09,Medio-Alto,225.91,1.44
+case_0116,Volumen Tumoral,mm³,12854.0,Medio-Alto,13354.37,Medio-Alto,500.37,3.89
+case_0117,Volumen Tumoral,mm³,22029.0,Alto,22103.59,Alto,74.59,0.34
+case_0119,Volumen Tumoral,mm³,9245.0,Medio-Alto,8666.03,Moderado,578.97,6.26
+case_0124,Volumen Tumoral,mm³,70953.0,Alto,71569.51,Alto,616.51,0.87
+case_0125,Volumen Tumoral,mm³,42161.0,Alto,39051.08,Alto,3109.92,7.38
+case_0126,Volumen Tumoral,mm³,5571.0,Moderado,5632.19,Moderado,61.19,1.1
+case_0129,Volumen Tumoral,mm³,19989.0,Medio-Alto,19907.28,Medio-Alto,81.72,0.41
+case_0130,Volumen Tumoral,mm³,37280.0,Alto,43184.66,Alto,5904.66,15.84
+case_0131,Volumen Tumoral,mm³,30360.0,Alto,35313.37,Alto,4953.37,16.32
+case_0132,Volumen Tumoral,mm³,45940.0,Alto,44553.06,Alto,1386.94,3.02
+case_0136,Volumen Tumoral,mm³,17397.0,Medio-Alto,18201.24,Medio-Alto,804.24,4.62
+case_0140,Volumen Tumoral,mm³,28505.0,Alto,20545.45,Alto,7959.55,27.92
+case_0142,Volumen Tumoral,mm³,133096.0,Alto,133211.66,Alto,115.66,0.09
+case_0149,Volumen Tumoral,mm³,18657.0,Medio-Alto,17544.53,Medio-Alto,1112.47,5.96
+case_0150,Volumen Tumoral,mm³,1214.0,Bajo,1728.69,Bajo,514.69,42.4
+case_0152,Volumen Tumoral,mm³,5319.0,Moderado,5932.31,Moderado,613.31,11.53
+case_0155,Volumen Tumoral,mm³,6540.0,Moderado,4180.36,Bajo,2359.64,36.08
+case_0158,Volumen Tumoral,mm³,2742.0,Bajo,2779.25,Bajo,37.25,1.36
+case_0159,Volumen Tumoral,mm³,4818.0,Moderado,4674.92,Moderado,143.08,2.97
+case_0160,Volumen Tumoral,mm³,18693.0,Medio-Alto,10826.57,Medio-Alto,7866.43,42.08
+case_0164,Volumen Tumoral,mm³,40110.0,Alto,42863.84,Alto,2753.84,6.87
+case_0166,Volumen Tumoral,mm³,6778.0,Moderado,6592.29,Moderado,185.71,2.74
+case_0170,Volumen Tumoral,mm³,8565.0,Moderado,7698.24,Moderado,866.76,10.12
+case_0171,Volumen Tumoral,mm³,70545.0,Alto,69330.15,Alto,1214.85,1.72
+case_0175,Volumen Tumoral,mm³,9695.0,Medio-Alto,10035.85,Medio-Alto,340.85,3.52
+case_0177,Volumen Tumoral,mm³,3465.0,Bajo,3195.33,Bajo,269.67,7.78
+case_0178,Volumen Tumoral,mm³,17252.0,Medio-Alto,17850.51,Medio-Alto,598.51,3.47
+case_0180,Volumen Tumoral,mm³,66549.0,Alto,57863.97,Alto,8685.03,13.05
+case_0182,Volumen Tumoral,mm³,2591.0,Bajo,2613.81,Bajo,22.81,0.88
+case_0183,Volumen Tumoral,mm³,8838.0,Moderado,5314.55,Moderado,3523.45,39.87
+case_0187,Volumen Tumoral,mm³,5516.0,Moderado,5676.5,Moderado,160.5,2.91
+case_0188,Volumen Tumoral,mm³,46754.0,Alto,45991.14,Alto,762.86,1.63
+case_0189,Volumen Tumoral,mm³,2969.0,Bajo,2786.21,Bajo,182.79,6.16
+case_0191,Volumen Tumoral,mm³,2751.0,Bajo,3009.38,Bajo,258.38,9.39
+case_0193,Volumen Tumoral,mm³,3317.0,Bajo,2367.24,Bajo,949.76,28.63
+case_0194,Volumen Tumoral,mm³,8112.0,Moderado,8273.6,Moderado,161.6,1.99
+case_0197,Volumen Tumoral,mm³,28578.0,Alto,26236.0,Alto,2342.0,8.2
+case_0199,Volumen Tumoral,mm³,91063.0,Alto,95667.59,Alto,4604.59,5.06
+case_0201,Volumen Tumoral,mm³,115991.0,Alto,101377.57,Alto,14613.43,12.6
+case_0202,Volumen Tumoral,mm³,480.0,Bajo,969.78,Bajo,489.78,102.04
+case_0203,Volumen Tumoral,mm³,11787.0,Medio-Alto,15956.88,Medio-Alto,4169.88,35.38
+case_0204,Volumen Tumoral,mm³,10449.0,Medio-Alto,11290.58,Medio-Alto,841.58,8.05
+case_0206,Volumen Tumoral,mm³,17201.0,Medio-Alto,14660.05,Medio-Alto,2540.95,14.77
+case_0210,Volumen Tumoral,mm³,21960.0,Alto,23320.96,Alto,1360.96,6.2
+case_0216,Volumen Tumoral,mm³,6715.0,Moderado,7284.91,Moderado,569.91,8.49
+case_0219,Volumen Tumoral,mm³,11274.0,Medio-Alto,11116.8,Medio-Alto,157.2,1.39
+case_0222,Volumen Tumoral,mm³,6936.0,Moderado,9100.34,Moderado,2164.34,31.2
+case_0223,Volumen Tumoral,mm³,8763.0,Moderado,8806.92,Moderado,43.92,0.5
+case_0225,Volumen Tumoral,mm³,15062.0,Medio-Alto,18572.51,Medio-Alto,3510.51,23.31
+case_0227,Volumen Tumoral,mm³,7827.0,Moderado,7915.77,Moderado,88.77,1.13
+case_0228,Volumen Tumoral,mm³,65502.0,Alto,54384.5,Alto,11117.5,16.97
+case_0229,Volumen Tumoral,mm³,15552.0,Medio-Alto,19157.76,Medio-Alto,3605.76,23.19
+case_0230,Volumen Tumoral,mm³,121250.0,Alto,105340.5,Alto,15909.5,13.12
+case_0232,Volumen Tumoral,mm³,22388.0,Alto,19651.41,Medio-Alto,2736.59,12.22
+case_0236,Volumen Tumoral,mm³,11925.0,Medio-Alto,11602.47,Medio-Alto,322.53,2.7
+case_0238,Volumen Tumoral,mm³,6027.0,Moderado,5668.5,Moderado,358.5,5.95
+case_0239,Volumen Tumoral,mm³,14891.0,Medio-Alto,15163.59,Medio-Alto,272.59,1.83
+case_0240,Volumen Tumoral,mm³,50555.0,Alto,61809.55,Alto,11254.55,22.26
+case_0242,Volumen Tumoral,mm³,5706.0,Moderado,5018.6,Moderado,687.4,12.05
+case_0243,Volumen Tumoral,mm³,8191.0,Moderado,5364.11,Moderado,2826.89,34.51
+case_0244,Volumen Tumoral,mm³,11054.0,Medio-Alto,9908.94,Medio-Alto,1145.06,10.36
+case_0246,Volumen Tumoral,mm³,7050.0,Moderado,7082.34,Moderado,32.34,0.46
+case_0247,Volumen Tumoral,mm³,10156.0,Medio-Alto,10253.71,Medio-Alto,97.71,0.96
+case_0250,Volumen Tumoral,mm³,6891.0,Moderado,6784.53,Moderado,106.47,1.54
+case_0252,Volumen Tumoral,mm³,13678.0,Medio-Alto,13001.83,Medio-Alto,676.17,4.94
+case_0256,Volumen Tumoral,mm³,13551.0,Medio-Alto,13183.21,Medio-Alto,367.79,2.71
+case_0259,Volumen Tumoral,mm³,4026.0,Bajo,3901.06,Bajo,124.94,3.1
+case_0264,Volumen Tumoral,mm³,225877.0,Alto,146213.09,Alto,79663.91,35.27
+case_0267,Volumen Tumoral,mm³,27906.0,Alto,32773.46,Alto,4867.46,17.44
+case_0269,Volumen Tumoral,mm³,10451.0,Medio-Alto,10172.46,Medio-Alto,278.54,2.67
+case_0270,Volumen Tumoral,mm³,5142.0,Moderado,5019.73,Moderado,122.27,2.38
+case_0271,Volumen Tumoral,mm³,12908.0,Medio-Alto,13186.87,Medio-Alto,278.87,2.16
+case_0273,Volumen Tumoral,mm³,10488.0,Medio-Alto,11781.33,Medio-Alto,1293.33,12.33
+case_0278,Volumen Tumoral,mm³,16764.0,Medio-Alto,19416.2,Medio-Alto,2652.2,15.82
+case_0279,Volumen Tumoral,mm³,5118.0,Moderado,5572.02,Moderado,454.02,8.87
+case_0281,Volumen Tumoral,mm³,5547.0,Moderado,4835.73,Moderado,711.27,12.82
+case_0282,Volumen Tumoral,mm³,28040.0,Alto,26167.36,Alto,1872.64,6.68
+case_0283,Volumen Tumoral,mm³,5778.0,Moderado,5433.79,Moderado,344.21,5.96
+case_0286,Volumen Tumoral,mm³,125176.0,Alto,131585.78,Alto,6409.78,5.12
+case_0287,Volumen Tumoral,mm³,4008.0,Bajo,3779.33,Bajo,228.67,5.71
+case_0288,Volumen Tumoral,mm³,14064.0,Medio-Alto,12057.21,Medio-Alto,2006.79,14.27
+case_0292,Volumen Tumoral,mm³,14781.0,Medio-Alto,14828.08,Medio-Alto,47.08,0.32
+case_0295,Volumen Tumoral,mm³,5055.0,Moderado,5452.14,Moderado,397.14,7.86
+case_0296,Volumen Tumoral,mm³,90549.0,Alto,72588.06,Alto,17960.94,19.84
+case_0297,Volumen Tumoral,mm³,13868.0,Medio-Alto,13862.65,Medio-Alto,5.35,0.04
+case_0301,Volumen Tumoral,mm³,3525.0,Bajo,3637.62,Bajo,112.62,3.2
+case_0302,Volumen Tumoral,mm³,13302.0,Medio-Alto,12758.33,Medio-Alto,543.67,4.09
+case_0304,Volumen Tumoral,mm³,1380.0,Bajo,1327.58,Bajo,52.42,3.8
+case_0308,Volumen Tumoral,mm³,6276.0,Moderado,5341.84,Moderado,934.16,14.88
+case_0311,Volumen Tumoral,mm³,29150.0,Alto,36020.72,Alto,6870.72,23.57
+case_0313,Volumen Tumoral,mm³,2596.0,Bajo,2680.34,Bajo,84.34,3.25
+case_0314,Volumen Tumoral,mm³,77644.0,Alto,68362.39,Alto,9281.61,11.95
+case_0315,Volumen Tumoral,mm³,3024.0,Bajo,3054.31,Bajo,30.31,1.0
+case_0317,Volumen Tumoral,mm³,18959.0,Medio-Alto,18527.19,Medio-Alto,431.81,2.28
+case_0318,Volumen Tumoral,mm³,89610.0,Alto,87509.26,Alto,2100.74,2.34
+case_0319,Volumen Tumoral,mm³,7590.0,Moderado,7354.42,Moderado,235.58,3.1
+case_0320,Volumen Tumoral,mm³,3323.0,Bajo,3667.63,Bajo,344.63,10.37
+case_0322,Volumen Tumoral,mm³,2170.0,Bajo,2413.86,Bajo,243.86,11.24
+case_0324,Volumen Tumoral,mm³,23574.0,Alto,25330.95,Alto,1756.95,7.45
+case_0326,Volumen Tumoral,mm³,55145.0,Alto,61151.5,Alto,6006.5,10.89
+case_0327,Volumen Tumoral,mm³,6135.0,Moderado,6386.04,Moderado,251.04,4.09
+case_0328,Volumen Tumoral,mm³,12290.0,Medio-Alto,14334.11,Medio-Alto,2044.11,16.63
+case_0329,Volumen Tumoral,mm³,4146.0,Bajo,4525.4,Bajo,379.4,9.15
+case_0331,Volumen Tumoral,mm³,4791.0,Moderado,5086.35,Moderado,295.35,6.16
+case_0333,Volumen Tumoral,mm³,31575.0,Alto,32447.46,Alto,872.46,2.76
+case_0334,Volumen Tumoral,mm³,9915.0,Medio-Alto,10317.02,Medio-Alto,402.02,4.05
+case_0336,Volumen Tumoral,mm³,20131.0,Medio-Alto,20822.74,Alto,691.74,3.44
+case_0338,Volumen Tumoral,mm³,5086.0,Moderado,5166.95,Moderado,80.95,1.59
+case_0341,Volumen Tumoral,mm³,16873.0,Medio-Alto,15536.8,Medio-Alto,1336.2,7.92
+case_0343,Volumen Tumoral,mm³,9258.0,Medio-Alto,9372.28,Medio-Alto,114.28,1.23
+case_0348,Volumen Tumoral,mm³,8266.0,Moderado,9523.01,Medio-Alto,1257.01,15.21
+case_0354,Volumen Tumoral,mm³,16589.0,Medio-Alto,15624.07,Medio-Alto,964.93,5.82
+case_0356,Volumen Tumoral,mm³,5736.0,Moderado,5668.97,Moderado,67.03,1.17
+case_0357,Volumen Tumoral,mm³,5490.0,Moderado,5142.25,Moderado,347.75,6.33
+case_0359,Volumen Tumoral,mm³,201427.0,Alto,163756.05,Alto,37670.95,18.7
+case_0360,Volumen Tumoral,mm³,13347.0,Medio-Alto,14350.2,Medio-Alto,1003.2,7.52
+case_0364,Volumen Tumoral,mm³,19145.0,Medio-Alto,7168.9,Moderado,11976.1,62.55
+case_0365,Volumen Tumoral,mm³,40410.0,Alto,40004.29,Alto,405.71,1.0
+case_0368,Volumen Tumoral,mm³,5868.0,Moderado,6360.49,Moderado,492.49,8.39
+case_0376,Volumen Tumoral,mm³,4195.0,Bajo,4227.16,Bajo,32.16,0.77
+case_0378,Volumen Tumoral,mm³,52390.0,Alto,55006.35,Alto,2616.35,4.99
+case_0380,Volumen Tumoral,mm³,4377.0,Bajo,3843.5,Bajo,533.5,12.19
+case_0384,Volumen Tumoral,mm³,20034.0,Medio-Alto,18023.73,Medio-Alto,2010.27,10.03
+case_0385,Volumen Tumoral,mm³,12885.0,Medio-Alto,13327.52,Medio-Alto,442.52,3.43
+case_0386,Volumen Tumoral,mm³,15806.0,Medio-Alto,15453.78,Medio-Alto,352.22,2.23
+case_0392,Volumen Tumoral,mm³,6974.0,Moderado,6633.97,Moderado,340.03,4.88
+case_0394,Volumen Tumoral,mm³,584.0,Bajo,718.31,Bajo,134.31,23.0
+case_0395,Volumen Tumoral,mm³,5603.0,Moderado,4936.7,Moderado,666.3,11.89
+case_0396,Volumen Tumoral,mm³,12987.0,Medio-Alto,14680.35,Medio-Alto,1693.35,13.04
+case_0398,Volumen Tumoral,mm³,85635.0,Alto,87389.84,Alto,1754.84,2.05
+case_0400,Volumen Tumoral,mm³,1818.0,Bajo,1334.86,Bajo,483.14,26.58
+case_0401,Volumen Tumoral,mm³,8242.0,Moderado,7303.37,Moderado,938.63,11.39
+case_0402,Volumen Tumoral,mm³,1124.0,Bajo,1044.51,Bajo,79.49,7.07
+case_0406,Volumen Tumoral,mm³,5019.0,Moderado,3631.41,Bajo,1387.59,27.65
+case_0411,Volumen Tumoral,mm³,10249.0,Medio-Alto,10600.12,Medio-Alto,351.12,3.43
+case_0412,Volumen Tumoral,mm³,5871.0,Moderado,5364.91,Moderado,506.09,8.62
+case_0413,Volumen Tumoral,mm³,55455.0,Alto,59881.46,Alto,4426.46,7.98
+case_0415,Volumen Tumoral,mm³,23318.0,Alto,20586.13,Alto,2731.87,11.72
+case_0417,Volumen Tumoral,mm³,23232.0,Alto,21853.0,Alto,1379.0,5.94
+case_0418,Volumen Tumoral,mm³,4995.0,Moderado,5345.7,Moderado,350.7,7.02
+case_0419,Volumen Tumoral,mm³,1346.0,Bajo,1472.99,Bajo,126.99,9.43
+case_0421,Volumen Tumoral,mm³,11847.0,Medio-Alto,11683.59,Medio-Alto,163.41,1.38
+case_0423,Volumen Tumoral,mm³,6828.0,Moderado,7048.47,Moderado,220.47,3.23
+case_0424,Volumen Tumoral,mm³,1749.0,Bajo,2566.84,Bajo,817.84,46.76
+case_0428,Volumen Tumoral,mm³,217514.0,Alto,153997.04,Alto,63516.96,29.2
+case_0431,Volumen Tumoral,mm³,5314.0,Moderado,5784.99,Moderado,470.99,8.86
+case_0434,Volumen Tumoral,mm³,7374.0,Moderado,6926.09,Moderado,447.91,6.07
+case_0436,Volumen Tumoral,mm³,6062.0,Moderado,5880.03,Moderado,181.97,3.0
+case_0437,Volumen Tumoral,mm³,6983.0,Moderado,7220.61,Moderado,237.61,3.4
+case_0439,Volumen Tumoral,mm³,27037.0,Alto,27970.75,Alto,933.75,3.45
+case_0440,Volumen Tumoral,mm³,11886.0,Medio-Alto,13199.47,Medio-Alto,1313.47,11.05
+case_0441,Volumen Tumoral,mm³,21420.0,Alto,21498.19,Alto,78.19,0.37
+case_0442,Volumen Tumoral,mm³,64464.0,Alto,62967.36,Alto,1496.64,2.32
+case_0444,Volumen Tumoral,mm³,2814.0,Bajo,2966.09,Bajo,152.09,5.4
+case_0445,Volumen Tumoral,mm³,15280.0,Medio-Alto,13817.08,Medio-Alto,1462.92,9.57
+case_0446,Volumen Tumoral,mm³,5957.0,Moderado,5234.35,Moderado,722.65,12.13
+case_0448,Volumen Tumoral,mm³,2626.0,Bajo,2467.33,Bajo,158.67,6.04
+case_0449,Volumen Tumoral,mm³,6921.0,Moderado,7123.66,Moderado,202.66,2.93
+case_0450,Volumen Tumoral,mm³,12381.0,Medio-Alto,13617.15,Medio-Alto,1236.15,9.98
+case_0452,Volumen Tumoral,mm³,21533.0,Alto,21087.03,Alto,445.97,2.07
+case_0456,Volumen Tumoral,mm³,5718.0,Moderado,5293.27,Moderado,424.73,7.43
+case_0459,Volumen Tumoral,mm³,13242.0,Medio-Alto,13694.43,Medio-Alto,452.43,3.42
+case_0463,Volumen Tumoral,mm³,2193.0,Bajo,2004.15,Bajo,188.85,8.61
+case_0466,Volumen Tumoral,mm³,9360.0,Medio-Alto,9132.03,Medio-Alto,227.97,2.44
+case_0468,Volumen Tumoral,mm³,20838.0,Alto,19889.22,Medio-Alto,948.78,4.55
+case_0469,Volumen Tumoral,mm³,2011.0,Bajo,1985.7,Bajo,25.3,1.26
+case_0470,Volumen Tumoral,mm³,17100.0,Medio-Alto,18486.83,Medio-Alto,1386.83,8.11
+case_0474,Volumen Tumoral,mm³,2640.0,Bajo,2889.81,Bajo,249.81,9.46
+case_0475,Volumen Tumoral,mm³,2148.0,Bajo,2280.3,Bajo,132.3,6.16
+case_0478,Volumen Tumoral,mm³,33726.0,Alto,40441.59,Alto,6715.59,19.91
+case_0480,Volumen Tumoral,mm³,39473.0,Alto,36919.62,Alto,2553.38,6.47
+case_0481,Volumen Tumoral,mm³,3783.0,Bajo,2952.52,Bajo,830.48,21.95
+case_0482,Volumen Tumoral,mm³,1008.0,Bajo,832.09,Bajo,175.91,17.45
+case_0484,Volumen Tumoral,mm³,41669.0,Alto,44950.98,Alto,3281.98,7.88
+case_0487,Volumen Tumoral,mm³,9111.0,Medio-Alto,9818.14,Medio-Alto,707.14,7.76
+case_0489,Volumen Tumoral,mm³,5280.0,Moderado,5055.12,Moderado,224.88,4.26
+case_0491,Volumen Tumoral,mm³,37830.0,Alto,37775.23,Alto,54.77,0.14
+case_0493,Volumen Tumoral,mm³,2481.0,Bajo,2953.95,Bajo,472.95,19.06
+case_0495,Volumen Tumoral,mm³,19381.0,Medio-Alto,19495.47,Medio-Alto,114.47,0.59
+case_0496,Volumen Tumoral,mm³,4108.0,Bajo,4067.65,Bajo,40.35,0.98
+case_0497,Volumen Tumoral,mm³,18382.0,Medio-Alto,18023.49,Medio-Alto,358.51,1.95
+case_0499,Volumen Tumoral,mm³,4470.0,Bajo,3947.76,Bajo,522.24,11.68
+case_0501,Volumen Tumoral,mm³,28745.0,Alto,30289.64,Alto,1544.64,5.37
+case_0504,Volumen Tumoral,mm³,4212.0,Bajo,4186.19,Bajo,25.81,0.61
+case_0506,Volumen Tumoral,mm³,3915.0,Bajo,4433.67,Bajo,518.67,13.25
+case_0508,Volumen Tumoral,mm³,16016.0,Medio-Alto,15017.96,Medio-Alto,998.04,6.23
+case_0509,Volumen Tumoral,mm³,1035.0,Bajo,677.07,Bajo,357.93,34.58
+case_0512,Volumen Tumoral,mm³,1925.0,Bajo,2136.35,Bajo,211.35,10.98
+case_0513,Volumen Tumoral,mm³,13922.0,Medio-Alto,14387.17,Medio-Alto,465.17,3.34
+case_0514,Volumen Tumoral,mm³,4188.0,Bajo,4622.68,Moderado,434.68,10.38
+case_0515,Volumen Tumoral,mm³,1953.0,Bajo,2165.12,Bajo,212.12,10.86
+case_0518,Volumen Tumoral,mm³,1656.0,Bajo,1531.1,Bajo,124.9,7.54
+case_0519,Volumen Tumoral,mm³,2512.0,Bajo,2418.22,Bajo,93.78,3.73
+case_0522,Volumen Tumoral,mm³,471.0,Bajo,699.98,Bajo,228.98,48.62
+case_0523,Volumen Tumoral,mm³,26971.0,Alto,29206.16,Alto,2235.16,8.29
+case_0524,Volumen Tumoral,mm³,11917.0,Medio-Alto,11371.2,Medio-Alto,545.8,4.58
+case_0527,Volumen Tumoral,mm³,37950.0,Alto,37849.65,Alto,100.35,0.26
+case_0531,Volumen Tumoral,mm³,7240.0,Moderado,7540.58,Moderado,300.58,4.15
+case_0532,Volumen Tumoral,mm³,8950.0,Moderado,8330.0,Moderado,620.0,6.93
+case_0546,Volumen Tumoral,mm³,2694.0,Bajo,2645.63,Bajo,48.37,1.8
+case_0547,Volumen Tumoral,mm³,8159.0,Moderado,8022.24,Moderado,136.76,1.68
+case_0548,Volumen Tumoral,mm³,17973.0,Medio-Alto,20628.07,Alto,2655.07,14.77
+case_0550,Volumen Tumoral,mm³,104495.0,Alto,142038.92,Alto,37543.92,35.93
+case_0551,Volumen Tumoral,mm³,9194.0,Medio-Alto,8021.47,Moderado,1172.53,12.75
+case_0552,Volumen Tumoral,mm³,30090.0,Alto,33206.83,Alto,3116.83,10.36
+case_0553,Volumen Tumoral,mm³,8366.0,Moderado,8227.22,Moderado,138.78,1.66
+case_0554,Volumen Tumoral,mm³,13782.0,Medio-Alto,13905.82,Medio-Alto,123.82,0.9
+case_0556,Volumen Tumoral,mm³,4998.0,Moderado,5416.09,Moderado,418.09,8.37
+case_0558,Volumen Tumoral,mm³,5578.0,Moderado,5657.66,Moderado,79.66,1.43
+case_0562,Volumen Tumoral,mm³,12276.0,Medio-Alto,12819.11,Medio-Alto,543.11,4.42
+case_0566,Volumen Tumoral,mm³,5320.0,Moderado,2843.48,Bajo,2476.52,46.55
+case_0567,Volumen Tumoral,mm³,8643.0,Moderado,9062.87,Moderado,419.87,4.86
+case_0571,Volumen Tumoral,mm³,16238.0,Medio-Alto,15855.97,Medio-Alto,382.03,2.35
+case_0573,Volumen Tumoral,mm³,1479.0,Bajo,1527.3,Bajo,48.3,3.27
+case_0577,Volumen Tumoral,mm³,1527.0,Bajo,1752.89,Bajo,225.89,14.79
+case_0582,Volumen Tumoral,mm³,3862.0,Bajo,3595.26,Bajo,266.74,6.91
+case_0583,Volumen Tumoral,mm³,53214.0,Alto,54403.86,Alto,1189.86,2.24
+case_0586,Volumen Tumoral,mm³,4980.0,Moderado,5321.94,Moderado,341.94,6.87
+case_0590,Volumen Tumoral,mm³,4779.0,Moderado,4082.29,Bajo,696.71,14.58
+case_0591,Volumen Tumoral,mm³,15495.0,Medio-Alto,16393.03,Medio-Alto,898.03,5.8
+case_0593,Volumen Tumoral,mm³,6374.0,Moderado,6006.18,Moderado,367.82,5.77
+case_0596,Volumen Tumoral,mm³,6350.0,Moderado,6720.77,Moderado,370.77,5.84
+case_0597,Volumen Tumoral,mm³,24677.0,Alto,25351.83,Alto,674.83,2.73
+case_0599,Volumen Tumoral,mm³,10505.0,Medio-Alto,9867.78,Medio-Alto,637.22,6.07
+case_0601,Volumen Tumoral,mm³,6463.0,Moderado,7964.83,Moderado,1501.83,23.24
+case_0604,Volumen Tumoral,mm³,5481.0,Moderado,6313.19,Moderado,832.19,15.18
+case_0605,Volumen Tumoral,mm³,6987.0,Moderado,6399.95,Moderado,587.05,8.4
+case_0607,Volumen Tumoral,mm³,20445.0,Medio-Alto,22106.6,Alto,1661.6,8.13
+case_0608,Volumen Tumoral,mm³,24274.0,Alto,23317.92,Alto,956.08,3.94
+case_0609,Volumen Tumoral,mm³,20459.0,Alto,20823.58,Alto,364.58,1.78
+case_0610,Volumen Tumoral,mm³,2404.0,Bajo,2486.14,Bajo,82.14,3.42
+case_0611,Volumen Tumoral,mm³,1569.0,Bajo,1844.68,Bajo,275.68,17.57
+case_0614,Volumen Tumoral,mm³,6714.0,Moderado,5524.75,Moderado,1189.25,17.71
+case_0615,Volumen Tumoral,mm³,1326.0,Bajo,1139.69,Bajo,186.31,14.05
+case_0616,Volumen Tumoral,mm³,5444.0,Moderado,5976.38,Moderado,532.38,9.78
+case_0618,Volumen Tumoral,mm³,43496.0,Alto,69253.84,Alto,25757.84,59.22
+case_0621,Volumen Tumoral,mm³,38869.0,Alto,43713.97,Alto,4844.97,12.46
+case_0622,Volumen Tumoral,mm³,2468.0,Bajo,2543.05,Bajo,75.05,3.04
+case_0626,Volumen Tumoral,mm³,10157.0,Medio-Alto,9809.92,Medio-Alto,347.08,3.42
+case_0627,Volumen Tumoral,mm³,45510.0,Alto,45332.17,Alto,177.83,0.39
+case_0628,Volumen Tumoral,mm³,3994.0,Bajo,7200.42,Moderado,3206.42,80.28
+case_0636,Volumen Tumoral,mm³,9742.0,Medio-Alto,9707.39,Medio-Alto,34.61,0.36
+case_0638,Volumen Tumoral,mm³,10419.0,Medio-Alto,11647.03,Medio-Alto,1228.03,11.79
+case_0642,Volumen Tumoral,mm³,21705.0,Alto,19988.34,Medio-Alto,1716.66,7.91
+case_0645,Volumen Tumoral,mm³,9702.0,Medio-Alto,9244.78,Medio-Alto,457.22,4.71
+case_0646,Volumen Tumoral,mm³,1081.0,Bajo,1051.54,Bajo,29.46,2.72
+case_0648,Volumen Tumoral,mm³,5760.0,Moderado,5618.43,Moderado,141.57,2.46
+case_0649,Volumen Tumoral,mm³,10443.0,Medio-Alto,10433.01,Medio-Alto,9.99,0.1
+case_0651,Volumen Tumoral,mm³,20187.0,Medio-Alto,20346.11,Medio-Alto,159.11,0.79
+case_0654,Volumen Tumoral,mm³,15462.0,Medio-Alto,14164.39,Medio-Alto,1297.61,8.39
+case_0655,Volumen Tumoral,mm³,35907.0,Alto,41476.41,Alto,5569.41,15.51
+case_0656,Volumen Tumoral,mm³,105562.0,Alto,81339.88,Alto,24222.12,22.95
+case_0657,Volumen Tumoral,mm³,7317.0,Moderado,7805.21,Moderado,488.21,6.67
+case_0658,Volumen Tumoral,mm³,113436.0,Alto,68610.08,Alto,44825.92,39.52
+case_0659,Volumen Tumoral,mm³,5262.0,Moderado,4736.67,Moderado,525.33,9.98
+case_0662,Volumen Tumoral,mm³,5996.0,Moderado,6802.42,Moderado,806.42,13.45
+case_0663,Volumen Tumoral,mm³,25464.0,Alto,27061.0,Alto,1597.0,6.27
+case_0666,Volumen Tumoral,mm³,22291.0,Alto,19816.2,Medio-Alto,2474.8,11.1
+case_0667,Volumen Tumoral,mm³,8450.0,Moderado,8609.99,Moderado,159.99,1.89
+case_0668,Volumen Tumoral,mm³,5334.0,Moderado,4843.7,Moderado,490.3,9.19
+case_0669,Volumen Tumoral,mm³,1539.0,Bajo,2051.08,Bajo,512.08,33.27
+case_0671,Volumen Tumoral,mm³,1008.0,Bajo,1224.54,Bajo,216.54,21.48
+case_0673,Volumen Tumoral,mm³,27700.0,Alto,30101.1,Alto,2401.1,8.67
+case_0676,Volumen Tumoral,mm³,25589.0,Alto,20702.48,Alto,4886.52,19.1
+case_0677,Volumen Tumoral,mm³,12201.0,Medio-Alto,10208.13,Medio-Alto,1992.87,16.33
+case_0678,Volumen Tumoral,mm³,12705.0,Medio-Alto,12145.57,Medio-Alto,559.43,4.4
+case_0679,Volumen Tumoral,mm³,14046.0,Medio-Alto,15135.59,Medio-Alto,1089.59,7.76
+case_0682,Volumen Tumoral,mm³,4953.0,Moderado,5196.5,Moderado,243.5,4.92
+case_0683,Volumen Tumoral,mm³,5240.0,Moderado,5038.02,Moderado,201.98,3.85
+case_0685,Volumen Tumoral,mm³,2004.0,Bajo,1722.92,Bajo,281.08,14.03
+case_0686,Volumen Tumoral,mm³,16934.0,Medio-Alto,17747.17,Medio-Alto,813.17,4.8
+case_0688,Volumen Tumoral,mm³,956.0,Bajo,1234.66,Bajo,278.66,29.15
+case_0690,Volumen Tumoral,mm³,10937.0,Medio-Alto,9554.84,Medio-Alto,1382.16,12.64
+case_0691,Volumen Tumoral,mm³,17990.0,Medio-Alto,17214.75,Medio-Alto,775.25,4.31
+case_0694,Volumen Tumoral,mm³,25123.0,Alto,25839.23,Alto,716.23,2.85
+case_0695,Volumen Tumoral,mm³,732.0,Bajo,563.1,Bajo,168.9,23.07
+case_0697,Volumen Tumoral,mm³,40598.0,Alto,40327.33,Alto,270.67,0.67
+case_0700,Volumen Tumoral,mm³,10202.0,Medio-Alto,10844.15,Medio-Alto,642.15,6.29
+case_0702,Volumen Tumoral,mm³,21591.0,Alto,23299.09,Alto,1708.09,7.91
+case_0704,Volumen Tumoral,mm³,69470.0,Alto,74259.6,Alto,4789.6,6.89
+case_0707,Volumen Tumoral,mm³,2904.0,Bajo,3483.84,Bajo,579.84,19.97
+case_0708,Volumen Tumoral,mm³,96753.0,Alto,83336.91,Alto,13416.09,13.87
+case_0709,Volumen Tumoral,mm³,13623.0,Medio-Alto,12235.86,Medio-Alto,1387.14,10.18
+case_0714,Volumen Tumoral,mm³,140959.0,Alto,145275.6,Alto,4316.6,3.06
+case_0715,Volumen Tumoral,mm³,21892.0,Alto,26260.09,Alto,4368.09,19.95
+case_0716,Volumen Tumoral,mm³,64103.0,Alto,57034.4,Alto,7068.6,11.03
+case_0717,Volumen Tumoral,mm³,3422.0,Bajo,3533.42,Bajo,111.42,3.26
+case_0719,Volumen Tumoral,mm³,776.0,Bajo,751.83,Bajo,24.17,3.11
+case_0720,Volumen Tumoral,mm³,51356.0,Alto,52232.41,Alto,876.41,1.71
+case_0725,Volumen Tumoral,mm³,68733.0,Alto,73001.44,Alto,4268.44,6.21
+case_0727,Volumen Tumoral,mm³,9442.0,Medio-Alto,9787.57,Medio-Alto,345.57,3.66
+case_0731,Volumen Tumoral,mm³,951.0,Bajo,1205.4,Bajo,254.4,26.75
+case_0732,Volumen Tumoral,mm³,8865.0,Moderado,8295.03,Moderado,569.97,6.43
+case_0737,Volumen Tumoral,mm³,9294.0,Medio-Alto,13150.38,Medio-Alto,3856.38,41.49
+case_0738,Volumen Tumoral,mm³,25320.0,Alto,27482.15,Alto,2162.15,8.54
+case_0740,Volumen Tumoral,mm³,5088.0,Moderado,6384.06,Moderado,1296.06,25.47
+case_0742,Volumen Tumoral,mm³,14709.0,Medio-Alto,15607.84,Medio-Alto,898.84,6.11
+case_0745,Volumen Tumoral,mm³,16941.0,Medio-Alto,19323.54,Medio-Alto,2382.54,14.06
+case_0746,Volumen Tumoral,mm³,11260.0,Medio-Alto,12003.54,Medio-Alto,743.54,6.6
+case_0748,Volumen Tumoral,mm³,5507.0,Moderado,7883.34,Moderado,2376.34,43.15
+case_0749,Volumen Tumoral,mm³,1345.0,Bajo,2041.85,Bajo,696.85,51.81
+case_0751,Volumen Tumoral,mm³,42095.0,Alto,38063.25,Alto,4031.75,9.58
+case_0752,Volumen Tumoral,mm³,17940.0,Medio-Alto,18117.48,Medio-Alto,177.48,0.99
+case_0754,Volumen Tumoral,mm³,17110.0,Medio-Alto,16114.07,Medio-Alto,995.93,5.82
+case_0758,Volumen Tumoral,mm³,6974.0,Moderado,7704.1,Moderado,730.1,10.47
+case_0761,Volumen Tumoral,mm³,5510.0,Moderado,5366.48,Moderado,143.52,2.6
+case_0763,Volumen Tumoral,mm³,21120.0,Alto,19180.04,Medio-Alto,1939.96,9.19
+case_0764,Volumen Tumoral,mm³,5691.0,Moderado,5285.77,Moderado,405.23,7.12
+case_0765,Volumen Tumoral,mm³,4639.0,Moderado,4445.57,Bajo,193.43,4.17
+case_0766,Volumen Tumoral,mm³,13344.0,Medio-Alto,12013.31,Medio-Alto,1330.69,9.97
+case_0767,Volumen Tumoral,mm³,3155.0,Bajo,3478.84,Bajo,323.84,10.26
+case_0768,Volumen Tumoral,mm³,2915.0,Bajo,3041.59,Bajo,126.59,4.34
+case_0769,Volumen Tumoral,mm³,1886.0,Bajo,1898.02,Bajo,12.02,0.64
+case_0771,Volumen Tumoral,mm³,159510.0,Alto,124832.22,Alto,34677.78,21.74
+case_0772,Volumen Tumoral,mm³,19197.0,Medio-Alto,20420.8,Medio-Alto,1223.8,6.37
+case_0773,Volumen Tumoral,mm³,4308.0,Bajo,4683.24,Moderado,375.24,8.71
+case_0774,Volumen Tumoral,mm³,8108.0,Moderado,7363.04,Moderado,744.96,9.19
+case_0775,Volumen Tumoral,mm³,60924.0,Alto,66597.56,Alto,5673.56,9.31
+case_0782,Volumen Tumoral,mm³,6956.0,Moderado,7861.96,Moderado,905.96,13.02
+case_0784,Volumen Tumoral,mm³,939.0,Bajo,1111.22,Bajo,172.22,18.34
+case_0786,Volumen Tumoral,mm³,4600.0,Moderado,4093.96,Bajo,506.04,11.0
+case_0788,Volumen Tumoral,mm³,22135.0,Alto,22637.12,Alto,502.12,2.27
+case_0790,Volumen Tumoral,mm³,3123.0,Bajo,3410.06,Bajo,287.06,9.19
+case_0792,Volumen Tumoral,mm³,10328.0,Medio-Alto,9403.36,Medio-Alto,924.64,8.95
+case_0793,Volumen Tumoral,mm³,3454.0,Bajo,3957.47,Bajo,503.47,14.58
+case_0795,Volumen Tumoral,mm³,41691.0,Alto,45455.93,Alto,3764.93,9.03
+case_0796,Volumen Tumoral,mm³,5359.0,Moderado,5423.21,Moderado,64.21,1.2
+case_0798,Volumen Tumoral,mm³,4060.0,Bajo,4064.14,Bajo,4.14,0.1
+case_0799,Volumen Tumoral,mm³,12783.0,Medio-Alto,15152.61,Medio-Alto,2369.61,18.54
+case_0800,Volumen Tumoral,mm³,6864.0,Moderado,7724.44,Moderado,860.44,12.54
+case_0802,Volumen Tumoral,mm³,30605.0,Alto,29763.58,Alto,841.42,2.75
+case_0803,Volumen Tumoral,mm³,3632.0,Bajo,3666.89,Bajo,34.89,0.96
+case_0804,Volumen Tumoral,mm³,22877.0,Alto,25808.56,Alto,2931.56,12.81
+case_0808,Volumen Tumoral,mm³,64377.0,Alto,77213.49,Alto,12836.49,19.94
+case_0817,Volumen Tumoral,mm³,2682.0,Bajo,2819.15,Bajo,137.15,5.11
+case_0818,Volumen Tumoral,mm³,16996.0,Medio-Alto,25418.26,Alto,8422.26,49.55
+case_0820,Volumen Tumoral,mm³,6736.0,Moderado,8420.93,Moderado,1684.93,25.01
+case_0823,Volumen Tumoral,mm³,55998.0,Alto,54525.54,Alto,1472.46,2.63
+case_0825,Volumen Tumoral,mm³,4569.0,Moderado,4455.25,Bajo,113.75,2.49
+case_0826,Volumen Tumoral,mm³,4464.0,Bajo,4244.75,Bajo,219.25,4.91
+case_0827,Volumen Tumoral,mm³,11445.0,Medio-Alto,11530.07,Medio-Alto,85.07,0.74
+case_0831,Volumen Tumoral,mm³,1590.0,Bajo,1465.31,Bajo,124.69,7.84
+case_0832,Volumen Tumoral,mm³,39070.0,Alto,39954.69,Alto,884.69,2.26
+case_0833,Volumen Tumoral,mm³,8970.0,Moderado,8813.93,Moderado,156.07,1.74
+case_0837,Volumen Tumoral,mm³,31445.0,Alto,34332.38,Alto,2887.38,9.18
+case_0838,Volumen Tumoral,mm³,2036.0,Bajo,2235.41,Bajo,199.41,9.79
+case_0847,Volumen Tumoral,mm³,22893.0,Alto,23741.84,Alto,848.84,3.71
+case_0849,Volumen Tumoral,mm³,5007.0,Moderado,4943.47,Moderado,63.53,1.27
+case_0856,Volumen Tumoral,mm³,1721.0,Bajo,1458.62,Bajo,262.38,15.25
+case_0857,Volumen Tumoral,mm³,26263.0,Alto,24537.01,Alto,1725.99,6.57
+case_0858,Volumen Tumoral,mm³,2013.0,Bajo,2709.09,Bajo,696.09,34.58
+case_0860,Volumen Tumoral,mm³,376.0,Bajo,710.49,Bajo,334.49,88.96
+case_0863,Volumen Tumoral,mm³,3178.0,Bajo,3150.38,Bajo,27.62,0.87
+case_0865,Volumen Tumoral,mm³,11031.0,Medio-Alto,10486.64,Medio-Alto,544.36,4.93
+case_0866,Volumen Tumoral,mm³,23436.0,Alto,23505.44,Alto,69.44,0.3
+case_0868,Volumen Tumoral,mm³,68523.0,Alto,105014.15,Alto,36491.15,53.25
+case_0869,Volumen Tumoral,mm³,67259.0,Alto,65636.39,Alto,1622.61,2.41
+case_0872,Volumen Tumoral,mm³,84244.0,Alto,84907.14,Alto,663.14,0.79
+case_0874,Volumen Tumoral,mm³,21522.0,Alto,22782.55,Alto,1260.55,5.86
+case_0880,Volumen Tumoral,mm³,5589.0,Moderado,5579.76,Moderado,9.24,0.17
+case_0883,Volumen Tumoral,mm³,15782.0,Medio-Alto,16087.61,Medio-Alto,305.61,1.94
+case_0885,Volumen Tumoral,mm³,3450.0,Bajo,3071.1,Bajo,378.9,10.98
+case_0887,Volumen Tumoral,mm³,4064.0,Bajo,3927.56,Bajo,136.44,3.36
+case_0890,Volumen Tumoral,mm³,14368.0,Medio-Alto,14152.03,Medio-Alto,215.97,1.5
+case_0895,Volumen Tumoral,mm³,1990.0,Bajo,1855.59,Bajo,134.41,6.75
+case_0897,Volumen Tumoral,mm³,8215.0,Moderado,9164.99,Medio-Alto,949.99,11.56
+case_0902,Volumen Tumoral,mm³,25002.0,Alto,24402.83,Alto,599.17,2.4
+case_0903,Volumen Tumoral,mm³,2719.0,Bajo,2653.49,Bajo,65.51,2.41
+case_0906,Volumen Tumoral,mm³,1260.0,Bajo,1498.76,Bajo,238.76,18.95
+case_0909,Volumen Tumoral,mm³,9106.0,Moderado,9462.33,Medio-Alto,356.33,3.91
+case_0911,Volumen Tumoral,mm³,6443.0,Moderado,5859.93,Moderado,583.07,9.05
+case_0922,Volumen Tumoral,mm³,4890.0,Moderado,4830.18,Moderado,59.82,1.22
+case_0926,Volumen Tumoral,mm³,9795.0,Medio-Alto,9888.33,Medio-Alto,93.33,0.95
+case_0927,Volumen Tumoral,mm³,5982.0,Moderado,5943.86,Moderado,38.14,0.64
+case_0931,Volumen Tumoral,mm³,20856.0,Alto,22438.25,Alto,1582.25,7.59
+case_0932,Volumen Tumoral,mm³,7296.0,Moderado,7283.91,Moderado,12.09,0.17
+case_0933,Volumen Tumoral,mm³,3357.0,Bajo,3358.49,Bajo,1.49,0.04
+case_0934,Volumen Tumoral,mm³,1529.0,Bajo,1667.33,Bajo,138.33,9.05
+case_0935,Volumen Tumoral,mm³,1941.0,Bajo,1853.33,Bajo,87.67,4.52
+case_0938,Volumen Tumoral,mm³,23529.0,Alto,31551.67,Alto,8022.67,34.1
+case_0939,Volumen Tumoral,mm³,11650.0,Medio-Alto,11631.92,Medio-Alto,18.08,0.16
+case_0941,Volumen Tumoral,mm³,4248.0,Bajo,3209.47,Bajo,1038.53,24.45
+case_0942,Volumen Tumoral,mm³,57946.0,Alto,91269.28,Alto,33323.28,57.51
+case_0943,Volumen Tumoral,mm³,2772.0,Bajo,2696.31,Bajo,75.69,2.73
+case_0944,Volumen Tumoral,mm³,8558.0,Moderado,6949.92,Moderado,1608.08,18.79
+case_0945,Volumen Tumoral,mm³,9152.0,Medio-Alto,9749.86,Medio-Alto,597.86,6.53
+case_0946,Volumen Tumoral,mm³,20203.0,Medio-Alto,19535.5,Medio-Alto,667.5,3.3
+case_0948,Volumen Tumoral,mm³,8327.0,Moderado,13167.18,Medio-Alto,4840.18,58.13
+case_0949,Volumen Tumoral,mm³,5037.0,Moderado,5307.29,Moderado,270.29,5.37
+case_0951,Volumen Tumoral,mm³,7812.0,Moderado,8397.75,Moderado,585.75,7.5
+case_0952,Volumen Tumoral,mm³,2229.0,Bajo,2051.51,Bajo,177.49,7.96
+case_0954,Volumen Tumoral,mm³,32163.0,Alto,33854.51,Alto,1691.51,5.26
+case_0955,Volumen Tumoral,mm³,2790.0,Bajo,2745.3,Bajo,44.7,1.6
+case_0958,Volumen Tumoral,mm³,38204.0,Alto,36887.78,Alto,1316.22,3.45
+case_0962,Volumen Tumoral,mm³,8920.0,Moderado,9821.83,Medio-Alto,901.83,10.11
+case_0964,Volumen Tumoral,mm³,17703.0,Medio-Alto,16454.24,Medio-Alto,1248.76,7.05
+case_0966,Volumen Tumoral,mm³,23847.0,Alto,17502.0,Medio-Alto,6345.0,26.61
+case_0967,Volumen Tumoral,mm³,4122.0,Bajo,4341.32,Bajo,219.32,5.32
+case_0969,Volumen Tumoral,mm³,10335.0,Medio-Alto,10465.95,Medio-Alto,130.95,1.27
+case_0972,Volumen Tumoral,mm³,2967.0,Bajo,3089.86,Bajo,122.86,4.14
+case_0973,Volumen Tumoral,mm³,3097.0,Bajo,2786.68,Bajo,310.32,10.02
+case_0974,Volumen Tumoral,mm³,8040.0,Moderado,8716.62,Moderado,676.62,8.42
+case_0977,Volumen Tumoral,mm³,6825.0,Moderado,6578.81,Moderado,246.19,3.61
+case_0979,Volumen Tumoral,mm³,11416.0,Medio-Alto,10654.35,Medio-Alto,761.65,6.67
+case_0980,Volumen Tumoral,mm³,4559.0,Moderado,4260.06,Bajo,298.94,6.56
+case_0982,Volumen Tumoral,mm³,4221.0,Bajo,4697.49,Moderado,476.49,11.29
+case_0985,Volumen Tumoral,mm³,18391.0,Medio-Alto,19957.64,Medio-Alto,1566.64,8.52
+case_0986,Volumen Tumoral,mm³,6975.0,Moderado,6377.36,Moderado,597.64,8.57
+case_0988,Volumen Tumoral,mm³,16532.0,Medio-Alto,15932.57,Medio-Alto,599.43,3.63
+case_0989,Volumen Tumoral,mm³,3472.0,Bajo,3476.07,Bajo,4.07,0.12
+case_0992,Volumen Tumoral,mm³,1596.0,Bajo,1702.77,Bajo,106.77,6.69
+case_0993,Volumen Tumoral,mm³,4287.0,Bajo,4436.4,Bajo,149.4,3.48
+case_0995,Volumen Tumoral,mm³,4593.0,Moderado,5232.19,Moderado,639.19,13.92
+case_0997,Volumen Tumoral,mm³,14825.0,Medio-Alto,16040.78,Medio-Alto,1215.78,8.2
+case_1002,Volumen Tumoral,mm³,3683.0,Bajo,3314.2,Bajo,368.8,10.01
+case_1003,Volumen Tumoral,mm³,20920.0,Alto,20145.3,Medio-Alto,774.7,3.7
+case_1007,Volumen Tumoral,mm³,5827.0,Moderado,5130.94,Moderado,696.06,11.95
+case_1010,Volumen Tumoral,mm³,15845.0,Medio-Alto,20085.75,Medio-Alto,4240.75,26.76
+case_1012,Volumen Tumoral,mm³,7069.0,Moderado,6869.58,Moderado,199.42,2.82
+case_1013,Volumen Tumoral,mm³,3896.0,Bajo,3671.79,Bajo,224.21,5.75
+case_1017,Volumen Tumoral,mm³,7655.0,Moderado,7231.94,Moderado,423.06,5.53
+case_1018,Volumen Tumoral,mm³,2811.0,Bajo,1995.33,Bajo,815.67,29.02
+case_1019,Volumen Tumoral,mm³,42420.0,Alto,40564.89,Alto,1855.11,4.37
+case_1020,Volumen Tumoral,mm³,8837.0,Moderado,8246.74,Moderado,590.26,6.68
+case_1021,Volumen Tumoral,mm³,54160.0,Alto,45238.83,Alto,8921.17,16.47
+case_1022,Volumen Tumoral,mm³,4920.0,Moderado,4446.48,Bajo,473.52,9.62
+case_1023,Volumen Tumoral,mm³,6438.0,Moderado,6315.56,Moderado,122.44,1.9
+case_1034,Volumen Tumoral,mm³,2655.0,Bajo,2935.16,Bajo,280.16,10.55
+case_1042,Volumen Tumoral,mm³,21040.0,Alto,24110.84,Alto,3070.84,14.6
+case_1044,Volumen Tumoral,mm³,1350.0,Bajo,1771.72,Bajo,421.72,31.24
+case_1045,Volumen Tumoral,mm³,416.0,Bajo,807.96,Bajo,391.96,94.22
+case_1047,Volumen Tumoral,mm³,8770.0,Moderado,8810.36,Moderado,40.36,0.46
+case_1051,Volumen Tumoral,mm³,7698.0,Moderado,7914.06,Moderado,216.06,2.81
+case_1057,Volumen Tumoral,mm³,6777.0,Moderado,6949.99,Moderado,172.99,2.55
+case_1060,Volumen Tumoral,mm³,9906.0,Medio-Alto,10588.64,Medio-Alto,682.64,6.89
+case_1062,Volumen Tumoral,mm³,4071.0,Bajo,4188.0,Bajo,117.0,2.87
+case_1064,Volumen Tumoral,mm³,8736.0,Moderado,8685.47,Moderado,50.53,0.58
+case_1065,Volumen Tumoral,mm³,15464.0,Medio-Alto,15097.07,Medio-Alto,366.93,2.37
+case_1067,Volumen Tumoral,mm³,10644.0,Medio-Alto,9936.65,Medio-Alto,707.35,6.65
+case_1071,Volumen Tumoral,mm³,678.0,Bajo,670.27,Bajo,7.73,1.14
+case_1072,Volumen Tumoral,mm³,56883.0,Alto,59138.81,Alto,2255.81,3.97
+case_1076,Volumen Tumoral,mm³,3614.0,Bajo,3415.9,Bajo,198.1,5.48
+case_1077,Volumen Tumoral,mm³,3922.0,Bajo,3736.84,Bajo,185.16,4.72
+case_1081,Volumen Tumoral,mm³,15052.0,Medio-Alto,15026.77,Medio-Alto,25.23,0.17
+case_1082,Volumen Tumoral,mm³,8091.0,Moderado,8151.83,Moderado,60.83,0.75
+case_1084,Volumen Tumoral,mm³,17074.0,Medio-Alto,16720.38,Medio-Alto,353.62,2.07
+case_1085,Volumen Tumoral,mm³,8142.0,Moderado,7691.77,Moderado,450.23,5.53
+case_1088,Volumen Tumoral,mm³,4848.0,Moderado,5271.28,Moderado,423.28,8.73
+case_1090,Volumen Tumoral,mm³,2479.0,Bajo,2694.02,Bajo,215.02,8.67
+case_1091,Volumen Tumoral,mm³,3150.0,Bajo,3662.06,Bajo,512.06,16.26
+case_1092,Volumen Tumoral,mm³,9089.0,Moderado,8918.07,Moderado,170.93,1.88
+case_1093,Volumen Tumoral,mm³,25180.0,Alto,28801.9,Alto,3621.9,14.38
+case_1096,Volumen Tumoral,mm³,69069.0,Alto,79550.23,Alto,10481.23,15.18
+case_1097,Volumen Tumoral,mm³,9992.0,Medio-Alto,9978.51,Medio-Alto,13.49,0.14
+case_1098,Volumen Tumoral,mm³,10419.0,Medio-Alto,9334.77,Medio-Alto,1084.23,10.41
+case_1100,Volumen Tumoral,mm³,95457.0,Alto,70522.37,Alto,24934.63,26.12
+case_0002,Diametro Eje Corto,mm,50.42,Alto,92.93,Alto,42.51,84.31
+case_0005,Diametro Eje Corto,mm,31.98,Medio-Alto,36.83,Medio-Alto,4.85,15.16
+case_0006,Diametro Eje Corto,mm,33.42,Medio-Alto,31.57,Medio-Alto,1.85,5.55
+case_0009,Diametro Eje Corto,mm,23.7,Moderado,36.03,Medio-Alto,12.33,52.03
+case_0012,Diametro Eje Corto,mm,20.33,Moderado,22.98,Moderado,2.65,13.02
+case_0013,Diametro Eje Corto,mm,74.84,Alto,46.27,Medio-Alto,28.57,38.18
+case_0015,Diametro Eje Corto,mm,57.37,Alto,93.81,Alto,36.44,63.53
+case_0017,Diametro Eje Corto,mm,13.12,Bajo,17.18,Bajo,4.06,30.98
+case_0018,Diametro Eje Corto,mm,62.72,Alto,83.47,Alto,20.74,33.07
+case_0021,Diametro Eje Corto,mm,40.87,Medio-Alto,38.79,Medio-Alto,2.08,5.08
+case_0023,Diametro Eje Corto,mm,29.17,Medio-Alto,34.48,Medio-Alto,5.32,18.23
+case_0024,Diametro Eje Corto,mm,20.96,Moderado,22.57,Moderado,1.61,7.7
+case_0026,Diametro Eje Corto,mm,19.05,Moderado,21.86,Moderado,2.82,14.78
+case_0029,Diametro Eje Corto,mm,22.91,Moderado,39.98,Medio-Alto,17.07,74.49
+case_0030,Diametro Eje Corto,mm,88.14,Alto,90.31,Alto,2.17,2.46
+case_0032,Diametro Eje Corto,mm,18.51,Bajo,19.35,Moderado,0.84,4.51
+case_0033,Diametro Eje Corto,mm,26.79,Medio-Alto,21.92,Moderado,4.88,18.2
+case_0034,Diametro Eje Corto,mm,20.74,Moderado,29.83,Medio-Alto,9.09,43.82
+case_0035,Diametro Eje Corto,mm,22.72,Moderado,44.98,Medio-Alto,22.27,98.03
+case_0039,Diametro Eje Corto,mm,51.37,Alto,30.28,Medio-Alto,21.09,41.06
+case_0040,Diametro Eje Corto,mm,28.55,Medio-Alto,32.52,Medio-Alto,3.97,13.92
+case_0042,Diametro Eje Corto,mm,10.66,Bajo,12.9,Bajo,2.24,21.01
+case_0044,Diametro Eje Corto,mm,25.78,Medio-Alto,25.48,Moderado,0.3,1.16
+case_0048,Diametro Eje Corto,mm,18.54,Bajo,18.46,Bajo,0.08,0.44
+case_0050,Diametro Eje Corto,mm,29.25,Medio-Alto,36.4,Medio-Alto,7.15,24.46
+case_0052,Diametro Eje Corto,mm,44.98,Medio-Alto,60.22,Alto,15.24,33.89
+case_0053,Diametro Eje Corto,mm,48.21,Alto,57.04,Alto,8.82,18.3
+case_0054,Diametro Eje Corto,mm,51.76,Alto,44.51,Medio-Alto,7.25,14.01
+case_0055,Diametro Eje Corto,mm,15.16,Bajo,19.69,Moderado,4.53,29.87
+case_0057,Diametro Eje Corto,mm,17.29,Bajo,18.23,Bajo,0.94,5.41
+case_0058,Diametro Eje Corto,mm,23.97,Moderado,32.0,Medio-Alto,8.03,33.52
+case_0061,Diametro Eje Corto,mm,111.58,Alto,63.67,Alto,47.91,42.94
+case_0064,Diametro Eje Corto,mm,16.13,Bajo,17.45,Bajo,1.33,8.24
+case_0065,Diametro Eje Corto,mm,89.32,Alto,83.39,Alto,5.93,6.64
+case_0068,Diametro Eje Corto,mm,15.83,Bajo,18.41,Bajo,2.58,16.31
+case_0069,Diametro Eje Corto,mm,18.34,Bajo,18.95,Moderado,0.61,3.32
+case_0074,Diametro Eje Corto,mm,33.66,Medio-Alto,47.64,Alto,13.98,41.55
+case_0076,Diametro Eje Corto,mm,18.5,Bajo,18.2,Bajo,0.3,1.6
+case_0078,Diametro Eje Corto,mm,35.58,Medio-Alto,53.41,Alto,17.83,50.1
+case_0088,Diametro Eje Corto,mm,19.87,Moderado,19.57,Moderado,0.3,1.53
+case_0089,Diametro Eje Corto,mm,88.71,Alto,48.17,Alto,40.54,45.7
+case_0092,Diametro Eje Corto,mm,20.09,Moderado,24.09,Moderado,4.0,19.91
+case_0093,Diametro Eje Corto,mm,32.11,Medio-Alto,43.34,Medio-Alto,11.22,34.96
+case_0098,Diametro Eje Corto,mm,62.09,Alto,30.18,Medio-Alto,31.91,51.39
+case_0101,Diametro Eje Corto,mm,28.71,Medio-Alto,28.17,Medio-Alto,0.54,1.9
+case_0102,Diametro Eje Corto,mm,20.01,Moderado,37.43,Medio-Alto,17.42,87.04
+case_0109,Diametro Eje Corto,mm,19.84,Moderado,27.55,Medio-Alto,7.71,38.86
+case_0110,Diametro Eje Corto,mm,21.87,Moderado,23.81,Moderado,1.94,8.87
+case_0111,Diametro Eje Corto,mm,11.58,Bajo,13.87,Bajo,2.29,19.77
+case_0112,Diametro Eje Corto,mm,89.68,Alto,85.25,Alto,4.43,4.94
+case_0113,Diametro Eje Corto,mm,12.52,Bajo,16.85,Bajo,4.33,34.58
+case_0115,Diametro Eje Corto,mm,28.72,Medio-Alto,33.09,Medio-Alto,4.36,15.19
+case_0116,Diametro Eje Corto,mm,24.03,Moderado,27.61,Medio-Alto,3.58,14.91
+case_0117,Diametro Eje Corto,mm,27.34,Medio-Alto,35.06,Medio-Alto,7.72,28.24
+case_0119,Diametro Eje Corto,mm,24.0,Moderado,61.84,Alto,37.84,157.7
+case_0124,Diametro Eje Corto,mm,96.57,Alto,87.63,Alto,8.94,9.26
+case_0125,Diametro Eje Corto,mm,62.28,Alto,39.83,Medio-Alto,22.44,36.04
+case_0126,Diametro Eje Corto,mm,19.02,Moderado,22.29,Moderado,3.28,17.23
+case_0129,Diametro Eje Corto,mm,38.05,Medio-Alto,34.2,Medio-Alto,3.84,10.1
+case_0130,Diametro Eje Corto,mm,38.75,Medio-Alto,56.3,Alto,17.55,45.29
+case_0131,Diametro Eje Corto,mm,37.06,Medio-Alto,52.0,Alto,14.94,40.3
+case_0132,Diametro Eje Corto,mm,91.43,Alto,81.52,Alto,9.91,10.84
+case_0136,Diametro Eje Corto,mm,79.74,Alto,53.77,Alto,25.97,32.57
+case_0140,Diametro Eje Corto,mm,65.14,Alto,56.19,Alto,8.94,13.73
+case_0142,Diametro Eje Corto,mm,59.12,Alto,81.93,Alto,22.81,38.59
+case_0149,Diametro Eje Corto,mm,26.47,Medio-Alto,45.62,Medio-Alto,19.15,72.32
+case_0150,Diametro Eje Corto,mm,11.29,Bajo,14.82,Bajo,3.53,31.23
+case_0152,Diametro Eje Corto,mm,20.0,Moderado,19.26,Moderado,0.75,3.74
+case_0155,Diametro Eje Corto,mm,21.64,Moderado,17.81,Bajo,3.83,17.71
+case_0158,Diametro Eje Corto,mm,16.2,Bajo,17.25,Bajo,1.04,6.43
+case_0159,Diametro Eje Corto,mm,21.38,Moderado,20.11,Moderado,1.27,5.95
+case_0160,Diametro Eje Corto,mm,34.87,Medio-Alto,34.13,Medio-Alto,0.74,2.12
+case_0164,Diametro Eje Corto,mm,98.83,Alto,49.4,Alto,49.44,50.02
+case_0166,Diametro Eje Corto,mm,22.33,Moderado,28.34,Medio-Alto,6.02,26.95
+case_0170,Diametro Eje Corto,mm,32.62,Medio-Alto,25.64,Medio-Alto,6.99,21.42
+case_0171,Diametro Eje Corto,mm,55.81,Alto,54.1,Alto,1.71,3.07
+case_0175,Diametro Eje Corto,mm,64.81,Alto,40.51,Medio-Alto,24.3,37.49
+case_0177,Diametro Eje Corto,mm,25.75,Medio-Alto,20.66,Moderado,5.09,19.75
+case_0178,Diametro Eje Corto,mm,29.76,Medio-Alto,32.72,Medio-Alto,2.96,9.96
+case_0180,Diametro Eje Corto,mm,91.24,Alto,78.34,Alto,12.9,14.14
+case_0182,Diametro Eje Corto,mm,17.61,Bajo,15.88,Bajo,1.74,9.85
+case_0183,Diametro Eje Corto,mm,23.23,Moderado,20.61,Moderado,2.62,11.28
+case_0187,Diametro Eje Corto,mm,20.05,Moderado,24.59,Moderado,4.55,22.68
+case_0188,Diametro Eje Corto,mm,87.5,Alto,99.53,Alto,12.03,13.75
+case_0189,Diametro Eje Corto,mm,18.22,Bajo,15.04,Bajo,3.17,17.41
+case_0191,Diametro Eje Corto,mm,15.47,Bajo,17.08,Bajo,1.62,10.46
+case_0193,Diametro Eje Corto,mm,14.48,Bajo,15.72,Bajo,1.24,8.53
+case_0194,Diametro Eje Corto,mm,21.07,Moderado,23.62,Moderado,2.56,12.15
+case_0197,Diametro Eje Corto,mm,35.5,Medio-Alto,37.13,Medio-Alto,1.63,4.59
+case_0199,Diametro Eje Corto,mm,54.06,Alto,52.14,Alto,1.92,3.55
+case_0201,Diametro Eje Corto,mm,77.49,Alto,84.92,Alto,7.43,9.58
+case_0202,Diametro Eje Corto,mm,10.81,Bajo,11.54,Bajo,0.73,6.75
+case_0203,Diametro Eje Corto,mm,30.67,Medio-Alto,42.05,Medio-Alto,11.38,37.12
+case_0204,Diametro Eje Corto,mm,22.09,Moderado,35.37,Medio-Alto,13.28,60.11
+case_0206,Diametro Eje Corto,mm,46.91,Medio-Alto,36.87,Medio-Alto,10.04,21.41
+case_0210,Diametro Eje Corto,mm,84.48,Alto,76.42,Alto,8.06,9.54
+case_0216,Diametro Eje Corto,mm,17.07,Bajo,37.5,Medio-Alto,20.43,119.72
+case_0219,Diametro Eje Corto,mm,27.68,Medio-Alto,24.5,Moderado,3.18,11.47
+case_0222,Diametro Eje Corto,mm,19.32,Moderado,29.83,Medio-Alto,10.5,54.36
+case_0223,Diametro Eje Corto,mm,26.85,Medio-Alto,32.2,Medio-Alto,5.35,19.93
+case_0225,Diametro Eje Corto,mm,59.75,Alto,35.81,Medio-Alto,23.94,40.07
+case_0227,Diametro Eje Corto,mm,18.7,Bajo,21.77,Moderado,3.07,16.42
+case_0228,Diametro Eje Corto,mm,107.33,Alto,87.28,Alto,20.04,18.68
+case_0229,Diametro Eje Corto,mm,27.39,Medio-Alto,37.63,Medio-Alto,10.24,37.39
+case_0230,Diametro Eje Corto,mm,90.86,Alto,90.2,Alto,0.66,0.72
+case_0232,Diametro Eje Corto,mm,32.27,Medio-Alto,42.71,Medio-Alto,10.44,32.37
+case_0236,Diametro Eje Corto,mm,29.65,Medio-Alto,47.22,Alto,17.57,59.27
+case_0238,Diametro Eje Corto,mm,21.5,Moderado,27.17,Medio-Alto,5.67,26.37
+case_0239,Diametro Eje Corto,mm,87.86,Alto,63.49,Alto,24.37,27.74
+case_0240,Diametro Eje Corto,mm,36.05,Medio-Alto,55.12,Alto,19.08,52.93
+case_0242,Diametro Eje Corto,mm,76.28,Alto,27.92,Medio-Alto,48.36,63.4
+case_0243,Diametro Eje Corto,mm,69.35,Alto,21.76,Moderado,47.6,68.63
+case_0244,Diametro Eje Corto,mm,20.12,Moderado,25.75,Medio-Alto,5.63,27.97
+case_0246,Diametro Eje Corto,mm,37.68,Medio-Alto,26.88,Medio-Alto,10.8,28.65
+case_0247,Diametro Eje Corto,mm,32.16,Medio-Alto,25.54,Medio-Alto,6.62,20.58
+case_0250,Diametro Eje Corto,mm,21.93,Moderado,22.43,Moderado,0.51,2.3
+case_0252,Diametro Eje Corto,mm,60.1,Alto,60.98,Alto,0.88,1.46
+case_0256,Diametro Eje Corto,mm,26.24,Medio-Alto,46.57,Medio-Alto,20.33,77.47
+case_0259,Diametro Eje Corto,mm,17.86,Bajo,17.74,Bajo,0.12,0.69
+case_0264,Diametro Eje Corto,mm,110.81,Alto,83.21,Alto,27.6,24.9
+case_0267,Diametro Eje Corto,mm,43.81,Medio-Alto,42.39,Medio-Alto,1.42,3.23
+case_0269,Diametro Eje Corto,mm,27.24,Medio-Alto,47.1,Alto,19.87,72.93
+case_0270,Diametro Eje Corto,mm,18.78,Bajo,19.47,Moderado,0.69,3.67
+case_0271,Diametro Eje Corto,mm,32.35,Medio-Alto,28.59,Medio-Alto,3.76,11.63
+case_0273,Diametro Eje Corto,mm,25.58,Medio-Alto,33.11,Medio-Alto,7.53,29.45
+case_0278,Diametro Eje Corto,mm,22.46,Moderado,36.31,Medio-Alto,13.85,61.69
+case_0279,Diametro Eje Corto,mm,19.69,Moderado,20.14,Moderado,0.45,2.29
+case_0281,Diametro Eje Corto,mm,19.58,Moderado,19.65,Moderado,0.07,0.34
+case_0282,Diametro Eje Corto,mm,41.01,Medio-Alto,50.87,Alto,9.86,24.05
+case_0283,Diametro Eje Corto,mm,23.97,Moderado,21.47,Moderado,2.5,10.43
+case_0286,Diametro Eje Corto,mm,65.48,Alto,71.68,Alto,6.19,9.46
+case_0287,Diametro Eje Corto,mm,17.48,Bajo,19.13,Moderado,1.65,9.47
+case_0288,Diametro Eje Corto,mm,20.34,Moderado,42.36,Medio-Alto,22.01,108.21
+case_0292,Diametro Eje Corto,mm,115.17,Alto,57.14,Alto,58.03,50.38
+case_0295,Diametro Eje Corto,mm,21.93,Moderado,32.82,Medio-Alto,10.89,49.67
+case_0296,Diametro Eje Corto,mm,47.53,Alto,59.68,Alto,12.15,25.56
+case_0297,Diametro Eje Corto,mm,30.93,Medio-Alto,40.34,Medio-Alto,9.4,30.4
+case_0301,Diametro Eje Corto,mm,16.26,Bajo,17.97,Bajo,1.71,10.54
+case_0302,Diametro Eje Corto,mm,23.78,Moderado,22.38,Moderado,1.4,5.89
+case_0304,Diametro Eje Corto,mm,12.35,Bajo,14.69,Bajo,2.34,18.96
+case_0308,Diametro Eje Corto,mm,18.95,Moderado,21.02,Moderado,2.07,10.9
+case_0311,Diametro Eje Corto,mm,54.93,Alto,60.07,Alto,5.13,9.34
+case_0313,Diametro Eje Corto,mm,14.04,Bajo,29.02,Medio-Alto,14.98,106.67
+case_0314,Diametro Eje Corto,mm,91.13,Alto,86.46,Alto,4.68,5.13
+case_0315,Diametro Eje Corto,mm,17.41,Bajo,16.21,Bajo,1.2,6.87
+case_0317,Diametro Eje Corto,mm,30.18,Medio-Alto,52.54,Alto,22.36,74.08
+case_0318,Diametro Eje Corto,mm,108.05,Alto,90.78,Alto,17.27,15.98
+case_0319,Diametro Eje Corto,mm,52.24,Alto,27.13,Medio-Alto,25.11,48.07
+case_0320,Diametro Eje Corto,mm,17.16,Bajo,17.94,Bajo,0.78,4.53
+case_0322,Diametro Eje Corto,mm,15.12,Bajo,17.06,Bajo,1.94,12.81
+case_0324,Diametro Eje Corto,mm,84.3,Alto,68.96,Alto,15.34,18.2
+case_0326,Diametro Eje Corto,mm,82.41,Alto,65.67,Alto,16.74,20.32
+case_0327,Diametro Eje Corto,mm,20.35,Moderado,21.7,Moderado,1.35,6.65
+case_0328,Diametro Eje Corto,mm,32.19,Medio-Alto,28.43,Medio-Alto,3.76,11.67
+case_0329,Diametro Eje Corto,mm,20.71,Moderado,17.63,Bajo,3.09,14.91
+case_0331,Diametro Eje Corto,mm,24.19,Moderado,22.65,Moderado,1.54,6.38
+case_0333,Diametro Eje Corto,mm,47.79,Alto,46.16,Medio-Alto,1.63,3.41
+case_0334,Diametro Eje Corto,mm,25.48,Moderado,25.59,Medio-Alto,0.12,0.46
+case_0336,Diametro Eje Corto,mm,78.4,Alto,56.15,Alto,22.25,28.38
+case_0338,Diametro Eje Corto,mm,19.05,Moderado,18.67,Bajo,0.38,1.97
+case_0341,Diametro Eje Corto,mm,65.39,Alto,39.29,Medio-Alto,26.1,39.91
+case_0343,Diametro Eje Corto,mm,23.01,Moderado,28.95,Medio-Alto,5.94,25.83
+case_0348,Diametro Eje Corto,mm,21.27,Moderado,23.45,Moderado,2.18,10.24
+case_0354,Diametro Eje Corto,mm,31.59,Medio-Alto,34.81,Medio-Alto,3.22,10.21
+case_0356,Diametro Eje Corto,mm,19.58,Moderado,23.17,Moderado,3.59,18.34
+case_0357,Diametro Eje Corto,mm,22.49,Moderado,21.37,Moderado,1.12,4.98
+case_0359,Diametro Eje Corto,mm,107.18,Alto,71.5,Alto,35.68,33.29
+case_0360,Diametro Eje Corto,mm,48.0,Alto,56.06,Alto,8.06,16.79
+case_0364,Diametro Eje Corto,mm,30.32,Medio-Alto,26.8,Medio-Alto,3.52,11.6
+case_0365,Diametro Eje Corto,mm,62.12,Alto,64.25,Alto,2.13,3.43
+case_0368,Diametro Eje Corto,mm,20.17,Moderado,25.93,Medio-Alto,5.77,28.59
+case_0376,Diametro Eje Corto,mm,18.5,Bajo,19.12,Moderado,0.62,3.32
+case_0378,Diametro Eje Corto,mm,63.12,Alto,83.87,Alto,20.75,32.88
+case_0380,Diametro Eje Corto,mm,20.06,Moderado,17.4,Bajo,2.65,13.22
+case_0384,Diametro Eje Corto,mm,71.75,Alto,33.51,Medio-Alto,38.24,53.29
+case_0385,Diametro Eje Corto,mm,30.59,Medio-Alto,32.2,Medio-Alto,1.61,5.27
+case_0386,Diametro Eje Corto,mm,33.58,Medio-Alto,38.32,Medio-Alto,4.74,14.12
+case_0392,Diametro Eje Corto,mm,18.42,Bajo,23.4,Moderado,4.98,27.07
+case_0394,Diametro Eje Corto,mm,8.59,Bajo,11.95,Bajo,3.35,38.99
+case_0395,Diametro Eje Corto,mm,17.73,Bajo,18.21,Bajo,0.48,2.73
+case_0396,Diametro Eje Corto,mm,30.17,Medio-Alto,32.42,Medio-Alto,2.25,7.45
+case_0398,Diametro Eje Corto,mm,87.36,Alto,55.61,Alto,31.75,36.34
+case_0400,Diametro Eje Corto,mm,23.85,Moderado,13.84,Bajo,10.01,41.97
+case_0401,Diametro Eje Corto,mm,27.25,Medio-Alto,20.53,Moderado,6.72,24.67
+case_0402,Diametro Eje Corto,mm,15.48,Bajo,13.61,Bajo,1.86,12.04
+case_0406,Diametro Eje Corto,mm,18.31,Bajo,24.22,Moderado,5.91,32.3
+case_0411,Diametro Eje Corto,mm,20.97,Moderado,40.45,Medio-Alto,19.48,92.89
+case_0412,Diametro Eje Corto,mm,52.94,Alto,26.55,Medio-Alto,26.38,49.84
+case_0413,Diametro Eje Corto,mm,86.61,Alto,73.91,Alto,12.7,14.67
+case_0415,Diametro Eje Corto,mm,37.33,Medio-Alto,35.63,Medio-Alto,1.7,4.56
+case_0417,Diametro Eje Corto,mm,32.16,Medio-Alto,27.78,Medio-Alto,4.38,13.61
+case_0418,Diametro Eje Corto,mm,18.54,Bajo,20.84,Moderado,2.3,12.39
+case_0419,Diametro Eje Corto,mm,12.15,Bajo,15.17,Bajo,3.02,24.83
+case_0421,Diametro Eje Corto,mm,20.82,Moderado,26.5,Medio-Alto,5.68,27.28
+case_0423,Diametro Eje Corto,mm,29.69,Medio-Alto,23.12,Moderado,6.57,22.14
+case_0424,Diametro Eje Corto,mm,13.47,Bajo,17.19,Bajo,3.72,27.58
+case_0428,Diametro Eje Corto,mm,73.09,Alto,48.44,Alto,24.65,33.72
+case_0431,Diametro Eje Corto,mm,20.17,Moderado,22.32,Moderado,2.15,10.66
+case_0434,Diametro Eje Corto,mm,69.6,Alto,36.21,Medio-Alto,33.39,47.98
+case_0436,Diametro Eje Corto,mm,18.81,Bajo,46.53,Medio-Alto,27.72,147.34
+case_0437,Diametro Eje Corto,mm,22.4,Moderado,22.95,Moderado,0.55,2.45
+case_0439,Diametro Eje Corto,mm,79.71,Alto,63.83,Alto,15.88,19.93
+case_0440,Diametro Eje Corto,mm,27.36,Medio-Alto,26.38,Medio-Alto,0.99,3.61
+case_0441,Diametro Eje Corto,mm,31.47,Medio-Alto,37.21,Medio-Alto,5.74,18.23
+case_0442,Diametro Eje Corto,mm,61.82,Alto,68.34,Alto,6.51,10.54
+case_0444,Diametro Eje Corto,mm,19.31,Moderado,19.53,Moderado,0.21,1.1
+case_0445,Diametro Eje Corto,mm,29.89,Medio-Alto,25.04,Moderado,4.85,16.23
+case_0446,Diametro Eje Corto,mm,24.88,Moderado,18.99,Moderado,5.9,23.7
+case_0448,Diametro Eje Corto,mm,16.42,Bajo,18.59,Bajo,2.17,13.23
+case_0449,Diametro Eje Corto,mm,27.66,Medio-Alto,24.37,Moderado,3.3,11.92
+case_0450,Diametro Eje Corto,mm,25.54,Medio-Alto,33.57,Medio-Alto,8.03,31.44
+case_0452,Diametro Eje Corto,mm,84.37,Alto,74.83,Alto,9.54,11.31
+case_0456,Diametro Eje Corto,mm,20.49,Moderado,20.29,Moderado,0.19,0.95
+case_0459,Diametro Eje Corto,mm,26.27,Medio-Alto,29.14,Medio-Alto,2.86,10.89
+case_0463,Diametro Eje Corto,mm,19.04,Moderado,18.07,Bajo,0.96,5.06
+case_0466,Diametro Eje Corto,mm,20.38,Moderado,23.32,Moderado,2.94,14.44
+case_0468,Diametro Eje Corto,mm,31.26,Medio-Alto,38.76,Medio-Alto,7.5,23.98
+case_0469,Diametro Eje Corto,mm,15.21,Bajo,15.58,Bajo,0.37,2.43
+case_0470,Diametro Eje Corto,mm,28.86,Medio-Alto,35.57,Medio-Alto,6.71,23.23
+case_0474,Diametro Eje Corto,mm,16.86,Bajo,17.21,Bajo,0.34,2.04
+case_0475,Diametro Eje Corto,mm,18.52,Bajo,20.3,Moderado,1.79,9.64
+case_0478,Diametro Eje Corto,mm,70.41,Alto,41.41,Medio-Alto,29.01,41.2
+case_0480,Diametro Eje Corto,mm,37.76,Medio-Alto,47.62,Alto,9.86,26.11
+case_0481,Diametro Eje Corto,mm,18.37,Bajo,17.36,Bajo,1.01,5.5
+case_0482,Diametro Eje Corto,mm,12.84,Bajo,14.68,Bajo,1.84,14.3
+case_0484,Diametro Eje Corto,mm,79.39,Alto,72.27,Alto,7.12,8.97
+case_0487,Diametro Eje Corto,mm,26.78,Medio-Alto,28.32,Medio-Alto,1.55,5.78
+case_0489,Diametro Eje Corto,mm,20.64,Moderado,19.72,Moderado,0.91,4.42
+case_0491,Diametro Eje Corto,mm,44.51,Medio-Alto,45.98,Medio-Alto,1.47,3.31
+case_0493,Diametro Eje Corto,mm,15.36,Bajo,16.24,Bajo,0.88,5.72
+case_0495,Diametro Eje Corto,mm,60.58,Alto,57.0,Alto,3.57,5.9
+case_0496,Diametro Eje Corto,mm,15.94,Bajo,18.11,Bajo,2.17,13.64
+case_0497,Diametro Eje Corto,mm,56.84,Alto,56.71,Alto,0.14,0.24
+case_0499,Diametro Eje Corto,mm,18.83,Bajo,18.28,Bajo,0.55,2.92
+case_0501,Diametro Eje Corto,mm,103.07,Alto,65.32,Alto,37.75,36.63
+case_0504,Diametro Eje Corto,mm,16.97,Bajo,18.4,Bajo,1.43,8.43
+case_0506,Diametro Eje Corto,mm,17.95,Bajo,21.17,Moderado,3.22,17.95
+case_0508,Diametro Eje Corto,mm,71.67,Alto,49.94,Alto,21.73,30.33
+case_0509,Diametro Eje Corto,mm,12.53,Bajo,12.42,Bajo,0.11,0.9
+case_0512,Diametro Eje Corto,mm,13.99,Bajo,16.48,Bajo,2.49,17.81
+case_0513,Diametro Eje Corto,mm,42.33,Medio-Alto,37.79,Medio-Alto,4.54,10.73
+case_0514,Diametro Eje Corto,mm,22.44,Moderado,19.66,Moderado,2.77,12.36
+case_0515,Diametro Eje Corto,mm,14.46,Bajo,16.26,Bajo,1.8,12.43
+case_0518,Diametro Eje Corto,mm,13.73,Bajo,15.33,Bajo,1.6,11.63
+case_0519,Diametro Eje Corto,mm,17.23,Bajo,16.22,Bajo,1.01,5.86
+case_0522,Diametro Eje Corto,mm,9.78,Bajo,13.25,Bajo,3.47,35.5
+case_0523,Diametro Eje Corto,mm,70.96,Alto,65.54,Alto,5.42,7.64
+case_0524,Diametro Eje Corto,mm,61.92,Alto,42.38,Medio-Alto,19.53,31.55
+case_0527,Diametro Eje Corto,mm,82.69,Alto,57.97,Alto,24.72,29.89
+case_0531,Diametro Eje Corto,mm,22.53,Moderado,26.48,Medio-Alto,3.95,17.53
+case_0532,Diametro Eje Corto,mm,24.33,Moderado,25.11,Moderado,0.78,3.19
+case_0546,Diametro Eje Corto,mm,18.01,Bajo,17.68,Bajo,0.33,1.82
+case_0547,Diametro Eje Corto,mm,114.33,Alto,30.71,Medio-Alto,83.62,73.14
+case_0548,Diametro Eje Corto,mm,24.85,Moderado,31.93,Medio-Alto,7.08,28.49
+case_0550,Diametro Eje Corto,mm,85.96,Alto,62.2,Alto,23.76,27.64
+case_0551,Diametro Eje Corto,mm,25.43,Moderado,21.39,Moderado,4.04,15.89
+case_0552,Diametro Eje Corto,mm,35.91,Medio-Alto,39.56,Medio-Alto,3.65,10.16
+case_0553,Diametro Eje Corto,mm,22.85,Moderado,21.67,Moderado,1.18,5.18
+case_0554,Diametro Eje Corto,mm,49.22,Alto,34.01,Medio-Alto,15.21,30.9
+case_0556,Diametro Eje Corto,mm,17.51,Bajo,20.58,Moderado,3.07,17.53
+case_0558,Diametro Eje Corto,mm,21.61,Moderado,20.64,Moderado,0.97,4.49
+case_0562,Diametro Eje Corto,mm,48.92,Alto,30.14,Medio-Alto,18.79,38.4
+case_0566,Diametro Eje Corto,mm,60.55,Alto,17.21,Bajo,43.34,71.58
+case_0567,Diametro Eje Corto,mm,21.29,Moderado,27.81,Medio-Alto,6.53,30.67
+case_0571,Diametro Eje Corto,mm,70.98,Alto,69.01,Alto,1.98,2.78
+case_0573,Diametro Eje Corto,mm,14.62,Bajo,15.92,Bajo,1.3,8.92
+case_0577,Diametro Eje Corto,mm,15.52,Bajo,17.07,Bajo,1.55,10.01
+case_0582,Diametro Eje Corto,mm,18.14,Bajo,20.76,Moderado,2.62,14.45
+case_0583,Diametro Eje Corto,mm,74.84,Alto,61.28,Alto,13.56,18.12
+case_0586,Diametro Eje Corto,mm,26.58,Medio-Alto,21.31,Moderado,5.27,19.82
+case_0590,Diametro Eje Corto,mm,35.07,Medio-Alto,24.99,Moderado,10.07,28.73
+case_0591,Diametro Eje Corto,mm,106.35,Alto,54.58,Alto,51.77,48.68
+case_0593,Diametro Eje Corto,mm,45.27,Medio-Alto,29.46,Medio-Alto,15.81,34.92
+case_0596,Diametro Eje Corto,mm,21.65,Moderado,24.03,Moderado,2.38,10.99
+case_0597,Diametro Eje Corto,mm,38.48,Medio-Alto,41.88,Medio-Alto,3.4,8.83
+case_0599,Diametro Eje Corto,mm,81.68,Alto,46.13,Medio-Alto,35.55,43.52
+case_0601,Diametro Eje Corto,mm,29.29,Medio-Alto,29.99,Medio-Alto,0.71,2.42
+case_0604,Diametro Eje Corto,mm,18.76,Bajo,20.63,Moderado,1.87,9.95
+case_0605,Diametro Eje Corto,mm,21.27,Moderado,23.22,Moderado,1.95,9.18
+case_0607,Diametro Eje Corto,mm,34.31,Medio-Alto,26.6,Medio-Alto,7.71,22.47
+case_0608,Diametro Eje Corto,mm,79.81,Alto,75.64,Alto,4.17,5.23
+case_0609,Diametro Eje Corto,mm,74.01,Alto,75.82,Alto,1.81,2.44
+case_0610,Diametro Eje Corto,mm,15.62,Bajo,17.19,Bajo,1.56,9.99
+case_0611,Diametro Eje Corto,mm,12.71,Bajo,15.51,Bajo,2.8,22.03
+case_0614,Diametro Eje Corto,mm,22.03,Moderado,19.19,Moderado,2.84,12.89
+case_0615,Diametro Eje Corto,mm,12.47,Bajo,14.2,Bajo,1.73,13.89
+case_0616,Diametro Eje Corto,mm,20.59,Moderado,21.96,Moderado,1.36,6.62
+case_0618,Diametro Eje Corto,mm,39.95,Medio-Alto,48.99,Alto,9.04,22.62
+case_0621,Diametro Eje Corto,mm,95.43,Alto,75.0,Alto,20.43,21.41
+case_0622,Diametro Eje Corto,mm,15.37,Bajo,15.79,Bajo,0.42,2.71
+case_0626,Diametro Eje Corto,mm,26.26,Medio-Alto,22.57,Moderado,3.69,14.05
+case_0627,Diametro Eje Corto,mm,76.95,Alto,62.99,Alto,13.95,18.13
+case_0628,Diametro Eje Corto,mm,15.76,Bajo,24.26,Moderado,8.5,53.92
+case_0636,Diametro Eje Corto,mm,66.43,Alto,27.76,Medio-Alto,38.68,58.22
+case_0638,Diametro Eje Corto,mm,21.15,Moderado,24.61,Moderado,3.46,16.34
+case_0642,Diametro Eje Corto,mm,71.57,Alto,67.0,Alto,4.57,6.38
+case_0645,Diametro Eje Corto,mm,47.44,Alto,26.68,Medio-Alto,20.76,43.77
+case_0646,Diametro Eje Corto,mm,15.67,Bajo,13.17,Bajo,2.51,16.0
+case_0648,Diametro Eje Corto,mm,21.06,Moderado,22.69,Moderado,1.63,7.74
+case_0649,Diametro Eje Corto,mm,23.8,Moderado,33.83,Medio-Alto,10.03,42.15
+case_0651,Diametro Eje Corto,mm,28.86,Medio-Alto,38.04,Medio-Alto,9.17,31.78
+case_0654,Diametro Eje Corto,mm,85.02,Alto,49.09,Alto,35.93,42.26
+case_0655,Diametro Eje Corto,mm,41.63,Medio-Alto,46.92,Medio-Alto,5.3,12.72
+case_0656,Diametro Eje Corto,mm,70.47,Alto,47.96,Alto,22.51,31.95
+case_0657,Diametro Eje Corto,mm,25.33,Moderado,21.66,Moderado,3.67,14.49
+case_0658,Diametro Eje Corto,mm,64.05,Alto,49.99,Alto,14.06,21.95
+case_0659,Diametro Eje Corto,mm,18.99,Moderado,17.96,Bajo,1.04,5.46
+case_0662,Diametro Eje Corto,mm,21.24,Moderado,19.23,Moderado,2.01,9.44
+case_0663,Diametro Eje Corto,mm,45.45,Medio-Alto,32.93,Medio-Alto,12.53,27.56
+case_0666,Diametro Eje Corto,mm,71.48,Alto,67.51,Alto,3.97,5.56
+case_0667,Diametro Eje Corto,mm,59.54,Alto,24.76,Moderado,34.79,58.42
+case_0668,Diametro Eje Corto,mm,19.53,Moderado,20.4,Moderado,0.87,4.46
+case_0669,Diametro Eje Corto,mm,17.82,Bajo,16.41,Bajo,1.4,7.87
+case_0671,Diametro Eje Corto,mm,10.72,Bajo,13.34,Bajo,2.62,24.46
+case_0673,Diametro Eje Corto,mm,83.24,Alto,81.01,Alto,2.23,2.68
+case_0676,Diametro Eje Corto,mm,110.49,Alto,59.33,Alto,51.16,46.31
+case_0677,Diametro Eje Corto,mm,37.08,Medio-Alto,34.04,Medio-Alto,3.04,8.21
+case_0678,Diametro Eje Corto,mm,39.08,Medio-Alto,40.98,Medio-Alto,1.89,4.84
+case_0679,Diametro Eje Corto,mm,44.93,Medio-Alto,30.29,Medio-Alto,14.64,32.58
+case_0682,Diametro Eje Corto,mm,24.77,Moderado,20.5,Moderado,4.27,17.23
+case_0683,Diametro Eje Corto,mm,19.93,Moderado,18.65,Bajo,1.27,6.4
+case_0685,Diametro Eje Corto,mm,14.32,Bajo,15.53,Bajo,1.21,8.43
+case_0686,Diametro Eje Corto,mm,43.91,Medio-Alto,62.42,Alto,18.52,42.17
+case_0688,Diametro Eje Corto,mm,11.83,Bajo,14.58,Bajo,2.76,23.3
+case_0690,Diametro Eje Corto,mm,25.27,Moderado,29.41,Medio-Alto,4.14,16.39
+case_0691,Diametro Eje Corto,mm,28.61,Medio-Alto,41.42,Medio-Alto,12.81,44.76
+case_0694,Diametro Eje Corto,mm,73.58,Alto,62.28,Alto,11.3,15.36
+case_0695,Diametro Eje Corto,mm,9.62,Bajo,11.87,Bajo,2.24,23.31
+case_0697,Diametro Eje Corto,mm,33.32,Medio-Alto,50.78,Alto,17.46,52.4
+case_0700,Diametro Eje Corto,mm,37.79,Medio-Alto,26.21,Medio-Alto,11.58,30.64
+case_0702,Diametro Eje Corto,mm,79.77,Alto,35.82,Medio-Alto,43.95,55.1
+case_0704,Diametro Eje Corto,mm,48.31,Alto,57.83,Alto,9.52,19.71
+case_0707,Diametro Eje Corto,mm,17.29,Bajo,17.32,Bajo,0.03,0.15
+case_0708,Diametro Eje Corto,mm,48.47,Alto,47.18,Alto,1.29,2.67
+case_0709,Diametro Eje Corto,mm,23.94,Moderado,28.87,Medio-Alto,4.93,20.6
+case_0714,Diametro Eje Corto,mm,64.3,Alto,58.68,Alto,5.63,8.75
+case_0715,Diametro Eje Corto,mm,38.58,Medio-Alto,36.45,Medio-Alto,2.12,5.5
+case_0716,Diametro Eje Corto,mm,114.42,Alto,77.89,Alto,36.53,31.92
+case_0717,Diametro Eje Corto,mm,17.36,Bajo,16.4,Bajo,0.96,5.55
+case_0719,Diametro Eje Corto,mm,10.28,Bajo,13.28,Bajo,3.0,29.24
+case_0720,Diametro Eje Corto,mm,41.35,Medio-Alto,45.42,Medio-Alto,4.07,9.84
+case_0725,Diametro Eje Corto,mm,82.03,Alto,63.44,Alto,18.59,22.66
+case_0727,Diametro Eje Corto,mm,22.66,Moderado,24.94,Moderado,2.27,10.03
+case_0731,Diametro Eje Corto,mm,11.66,Bajo,14.28,Bajo,2.62,22.48
+case_0732,Diametro Eje Corto,mm,25.92,Medio-Alto,25.52,Medio-Alto,0.4,1.55
+case_0737,Diametro Eje Corto,mm,20.35,Moderado,27.55,Medio-Alto,7.21,35.42
+case_0738,Diametro Eje Corto,mm,32.16,Medio-Alto,49.28,Alto,17.11,53.2
+case_0740,Diametro Eje Corto,mm,20.37,Moderado,21.15,Moderado,0.78,3.85
+case_0742,Diametro Eje Corto,mm,29.63,Medio-Alto,27.25,Medio-Alto,2.38,8.03
+case_0745,Diametro Eje Corto,mm,40.39,Medio-Alto,46.75,Medio-Alto,6.37,15.77
+case_0746,Diametro Eje Corto,mm,49.7,Alto,35.96,Medio-Alto,13.74,27.65
+case_0748,Diametro Eje Corto,mm,16.06,Bajo,27.95,Medio-Alto,11.88,73.96
+case_0749,Diametro Eje Corto,mm,12.89,Bajo,19.5,Moderado,6.61,51.31
+case_0751,Diametro Eje Corto,mm,64.36,Alto,76.56,Alto,12.2,18.95
+case_0752,Diametro Eje Corto,mm,27.57,Medio-Alto,27.49,Medio-Alto,0.08,0.29
+case_0754,Diametro Eje Corto,mm,27.27,Medio-Alto,26.71,Medio-Alto,0.57,2.07
+case_0758,Diametro Eje Corto,mm,19.87,Moderado,20.05,Moderado,0.18,0.89
+case_0761,Diametro Eje Corto,mm,21.07,Moderado,19.64,Moderado,1.43,6.78
+case_0763,Diametro Eje Corto,mm,42.79,Medio-Alto,63.52,Alto,20.73,48.43
+case_0764,Diametro Eje Corto,mm,21.51,Moderado,18.07,Bajo,3.44,15.98
+case_0765,Diametro Eje Corto,mm,29.41,Medio-Alto,19.88,Moderado,9.52,32.39
+case_0766,Diametro Eje Corto,mm,28.73,Medio-Alto,25.35,Moderado,3.39,11.79
+case_0767,Diametro Eje Corto,mm,15.83,Bajo,17.58,Bajo,1.75,11.02
+case_0768,Diametro Eje Corto,mm,18.77,Bajo,21.87,Moderado,3.1,16.5
+case_0769,Diametro Eje Corto,mm,12.85,Bajo,14.99,Bajo,2.14,16.67
+case_0771,Diametro Eje Corto,mm,106.87,Alto,78.4,Alto,28.47,26.64
+case_0772,Diametro Eje Corto,mm,27.2,Medio-Alto,40.55,Medio-Alto,13.35,49.1
+case_0773,Diametro Eje Corto,mm,18.48,Bajo,21.41,Moderado,2.93,15.84
+case_0774,Diametro Eje Corto,mm,23.92,Moderado,44.32,Medio-Alto,20.39,85.25
+case_0775,Diametro Eje Corto,mm,39.48,Medio-Alto,45.92,Medio-Alto,6.44,16.31
+case_0782,Diametro Eje Corto,mm,25.06,Moderado,25.32,Moderado,0.25,1.02
+case_0784,Diametro Eje Corto,mm,15.79,Bajo,13.48,Bajo,2.31,14.65
+case_0786,Diametro Eje Corto,mm,19.05,Moderado,19.32,Moderado,0.28,1.45
+case_0788,Diametro Eje Corto,mm,31.78,Medio-Alto,39.24,Medio-Alto,7.47,23.49
+case_0790,Diametro Eje Corto,mm,18.21,Bajo,19.18,Moderado,0.96,5.29
+case_0792,Diametro Eje Corto,mm,22.46,Moderado,20.83,Moderado,1.63,7.25
+case_0793,Diametro Eje Corto,mm,16.78,Bajo,18.94,Moderado,2.16,12.88
+case_0795,Diametro Eje Corto,mm,81.97,Alto,45.28,Medio-Alto,36.69,44.76
+case_0796,Diametro Eje Corto,mm,16.84,Bajo,20.92,Moderado,4.09,24.27
+case_0798,Diametro Eje Corto,mm,22.56,Moderado,18.06,Bajo,4.5,19.93
+case_0799,Diametro Eje Corto,mm,29.63,Medio-Alto,31.27,Medio-Alto,1.64,5.55
+case_0800,Diametro Eje Corto,mm,20.67,Moderado,24.81,Moderado,4.14,20.03
+case_0802,Diametro Eje Corto,mm,85.07,Alto,74.18,Alto,10.89,12.8
+case_0803,Diametro Eje Corto,mm,17.01,Bajo,19.37,Moderado,2.37,13.91
+case_0804,Diametro Eje Corto,mm,33.46,Medio-Alto,38.52,Medio-Alto,5.05,15.11
+case_0808,Diametro Eje Corto,mm,99.19,Alto,85.68,Alto,13.51,13.62
+case_0817,Diametro Eje Corto,mm,19.55,Moderado,18.51,Bajo,1.04,5.32
+case_0818,Diametro Eje Corto,mm,28.01,Medio-Alto,32.61,Medio-Alto,4.6,16.42
+case_0820,Diametro Eje Corto,mm,20.19,Moderado,27.86,Medio-Alto,7.67,38.01
+case_0823,Diametro Eje Corto,mm,38.97,Medio-Alto,54.67,Alto,15.71,40.31
+case_0825,Diametro Eje Corto,mm,19.07,Moderado,18.53,Bajo,0.54,2.84
+case_0826,Diametro Eje Corto,mm,21.74,Moderado,20.06,Moderado,1.68,7.74
+case_0827,Diametro Eje Corto,mm,31.74,Medio-Alto,26.51,Medio-Alto,5.23,16.47
+case_0831,Diametro Eje Corto,mm,11.7,Bajo,15.46,Bajo,3.76,32.11
+case_0832,Diametro Eje Corto,mm,66.39,Alto,77.54,Alto,11.15,16.79
+case_0833,Diametro Eje Corto,mm,22.83,Moderado,26.56,Medio-Alto,3.72,16.31
+case_0837,Diametro Eje Corto,mm,39.44,Medio-Alto,75.98,Alto,36.54,92.64
+case_0838,Diametro Eje Corto,mm,15.21,Bajo,16.29,Bajo,1.08,7.12
+case_0847,Diametro Eje Corto,mm,33.94,Medio-Alto,34.2,Medio-Alto,0.25,0.75
+case_0849,Diametro Eje Corto,mm,19.68,Moderado,20.15,Moderado,0.48,2.43
+case_0856,Diametro Eje Corto,mm,14.34,Bajo,15.96,Bajo,1.63,11.34
+case_0857,Diametro Eje Corto,mm,71.05,Alto,54.49,Alto,16.56,23.31
+case_0858,Diametro Eje Corto,mm,17.7,Bajo,19.27,Moderado,1.57,8.87
+case_0860,Diametro Eje Corto,mm,7.05,Bajo,12.79,Bajo,5.74,81.48
+case_0863,Diametro Eje Corto,mm,17.49,Bajo,17.67,Bajo,0.17,0.97
+case_0865,Diametro Eje Corto,mm,58.14,Alto,28.83,Medio-Alto,29.31,50.42
+case_0866,Diametro Eje Corto,mm,49.77,Alto,33.23,Medio-Alto,16.53,33.22
+case_0868,Diametro Eje Corto,mm,42.35,Medio-Alto,46.73,Medio-Alto,4.38,10.34
+case_0869,Diametro Eje Corto,mm,42.06,Medio-Alto,45.28,Medio-Alto,3.22,7.64
+case_0872,Diametro Eje Corto,mm,93.94,Alto,88.81,Alto,5.13,5.46
+case_0874,Diametro Eje Corto,mm,82.73,Alto,30.29,Medio-Alto,52.44,63.39
+case_0880,Diametro Eje Corto,mm,18.38,Bajo,21.21,Moderado,2.83,15.39
+case_0883,Diametro Eje Corto,mm,21.39,Moderado,29.06,Medio-Alto,7.67,35.87
+case_0885,Diametro Eje Corto,mm,18.04,Bajo,28.75,Medio-Alto,10.7,59.32
+case_0887,Diametro Eje Corto,mm,23.81,Moderado,20.99,Moderado,2.82,11.86
+case_0890,Diametro Eje Corto,mm,51.68,Alto,45.52,Medio-Alto,6.16,11.92
+case_0895,Diametro Eje Corto,mm,14.33,Bajo,15.41,Bajo,1.08,7.52
+case_0897,Diametro Eje Corto,mm,27.83,Medio-Alto,39.34,Medio-Alto,11.5,41.33
+case_0902,Diametro Eje Corto,mm,28.32,Medio-Alto,38.59,Medio-Alto,10.28,36.29
+case_0903,Diametro Eje Corto,mm,17.19,Bajo,17.09,Bajo,0.1,0.59
+case_0906,Diametro Eje Corto,mm,13.84,Bajo,14.77,Bajo,0.94,6.78
+case_0909,Diametro Eje Corto,mm,24.78,Moderado,21.05,Moderado,3.73,15.06
+case_0911,Diametro Eje Corto,mm,21.78,Moderado,20.8,Moderado,0.98,4.48
+case_0922,Diametro Eje Corto,mm,17.37,Bajo,18.66,Bajo,1.29,7.43
+case_0926,Diametro Eje Corto,mm,25.4,Moderado,25.04,Moderado,0.36,1.41
+case_0927,Diametro Eje Corto,mm,19.01,Moderado,31.47,Medio-Alto,12.46,65.55
+case_0931,Diametro Eje Corto,mm,30.52,Medio-Alto,33.04,Medio-Alto,2.52,8.25
+case_0932,Diametro Eje Corto,mm,19.01,Moderado,20.86,Moderado,1.85,9.75
+case_0933,Diametro Eje Corto,mm,18.55,Bajo,18.56,Bajo,0.01,0.03
+case_0934,Diametro Eje Corto,mm,12.06,Bajo,15.4,Bajo,3.34,27.72
+case_0935,Diametro Eje Corto,mm,19.71,Moderado,15.92,Bajo,3.79,19.23
+case_0938,Diametro Eje Corto,mm,37.48,Medio-Alto,39.77,Medio-Alto,2.29,6.11
+case_0939,Diametro Eje Corto,mm,70.52,Alto,44.52,Medio-Alto,26.0,36.87
+case_0941,Diametro Eje Corto,mm,18.73,Bajo,15.01,Bajo,3.72,19.88
+case_0942,Diametro Eje Corto,mm,67.03,Alto,68.75,Alto,1.73,2.58
+case_0943,Diametro Eje Corto,mm,16.0,Bajo,16.05,Bajo,0.05,0.31
+case_0944,Diametro Eje Corto,mm,22.64,Moderado,20.77,Moderado,1.87,8.25
+case_0945,Diametro Eje Corto,mm,24.23,Moderado,45.23,Medio-Alto,21.0,86.68
+case_0946,Diametro Eje Corto,mm,70.62,Alto,45.75,Medio-Alto,24.87,35.21
+case_0948,Diametro Eje Corto,mm,51.32,Alto,29.86,Medio-Alto,21.46,41.81
+case_0949,Diametro Eje Corto,mm,20.4,Moderado,19.21,Moderado,1.19,5.82
+case_0951,Diametro Eje Corto,mm,25.06,Moderado,23.29,Moderado,1.77,7.05
+case_0952,Diametro Eje Corto,mm,13.29,Bajo,16.9,Bajo,3.6,27.1
+case_0954,Diametro Eje Corto,mm,79.54,Alto,37.96,Medio-Alto,41.58,52.27
+case_0955,Diametro Eje Corto,mm,16.5,Bajo,18.05,Bajo,1.56,9.44
+case_0958,Diametro Eje Corto,mm,36.53,Medio-Alto,42.64,Medio-Alto,6.11,16.72
+case_0962,Diametro Eje Corto,mm,16.7,Bajo,22.16,Moderado,5.46,32.71
+case_0964,Diametro Eje Corto,mm,51.06,Alto,70.59,Alto,19.52,38.23
+case_0966,Diametro Eje Corto,mm,87.02,Alto,64.22,Alto,22.8,26.21
+case_0967,Diametro Eje Corto,mm,17.49,Bajo,20.82,Moderado,3.32,19.01
+case_0969,Diametro Eje Corto,mm,21.35,Moderado,28.58,Medio-Alto,7.23,33.88
+case_0972,Diametro Eje Corto,mm,18.49,Bajo,17.28,Bajo,1.21,6.52
+case_0973,Diametro Eje Corto,mm,53.61,Alto,18.72,Bajo,34.9,65.09
+case_0974,Diametro Eje Corto,mm,28.91,Medio-Alto,26.82,Medio-Alto,2.09,7.25
+case_0977,Diametro Eje Corto,mm,23.94,Moderado,20.61,Moderado,3.33,13.92
+case_0979,Diametro Eje Corto,mm,23.23,Moderado,21.81,Moderado,1.42,6.1
+case_0980,Diametro Eje Corto,mm,18.31,Bajo,18.64,Bajo,0.33,1.79
+case_0982,Diametro Eje Corto,mm,17.88,Bajo,18.69,Bajo,0.81,4.53
+case_0985,Diametro Eje Corto,mm,27.77,Medio-Alto,32.91,Medio-Alto,5.14,18.52
+case_0986,Diametro Eje Corto,mm,23.36,Moderado,20.05,Moderado,3.3,14.14
+case_0988,Diametro Eje Corto,mm,40.31,Medio-Alto,43.63,Medio-Alto,3.32,8.23
+case_0989,Diametro Eje Corto,mm,17.04,Bajo,18.88,Bajo,1.84,10.82
+case_0992,Diametro Eje Corto,mm,14.93,Bajo,15.48,Bajo,0.55,3.7
+case_0993,Diametro Eje Corto,mm,19.6,Moderado,19.62,Moderado,0.02,0.11
+case_0995,Diametro Eje Corto,mm,20.65,Moderado,21.74,Moderado,1.09,5.27
+case_0997,Diametro Eje Corto,mm,27.82,Medio-Alto,31.4,Medio-Alto,3.58,12.87
+case_1002,Diametro Eje Corto,mm,17.47,Bajo,20.27,Moderado,2.8,16.02
+case_1003,Diametro Eje Corto,mm,102.56,Alto,77.68,Alto,24.89,24.27
+case_1007,Diametro Eje Corto,mm,18.39,Bajo,19.03,Moderado,0.64,3.48
+case_1010,Diametro Eje Corto,mm,56.61,Alto,72.35,Alto,15.74,27.8
+case_1012,Diametro Eje Corto,mm,29.57,Medio-Alto,22.48,Moderado,7.1,24.0
+case_1013,Diametro Eje Corto,mm,16.88,Bajo,17.3,Bajo,0.42,2.5
+case_1017,Diametro Eje Corto,mm,21.73,Moderado,20.64,Moderado,1.09,5.03
+case_1018,Diametro Eje Corto,mm,15.59,Bajo,14.81,Bajo,0.78,5.01
+case_1019,Diametro Eje Corto,mm,39.12,Medio-Alto,49.18,Alto,10.06,25.71
+case_1020,Diametro Eje Corto,mm,34.22,Medio-Alto,24.05,Moderado,10.17,29.71
+case_1021,Diametro Eje Corto,mm,64.09,Alto,69.16,Alto,5.07,7.92
+case_1022,Diametro Eje Corto,mm,22.91,Moderado,19.92,Moderado,2.98,13.03
+case_1023,Diametro Eje Corto,mm,20.47,Moderado,19.04,Moderado,1.42,6.94
+case_1034,Diametro Eje Corto,mm,18.08,Bajo,17.99,Bajo,0.09,0.51
+case_1042,Diametro Eje Corto,mm,33.83,Medio-Alto,44.56,Medio-Alto,10.73,31.71
+case_1044,Diametro Eje Corto,mm,12.1,Bajo,15.71,Bajo,3.61,29.83
+case_1045,Diametro Eje Corto,mm,9.68,Bajo,13.8,Bajo,4.12,42.6
+case_1047,Diametro Eje Corto,mm,21.09,Moderado,20.63,Moderado,0.45,2.14
+case_1051,Diametro Eje Corto,mm,28.43,Medio-Alto,23.11,Moderado,5.32,18.7
+case_1057,Diametro Eje Corto,mm,21.53,Moderado,20.32,Moderado,1.22,5.65
+case_1060,Diametro Eje Corto,mm,26.83,Medio-Alto,23.96,Moderado,2.87,10.71
+case_1062,Diametro Eje Corto,mm,18.45,Bajo,19.74,Moderado,1.28,6.95
+case_1064,Diametro Eje Corto,mm,22.29,Moderado,23.89,Moderado,1.6,7.16
+case_1065,Diametro Eje Corto,mm,31.42,Medio-Alto,29.08,Medio-Alto,2.34,7.44
+case_1067,Diametro Eje Corto,mm,24.72,Moderado,25.13,Moderado,0.41,1.64
+case_1071,Diametro Eje Corto,mm,10.52,Bajo,11.69,Bajo,1.17,11.1
+case_1072,Diametro Eje Corto,mm,49.19,Alto,42.45,Medio-Alto,6.74,13.7
+case_1076,Diametro Eje Corto,mm,17.61,Bajo,16.89,Bajo,0.72,4.11
+case_1077,Diametro Eje Corto,mm,19.45,Moderado,17.55,Bajo,1.91,9.8
+case_1081,Diametro Eje Corto,mm,27.68,Medio-Alto,25.73,Medio-Alto,1.95,7.03
+case_1082,Diametro Eje Corto,mm,23.15,Moderado,25.98,Medio-Alto,2.84,12.25
+case_1084,Diametro Eje Corto,mm,26.55,Medio-Alto,31.54,Medio-Alto,4.99,18.79
+case_1085,Diametro Eje Corto,mm,51.09,Alto,48.61,Alto,2.49,4.86
+case_1088,Diametro Eje Corto,mm,17.98,Bajo,20.62,Moderado,2.65,14.72
+case_1090,Diametro Eje Corto,mm,14.9,Bajo,15.4,Bajo,0.5,3.36
+case_1091,Diametro Eje Corto,mm,15.18,Bajo,18.84,Bajo,3.66,24.11
+case_1092,Diametro Eje Corto,mm,22.38,Moderado,22.87,Moderado,0.49,2.19
+case_1093,Diametro Eje Corto,mm,43.14,Medio-Alto,38.79,Medio-Alto,4.35,10.08
+case_1096,Diametro Eje Corto,mm,54.72,Alto,35.54,Medio-Alto,19.18,35.06
+case_1097,Diametro Eje Corto,mm,29.46,Medio-Alto,38.19,Medio-Alto,8.73,29.64
+case_1098,Diametro Eje Corto,mm,27.93,Medio-Alto,29.37,Medio-Alto,1.44,5.17
+case_1100,Diametro Eje Corto,mm,56.71,Alto,49.09,Alto,7.61,13.43
+case_0002,Diametro Eje Largo,mm,111.33,Alto,111.53,Alto,0.19,0.17
+case_0005,Diametro Eje Largo,mm,62.19,Medio-Alto,68.33,Medio-Alto,6.14,9.87
+case_0006,Diametro Eje Largo,mm,74.11,Medio-Alto,62.34,Medio-Alto,11.77,15.88
+case_0009,Diametro Eje Largo,mm,79.12,Medio-Alto,66.74,Medio-Alto,12.38,15.65
+case_0012,Diametro Eje Largo,mm,25.8,Bajo,41.12,Moderado,15.32,59.39
+case_0013,Diametro Eje Largo,mm,130.68,Alto,82.31,Medio-Alto,48.37,37.01
+case_0015,Diametro Eje Largo,mm,125.85,Alto,125.08,Alto,0.76,0.61
+case_0017,Diametro Eje Largo,mm,22.06,Bajo,30.23,Moderado,8.17,37.03
+case_0018,Diametro Eje Largo,mm,103.87,Medio-Alto,118.73,Alto,14.86,14.31
+case_0021,Diametro Eje Largo,mm,97.45,Medio-Alto,79.64,Medio-Alto,17.81,18.28
+case_0023,Diametro Eje Largo,mm,68.79,Medio-Alto,63.81,Medio-Alto,4.98,7.24
+case_0024,Diametro Eje Largo,mm,39.63,Moderado,36.86,Moderado,2.77,7.0
+case_0026,Diametro Eje Largo,mm,67.11,Medio-Alto,34.79,Moderado,32.33,48.17
+case_0029,Diametro Eje Largo,mm,62.22,Medio-Alto,59.77,Medio-Alto,2.46,3.95
+case_0030,Diametro Eje Largo,mm,112.96,Alto,132.05,Alto,19.09,16.9
+case_0032,Diametro Eje Largo,mm,38.11,Moderado,28.78,Moderado,9.33,24.48
+case_0033,Diametro Eje Largo,mm,27.65,Bajo,37.18,Moderado,9.53,34.45
+case_0034,Diametro Eje Largo,mm,28.77,Bajo,70.31,Medio-Alto,41.54,144.39
+case_0035,Diametro Eje Largo,mm,32.78,Moderado,72.97,Medio-Alto,40.19,122.6
+case_0039,Diametro Eje Largo,mm,149.97,Alto,67.76,Medio-Alto,82.21,54.82
+case_0040,Diametro Eje Largo,mm,38.52,Moderado,76.06,Medio-Alto,37.54,97.47
+case_0042,Diametro Eje Largo,mm,17.17,Bajo,30.62,Moderado,13.45,78.31
+case_0044,Diametro Eje Largo,mm,43.19,Moderado,50.02,Moderado,6.83,15.82
+case_0048,Diametro Eje Largo,mm,22.73,Bajo,26.59,Bajo,3.86,16.99
+case_0050,Diametro Eje Largo,mm,80.35,Medio-Alto,77.81,Medio-Alto,2.55,3.17
+case_0052,Diametro Eje Largo,mm,204.6,Alto,138.39,Alto,66.21,32.36
+case_0053,Diametro Eje Largo,mm,105.14,Medio-Alto,89.4,Medio-Alto,15.74,14.97
+case_0054,Diametro Eje Largo,mm,79.19,Medio-Alto,82.99,Medio-Alto,3.8,4.8
+case_0055,Diametro Eje Largo,mm,38.19,Moderado,38.13,Moderado,0.05,0.14
+case_0057,Diametro Eje Largo,mm,23.01,Bajo,47.53,Moderado,24.52,106.55
+case_0058,Diametro Eje Largo,mm,42.62,Moderado,74.92,Medio-Alto,32.29,75.76
+case_0061,Diametro Eje Largo,mm,143.36,Alto,100.99,Medio-Alto,42.37,29.56
+case_0064,Diametro Eje Largo,mm,23.23,Bajo,27.51,Bajo,4.28,18.45
+case_0065,Diametro Eje Largo,mm,194.89,Alto,115.18,Alto,79.71,40.9
+case_0068,Diametro Eje Largo,mm,22.68,Bajo,47.98,Moderado,25.3,111.53
+case_0069,Diametro Eje Largo,mm,33.38,Moderado,29.31,Moderado,4.07,12.19
+case_0074,Diametro Eje Largo,mm,180.49,Alto,87.4,Medio-Alto,93.09,51.58
+case_0076,Diametro Eje Largo,mm,18.98,Bajo,42.06,Moderado,23.09,121.66
+case_0078,Diametro Eje Largo,mm,61.29,Medio-Alto,96.83,Medio-Alto,35.54,57.99
+case_0088,Diametro Eje Largo,mm,21.82,Bajo,32.11,Moderado,10.29,47.16
+case_0089,Diametro Eje Largo,mm,167.19,Alto,97.81,Medio-Alto,69.37,41.49
+case_0092,Diametro Eje Largo,mm,36.6,Moderado,44.61,Moderado,8.02,21.9
+case_0093,Diametro Eje Largo,mm,98.45,Medio-Alto,76.48,Medio-Alto,21.96,22.31
+case_0098,Diametro Eje Largo,mm,92.84,Medio-Alto,59.11,Medio-Alto,33.73,36.33
+case_0101,Diametro Eje Largo,mm,36.48,Moderado,67.98,Medio-Alto,31.5,86.35
+case_0102,Diametro Eje Largo,mm,33.51,Moderado,85.82,Medio-Alto,52.31,156.12
+case_0109,Diametro Eje Largo,mm,24.97,Bajo,38.11,Moderado,13.13,52.6
+case_0110,Diametro Eje Largo,mm,43.21,Moderado,50.92,Moderado,7.71,17.85
+case_0111,Diametro Eje Largo,mm,13.29,Bajo,30.66,Moderado,17.37,130.64
+case_0112,Diametro Eje Largo,mm,119.39,Alto,122.52,Alto,3.14,2.63
+case_0113,Diametro Eje Largo,mm,23.01,Bajo,38.06,Moderado,15.05,65.39
+case_0115,Diametro Eje Largo,mm,121.69,Alto,79.84,Medio-Alto,41.86,34.4
+case_0116,Diametro Eje Largo,mm,39.13,Moderado,74.76,Medio-Alto,35.63,91.04
+case_0117,Diametro Eje Largo,mm,79.6,Medio-Alto,78.62,Medio-Alto,0.98,1.24
+case_0119,Diametro Eje Largo,mm,29.87,Moderado,82.17,Medio-Alto,52.29,175.06
+case_0124,Diametro Eje Largo,mm,136.17,Alto,148.2,Alto,12.04,8.84
+case_0125,Diametro Eje Largo,mm,108.35,Alto,67.67,Medio-Alto,40.68,37.55
+case_0126,Diametro Eje Largo,mm,25.33,Bajo,42.81,Moderado,17.48,69.0
+case_0129,Diametro Eje Largo,mm,62.27,Medio-Alto,73.21,Medio-Alto,10.93,17.56
+case_0130,Diametro Eje Largo,mm,118.06,Alto,99.45,Medio-Alto,18.6,15.76
+case_0131,Diametro Eje Largo,mm,117.92,Alto,99.43,Medio-Alto,18.49,15.68
+case_0132,Diametro Eje Largo,mm,165.82,Alto,123.32,Alto,42.5,25.63
+case_0136,Diametro Eje Largo,mm,109.15,Alto,74.58,Medio-Alto,34.57,31.67
+case_0140,Diametro Eje Largo,mm,113.77,Alto,100.34,Medio-Alto,13.42,11.8
+case_0142,Diametro Eje Largo,mm,145.4,Alto,131.26,Alto,14.14,9.73
+case_0149,Diametro Eje Largo,mm,152.17,Alto,106.2,Medio-Alto,45.97,30.21
+case_0150,Diametro Eje Largo,mm,26.52,Bajo,26.23,Bajo,0.29,1.08
+case_0152,Diametro Eje Largo,mm,23.4,Bajo,41.68,Moderado,18.28,78.1
+case_0155,Diametro Eje Largo,mm,41.72,Moderado,34.99,Moderado,6.73,16.13
+case_0158,Diametro Eje Largo,mm,19.27,Bajo,26.55,Bajo,7.28,37.79
+case_0159,Diametro Eje Largo,mm,22.45,Bajo,47.76,Moderado,25.31,112.78
+case_0160,Diametro Eje Largo,mm,74.69,Medio-Alto,54.05,Moderado,20.64,27.63
+case_0164,Diametro Eje Largo,mm,112.36,Alto,76.84,Medio-Alto,35.52,31.61
+case_0166,Diametro Eje Largo,mm,88.94,Medio-Alto,56.93,Moderado,32.01,35.99
+case_0170,Diametro Eje Largo,mm,61.51,Medio-Alto,59.57,Medio-Alto,1.94,3.16
+case_0171,Diametro Eje Largo,mm,113.47,Alto,110.84,Alto,2.63,2.32
+case_0175,Diametro Eje Largo,mm,82.69,Medio-Alto,90.44,Medio-Alto,7.75,9.37
+case_0177,Diametro Eje Largo,mm,150.72,Alto,34.47,Moderado,116.25,77.13
+case_0178,Diametro Eje Largo,mm,40.32,Moderado,70.1,Medio-Alto,29.78,73.85
+case_0180,Diametro Eje Largo,mm,122.27,Alto,124.75,Alto,2.48,2.03
+case_0182,Diametro Eje Largo,mm,25.33,Bajo,36.23,Moderado,10.9,43.03
+case_0183,Diametro Eje Largo,mm,29.61,Moderado,38.79,Moderado,9.19,31.02
+case_0187,Diametro Eje Largo,mm,23.73,Bajo,61.91,Medio-Alto,38.17,160.85
+case_0188,Diametro Eje Largo,mm,111.44,Alto,161.93,Alto,50.48,45.3
+case_0189,Diametro Eje Largo,mm,20.53,Bajo,27.01,Bajo,6.48,31.56
+case_0191,Diametro Eje Largo,mm,23.93,Bajo,23.53,Bajo,0.4,1.69
+case_0193,Diametro Eje Largo,mm,28.78,Moderado,33.53,Moderado,4.75,16.52
+case_0194,Diametro Eje Largo,mm,37.19,Moderado,65.11,Medio-Alto,27.92,75.08
+case_0197,Diametro Eje Largo,mm,39.79,Moderado,75.38,Medio-Alto,35.59,89.44
+case_0199,Diametro Eje Largo,mm,71.73,Medio-Alto,99.29,Medio-Alto,27.56,38.42
+case_0201,Diametro Eje Largo,mm,124.51,Alto,129.9,Alto,5.39,4.33
+case_0202,Diametro Eje Largo,mm,15.11,Bajo,23.16,Bajo,8.05,53.28
+case_0203,Diametro Eje Largo,mm,74.84,Medio-Alto,77.03,Medio-Alto,2.2,2.94
+case_0204,Diametro Eje Largo,mm,99.49,Medio-Alto,78.53,Medio-Alto,20.96,21.07
+case_0206,Diametro Eje Largo,mm,56.56,Moderado,80.92,Medio-Alto,24.35,43.05
+case_0210,Diametro Eje Largo,mm,118.06,Alto,113.11,Alto,4.95,4.19
+case_0216,Diametro Eje Largo,mm,64.3,Medio-Alto,92.09,Medio-Alto,27.79,43.23
+case_0219,Diametro Eje Largo,mm,38.58,Moderado,45.23,Moderado,6.66,17.25
+case_0222,Diametro Eje Largo,mm,32.67,Moderado,62.78,Medio-Alto,30.11,92.17
+case_0223,Diametro Eje Largo,mm,30.13,Moderado,79.32,Medio-Alto,49.19,163.25
+case_0225,Diametro Eje Largo,mm,65.64,Medio-Alto,79.99,Medio-Alto,14.35,21.86
+case_0227,Diametro Eje Largo,mm,55.55,Moderado,46.23,Moderado,9.32,16.78
+case_0228,Diametro Eje Largo,mm,236.36,Alto,119.14,Alto,117.22,49.59
+case_0229,Diametro Eje Largo,mm,190.86,Alto,81.32,Medio-Alto,109.54,57.39
+case_0230,Diametro Eje Largo,mm,125.02,Alto,136.45,Alto,11.43,9.14
+case_0232,Diametro Eje Largo,mm,84.33,Medio-Alto,100.82,Medio-Alto,16.49,19.55
+case_0236,Diametro Eje Largo,mm,119.27,Alto,85.51,Medio-Alto,33.76,28.31
+case_0238,Diametro Eje Largo,mm,61.42,Medio-Alto,56.18,Moderado,5.24,8.54
+case_0239,Diametro Eje Largo,mm,121.25,Alto,97.15,Medio-Alto,24.1,19.88
+case_0240,Diametro Eje Largo,mm,147.94,Alto,102.7,Medio-Alto,45.24,30.58
+case_0242,Diametro Eje Largo,mm,89.98,Medio-Alto,53.04,Moderado,36.94,41.05
+case_0243,Diametro Eje Largo,mm,135.57,Alto,44.95,Moderado,90.62,66.85
+case_0244,Diametro Eje Largo,mm,119.03,Alto,62.5,Medio-Alto,56.53,47.5
+case_0246,Diametro Eje Largo,mm,110.54,Alto,53.03,Moderado,57.51,52.03
+case_0247,Diametro Eje Largo,mm,65.39,Medio-Alto,59.01,Medio-Alto,6.38,9.76
+case_0250,Diametro Eje Largo,mm,37.5,Moderado,48.09,Moderado,10.59,28.24
+case_0252,Diametro Eje Largo,mm,192.05,Alto,121.64,Alto,70.41,36.66
+case_0256,Diametro Eje Largo,mm,98.76,Medio-Alto,99.58,Medio-Alto,0.82,0.83
+case_0259,Diametro Eje Largo,mm,72.75,Medio-Alto,28.13,Bajo,44.62,61.33
+case_0264,Diametro Eje Largo,mm,179.69,Alto,128.97,Alto,50.72,28.23
+case_0267,Diametro Eje Largo,mm,57.79,Moderado,98.55,Medio-Alto,40.76,70.53
+case_0269,Diametro Eje Largo,mm,78.68,Medio-Alto,87.49,Medio-Alto,8.8,11.19
+case_0270,Diametro Eje Largo,mm,33.91,Moderado,28.41,Bajo,5.49,16.2
+case_0271,Diametro Eje Largo,mm,39.53,Moderado,55.64,Moderado,16.11,40.75
+case_0273,Diametro Eje Largo,mm,32.36,Moderado,70.32,Medio-Alto,37.95,117.27
+case_0278,Diametro Eje Largo,mm,61.42,Medio-Alto,74.51,Medio-Alto,13.09,21.31
+case_0279,Diametro Eje Largo,mm,127.17,Alto,36.97,Moderado,90.2,70.93
+case_0281,Diametro Eje Largo,mm,27.98,Bajo,38.44,Moderado,10.45,37.36
+case_0282,Diametro Eje Largo,mm,57.88,Medio-Alto,94.39,Medio-Alto,36.51,63.07
+case_0283,Diametro Eje Largo,mm,27.2,Bajo,39.27,Moderado,12.07,44.37
+case_0286,Diametro Eje Largo,mm,100.77,Medio-Alto,105.59,Medio-Alto,4.83,4.79
+case_0287,Diametro Eje Largo,mm,26.2,Bajo,29.15,Moderado,2.94,11.22
+case_0288,Diametro Eje Largo,mm,65.21,Medio-Alto,74.74,Medio-Alto,9.54,14.63
+case_0292,Diametro Eje Largo,mm,217.83,Alto,103.42,Medio-Alto,114.42,52.53
+case_0295,Diametro Eje Largo,mm,25.93,Bajo,49.4,Moderado,23.47,90.54
+case_0296,Diametro Eje Largo,mm,105.47,Medio-Alto,103.97,Medio-Alto,1.5,1.43
+case_0297,Diametro Eje Largo,mm,61.36,Medio-Alto,67.69,Medio-Alto,6.33,10.31
+case_0301,Diametro Eje Largo,mm,22.59,Bajo,27.26,Bajo,4.67,20.69
+case_0302,Diametro Eje Largo,mm,176.09,Alto,44.83,Moderado,131.26,74.54
+case_0304,Diametro Eje Largo,mm,176.39,Alto,41.74,Moderado,134.65,76.34
+case_0308,Diametro Eje Largo,mm,150.11,Alto,33.09,Moderado,117.03,77.96
+case_0311,Diametro Eje Largo,mm,116.39,Alto,90.94,Medio-Alto,25.45,21.87
+case_0313,Diametro Eje Largo,mm,26.83,Bajo,56.33,Moderado,29.49,109.9
+case_0314,Diametro Eje Largo,mm,138.29,Alto,136.89,Alto,1.4,1.01
+case_0315,Diametro Eje Largo,mm,18.95,Bajo,42.73,Moderado,23.79,125.55
+case_0317,Diametro Eje Largo,mm,50.46,Moderado,100.88,Medio-Alto,50.41,99.9
+case_0318,Diametro Eje Largo,mm,129.85,Alto,139.75,Alto,9.9,7.63
+case_0319,Diametro Eje Largo,mm,85.36,Medio-Alto,47.2,Moderado,38.16,44.71
+case_0320,Diametro Eje Largo,mm,27.31,Bajo,28.05,Bajo,0.74,2.71
+case_0322,Diametro Eje Largo,mm,19.59,Bajo,26.09,Bajo,6.5,33.18
+case_0324,Diametro Eje Largo,mm,106.88,Medio-Alto,97.76,Medio-Alto,9.12,8.53
+case_0326,Diametro Eje Largo,mm,180.3,Alto,115.71,Alto,64.59,35.82
+case_0327,Diametro Eje Largo,mm,26.11,Bajo,53.54,Moderado,27.43,105.07
+case_0328,Diametro Eje Largo,mm,66.77,Medio-Alto,48.96,Moderado,17.81,26.67
+case_0329,Diametro Eje Largo,mm,28.02,Bajo,35.07,Moderado,7.05,25.16
+case_0331,Diametro Eje Largo,mm,29.91,Moderado,41.7,Moderado,11.79,39.41
+case_0333,Diametro Eje Largo,mm,64.72,Medio-Alto,76.87,Medio-Alto,12.14,18.76
+case_0334,Diametro Eje Largo,mm,36.32,Moderado,67.67,Medio-Alto,31.34,86.29
+case_0336,Diametro Eje Largo,mm,106.59,Medio-Alto,92.16,Medio-Alto,14.43,13.54
+case_0338,Diametro Eje Largo,mm,29.73,Moderado,28.35,Bajo,1.38,4.63
+case_0341,Diametro Eje Largo,mm,98.94,Medio-Alto,84.11,Medio-Alto,14.83,14.99
+case_0343,Diametro Eje Largo,mm,35.37,Moderado,52.72,Moderado,17.35,49.06
+case_0348,Diametro Eje Largo,mm,57.56,Moderado,53.03,Moderado,4.53,7.86
+case_0354,Diametro Eje Largo,mm,41.4,Moderado,63.01,Medio-Alto,21.61,52.19
+case_0356,Diametro Eje Largo,mm,70.76,Medio-Alto,49.77,Moderado,20.99,29.66
+case_0357,Diametro Eje Largo,mm,65.91,Medio-Alto,43.09,Moderado,22.82,34.62
+case_0359,Diametro Eje Largo,mm,121.97,Alto,109.96,Alto,12.01,9.85
+case_0360,Diametro Eje Largo,mm,79.74,Medio-Alto,114.98,Alto,35.25,44.21
+case_0364,Diametro Eje Largo,mm,38.27,Moderado,52.47,Moderado,14.19,37.09
+case_0365,Diametro Eje Largo,mm,111.41,Alto,106.21,Medio-Alto,5.2,4.66
+case_0368,Diametro Eje Largo,mm,41.53,Moderado,50.52,Moderado,8.99,21.64
+case_0376,Diametro Eje Largo,mm,27.43,Bajo,31.3,Moderado,3.87,14.09
+case_0378,Diametro Eje Largo,mm,177.13,Alto,136.43,Alto,40.7,22.98
+case_0380,Diametro Eje Largo,mm,23.43,Bajo,25.29,Bajo,1.87,7.97
+case_0384,Diametro Eje Largo,mm,161.75,Alto,93.51,Medio-Alto,68.24,42.19
+case_0385,Diametro Eje Largo,mm,49.76,Moderado,60.23,Medio-Alto,10.46,21.02
+case_0386,Diametro Eje Largo,mm,81.97,Medio-Alto,76.27,Medio-Alto,5.7,6.95
+case_0392,Diametro Eje Largo,mm,46.54,Moderado,37.25,Moderado,9.28,19.95
+case_0394,Diametro Eje Largo,mm,18.09,Bajo,18.55,Bajo,0.46,2.54
+case_0395,Diametro Eje Largo,mm,29.2,Moderado,30.77,Moderado,1.57,5.38
+case_0396,Diametro Eje Largo,mm,94.29,Medio-Alto,66.74,Medio-Alto,27.55,29.22
+case_0398,Diametro Eje Largo,mm,117.68,Alto,89.44,Medio-Alto,28.24,23.99
+case_0400,Diametro Eje Largo,mm,100.57,Medio-Alto,30.09,Moderado,70.48,70.08
+case_0401,Diametro Eje Largo,mm,55.4,Moderado,35.64,Moderado,19.76,35.67
+case_0402,Diametro Eje Largo,mm,16.1,Bajo,20.95,Bajo,4.85,30.09
+case_0406,Diametro Eje Largo,mm,26.32,Bajo,54.39,Moderado,28.07,106.66
+case_0411,Diametro Eje Largo,mm,37.44,Moderado,96.77,Medio-Alto,59.33,158.44
+case_0412,Diametro Eje Largo,mm,133.97,Alto,53.97,Moderado,80.0,59.72
+case_0413,Diametro Eje Largo,mm,137.6,Alto,131.39,Alto,6.21,4.51
+case_0415,Diametro Eje Largo,mm,56.8,Moderado,99.84,Medio-Alto,43.04,75.78
+case_0417,Diametro Eje Largo,mm,46.56,Moderado,48.41,Moderado,1.85,3.98
+case_0418,Diametro Eje Largo,mm,26.99,Bajo,49.95,Moderado,22.96,85.05
+case_0419,Diametro Eje Largo,mm,16.59,Bajo,26.92,Bajo,10.33,62.24
+case_0421,Diametro Eje Largo,mm,45.73,Moderado,71.71,Medio-Alto,25.97,56.79
+case_0423,Diametro Eje Largo,mm,56.92,Moderado,48.33,Moderado,8.59,15.08
+case_0424,Diametro Eje Largo,mm,22.88,Bajo,40.01,Moderado,17.13,74.88
+case_0428,Diametro Eje Largo,mm,182.51,Alto,95.59,Medio-Alto,86.92,47.62
+case_0431,Diametro Eje Largo,mm,32.53,Moderado,52.33,Moderado,19.81,60.9
+case_0434,Diametro Eje Largo,mm,92.09,Medio-Alto,48.25,Moderado,43.84,47.61
+case_0436,Diametro Eje Largo,mm,29.32,Moderado,68.34,Medio-Alto,39.02,133.08
+case_0437,Diametro Eje Largo,mm,34.53,Moderado,49.76,Moderado,15.23,44.12
+case_0439,Diametro Eje Largo,mm,150.72,Alto,103.01,Medio-Alto,47.71,31.65
+case_0440,Diametro Eje Largo,mm,36.19,Moderado,82.35,Medio-Alto,46.16,127.54
+case_0441,Diametro Eje Largo,mm,44.36,Moderado,67.75,Medio-Alto,23.39,52.73
+case_0442,Diametro Eje Largo,mm,174.03,Alto,121.6,Alto,52.43,30.13
+case_0444,Diametro Eje Largo,mm,20.41,Bajo,27.89,Bajo,7.47,36.62
+case_0445,Diametro Eje Largo,mm,36.35,Moderado,48.18,Moderado,11.83,32.54
+case_0446,Diametro Eje Largo,mm,26.35,Bajo,27.46,Bajo,1.11,4.21
+case_0448,Diametro Eje Largo,mm,27.75,Bajo,31.07,Moderado,3.32,11.95
+case_0449,Diametro Eje Largo,mm,86.25,Medio-Alto,46.3,Moderado,39.95,46.32
+case_0450,Diametro Eje Largo,mm,42.33,Moderado,72.79,Medio-Alto,30.45,71.93
+case_0452,Diametro Eje Largo,mm,120.32,Alto,127.27,Alto,6.95,5.78
+case_0456,Diametro Eje Largo,mm,41.21,Moderado,34.65,Moderado,6.56,15.93
+case_0459,Diametro Eje Largo,mm,94.45,Medio-Alto,68.65,Medio-Alto,25.8,27.32
+case_0463,Diametro Eje Largo,mm,113.05,Alto,60.12,Medio-Alto,52.93,46.82
+case_0466,Diametro Eje Largo,mm,38.61,Moderado,55.48,Moderado,16.86,43.68
+case_0468,Diametro Eje Largo,mm,113.51,Alto,74.8,Medio-Alto,38.71,34.1
+case_0469,Diametro Eje Largo,mm,15.74,Bajo,24.79,Bajo,9.05,57.49
+case_0470,Diametro Eje Largo,mm,39.39,Moderado,78.13,Medio-Alto,38.73,98.33
+case_0474,Diametro Eje Largo,mm,30.82,Moderado,26.77,Bajo,4.05,13.14
+case_0475,Diametro Eje Largo,mm,20.69,Bajo,39.69,Moderado,19.0,91.82
+case_0478,Diametro Eje Largo,mm,95.66,Medio-Alto,91.28,Medio-Alto,4.38,4.58
+case_0480,Diametro Eje Largo,mm,85.17,Medio-Alto,98.61,Medio-Alto,13.44,15.77
+case_0481,Diametro Eje Largo,mm,21.38,Bajo,42.61,Moderado,21.23,99.32
+case_0482,Diametro Eje Largo,mm,118.22,Alto,46.38,Moderado,71.85,60.77
+case_0484,Diametro Eje Largo,mm,116.1,Alto,110.44,Alto,5.67,4.88
+case_0487,Diametro Eje Largo,mm,142.94,Alto,61.32,Medio-Alto,81.62,57.1
+case_0489,Diametro Eje Largo,mm,27.8,Bajo,33.8,Moderado,6.0,21.59
+case_0491,Diametro Eje Largo,mm,188.65,Alto,82.22,Medio-Alto,106.42,56.41
+case_0493,Diametro Eje Largo,mm,19.7,Bajo,29.74,Moderado,10.04,50.94
+case_0495,Diametro Eje Largo,mm,132.77,Alto,88.41,Medio-Alto,44.35,33.41
+case_0496,Diametro Eje Largo,mm,28.31,Bajo,30.5,Moderado,2.19,7.75
+case_0497,Diametro Eje Largo,mm,146.33,Alto,114.6,Alto,31.73,21.69
+case_0499,Diametro Eje Largo,mm,43.76,Moderado,32.18,Moderado,11.58,26.45
+case_0501,Diametro Eje Largo,mm,128.29,Alto,105.43,Medio-Alto,22.86,17.82
+case_0504,Diametro Eje Largo,mm,22.86,Bajo,25.97,Bajo,3.11,13.61
+case_0506,Diametro Eje Largo,mm,30.44,Moderado,48.78,Moderado,18.34,60.26
+case_0508,Diametro Eje Largo,mm,97.98,Medio-Alto,86.3,Medio-Alto,11.68,11.92
+case_0509,Diametro Eje Largo,mm,15.17,Bajo,22.35,Bajo,7.18,47.35
+case_0512,Diametro Eje Largo,mm,18.38,Bajo,23.84,Bajo,5.46,29.7
+case_0513,Diametro Eje Largo,mm,71.92,Medio-Alto,64.81,Medio-Alto,7.1,9.88
+case_0514,Diametro Eje Largo,mm,25.35,Bajo,28.94,Moderado,3.59,14.14
+case_0515,Diametro Eje Largo,mm,17.8,Bajo,22.95,Bajo,5.15,28.95
+case_0518,Diametro Eje Largo,mm,19.54,Bajo,22.09,Bajo,2.55,13.02
+case_0519,Diametro Eje Largo,mm,18.39,Bajo,25.42,Bajo,7.03,38.23
+case_0522,Diametro Eje Largo,mm,10.39,Bajo,39.58,Moderado,29.19,280.98
+case_0523,Diametro Eje Largo,mm,113.9,Alto,97.84,Medio-Alto,16.07,14.11
+case_0524,Diametro Eje Largo,mm,107.18,Medio-Alto,94.09,Medio-Alto,13.09,12.22
+case_0527,Diametro Eje Largo,mm,120.88,Alto,98.08,Medio-Alto,22.81,18.87
+case_0531,Diametro Eje Largo,mm,191.2,Alto,50.31,Moderado,140.89,73.69
+case_0532,Diametro Eje Largo,mm,90.93,Medio-Alto,51.32,Moderado,39.62,43.57
+case_0546,Diametro Eje Largo,mm,20.78,Bajo,28.77,Bajo,7.99,38.46
+case_0547,Diametro Eje Largo,mm,211.37,Alto,54.02,Moderado,157.36,74.44
+case_0548,Diametro Eje Largo,mm,75.69,Medio-Alto,51.71,Moderado,23.98,31.69
+case_0550,Diametro Eje Largo,mm,134.56,Alto,108.35,Alto,26.2,19.47
+case_0551,Diametro Eje Largo,mm,32.22,Moderado,32.2,Moderado,0.02,0.06
+case_0552,Diametro Eje Largo,mm,38.42,Moderado,99.18,Medio-Alto,60.76,158.14
+case_0553,Diametro Eje Largo,mm,31.49,Moderado,69.3,Medio-Alto,37.81,120.08
+case_0554,Diametro Eje Largo,mm,68.73,Medio-Alto,80.74,Medio-Alto,12.02,17.48
+case_0556,Diametro Eje Largo,mm,122.85,Alto,34.44,Moderado,88.41,71.97
+case_0558,Diametro Eje Largo,mm,89.62,Medio-Alto,43.49,Moderado,46.13,51.47
+case_0562,Diametro Eje Largo,mm,90.66,Medio-Alto,59.52,Medio-Alto,31.14,34.35
+case_0566,Diametro Eje Largo,mm,85.79,Medio-Alto,36.49,Moderado,49.31,57.47
+case_0567,Diametro Eje Largo,mm,67.96,Medio-Alto,60.02,Medio-Alto,7.95,11.7
+case_0571,Diametro Eje Largo,mm,134.22,Alto,121.98,Alto,12.24,9.12
+case_0573,Diametro Eje Largo,mm,27.01,Bajo,46.1,Moderado,19.09,70.68
+case_0577,Diametro Eje Largo,mm,19.41,Bajo,24.2,Bajo,4.79,24.67
+case_0582,Diametro Eje Largo,mm,21.53,Bajo,39.52,Moderado,17.99,83.56
+case_0583,Diametro Eje Largo,mm,110.78,Alto,136.73,Alto,25.95,23.43
+case_0586,Diametro Eje Largo,mm,131.12,Alto,37.94,Moderado,93.18,71.07
+case_0590,Diametro Eje Largo,mm,106.1,Medio-Alto,38.61,Moderado,67.49,63.61
+case_0591,Diametro Eje Largo,mm,143.25,Alto,95.27,Medio-Alto,47.98,33.49
+case_0593,Diametro Eje Largo,mm,97.12,Medio-Alto,58.41,Medio-Alto,38.72,39.86
+case_0596,Diametro Eje Largo,mm,31.23,Moderado,50.62,Moderado,19.39,62.08
+case_0597,Diametro Eje Largo,mm,135.7,Alto,80.57,Medio-Alto,55.12,40.62
+case_0599,Diametro Eje Largo,mm,99.12,Medio-Alto,74.54,Medio-Alto,24.59,24.8
+case_0601,Diametro Eje Largo,mm,102.21,Medio-Alto,42.49,Moderado,59.72,58.43
+case_0604,Diametro Eje Largo,mm,24.11,Bajo,36.75,Moderado,12.64,52.42
+case_0605,Diametro Eje Largo,mm,51.52,Moderado,51.46,Moderado,0.07,0.13
+case_0607,Diametro Eje Largo,mm,46.05,Moderado,48.24,Moderado,2.18,4.74
+case_0608,Diametro Eje Largo,mm,159.91,Alto,106.09,Medio-Alto,53.81,33.65
+case_0609,Diametro Eje Largo,mm,105.82,Medio-Alto,120.32,Alto,14.51,13.71
+case_0610,Diametro Eje Largo,mm,21.71,Bajo,24.36,Bajo,2.65,12.2
+case_0611,Diametro Eje Largo,mm,18.21,Bajo,24.13,Bajo,5.92,32.52
+case_0614,Diametro Eje Largo,mm,28.73,Bajo,32.79,Moderado,4.06,14.13
+case_0615,Diametro Eje Largo,mm,24.2,Bajo,28.63,Bajo,4.43,18.3
+case_0616,Diametro Eje Largo,mm,59.26,Medio-Alto,35.34,Moderado,23.91,40.36
+case_0618,Diametro Eje Largo,mm,123.39,Alto,93.07,Medio-Alto,30.32,24.57
+case_0621,Diametro Eje Largo,mm,154.95,Alto,132.52,Alto,22.43,14.47
+case_0622,Diametro Eje Largo,mm,20.0,Bajo,24.74,Bajo,4.73,23.67
+case_0626,Diametro Eje Largo,mm,32.44,Moderado,46.67,Moderado,14.24,43.89
+case_0627,Diametro Eje Largo,mm,106.59,Medio-Alto,89.44,Medio-Alto,17.15,16.09
+case_0628,Diametro Eje Largo,mm,29.91,Moderado,44.44,Moderado,14.53,48.56
+case_0636,Diametro Eje Largo,mm,98.09,Medio-Alto,80.21,Medio-Alto,17.88,18.23
+case_0638,Diametro Eje Largo,mm,54.35,Moderado,56.82,Moderado,2.47,4.55
+case_0642,Diametro Eje Largo,mm,87.91,Medio-Alto,113.96,Alto,26.05,29.64
+case_0645,Diametro Eje Largo,mm,64.89,Medio-Alto,54.44,Moderado,10.45,16.1
+case_0646,Diametro Eje Largo,mm,18.6,Bajo,20.98,Bajo,2.38,12.77
+case_0648,Diametro Eje Largo,mm,28.91,Moderado,42.98,Moderado,14.08,48.69
+case_0649,Diametro Eje Largo,mm,105.27,Medio-Alto,68.35,Medio-Alto,36.92,35.07
+case_0651,Diametro Eje Largo,mm,49.2,Moderado,81.63,Medio-Alto,32.43,65.93
+case_0654,Diametro Eje Largo,mm,113.53,Alto,74.76,Medio-Alto,38.77,34.15
+case_0655,Diametro Eje Largo,mm,111.03,Alto,81.04,Medio-Alto,29.99,27.01
+case_0656,Diametro Eje Largo,mm,76.59,Medio-Alto,91.36,Medio-Alto,14.77,19.29
+case_0657,Diametro Eje Largo,mm,37.49,Moderado,46.52,Moderado,9.02,24.06
+case_0658,Diametro Eje Largo,mm,71.32,Medio-Alto,86.81,Medio-Alto,15.49,21.72
+case_0659,Diametro Eje Largo,mm,31.23,Moderado,42.77,Moderado,11.54,36.93
+case_0662,Diametro Eje Largo,mm,34.08,Moderado,35.63,Moderado,1.55,4.55
+case_0663,Diametro Eje Largo,mm,83.06,Medio-Alto,78.93,Medio-Alto,4.14,4.98
+case_0666,Diametro Eje Largo,mm,240.56,Alto,120.7,Alto,119.86,49.83
+case_0667,Diametro Eje Largo,mm,106.48,Medio-Alto,63.48,Medio-Alto,43.0,40.38
+case_0668,Diametro Eje Largo,mm,28.66,Bajo,37.1,Moderado,8.44,29.46
+case_0669,Diametro Eje Largo,mm,21.55,Bajo,27.8,Bajo,6.25,29.03
+case_0671,Diametro Eje Largo,mm,18.54,Bajo,19.65,Bajo,1.1,5.95
+case_0673,Diametro Eje Largo,mm,104.43,Medio-Alto,116.67,Alto,12.23,11.71
+case_0676,Diametro Eje Largo,mm,198.21,Alto,92.81,Medio-Alto,105.4,53.17
+case_0677,Diametro Eje Largo,mm,100.22,Medio-Alto,62.23,Medio-Alto,37.99,37.9
+case_0678,Diametro Eje Largo,mm,53.24,Moderado,86.63,Medio-Alto,33.39,62.73
+case_0679,Diametro Eje Largo,mm,123.49,Alto,52.19,Moderado,71.3,57.74
+case_0682,Diametro Eje Largo,mm,62.49,Medio-Alto,35.84,Moderado,26.65,42.65
+case_0683,Diametro Eje Largo,mm,168.92,Alto,38.6,Moderado,130.32,77.15
+case_0685,Diametro Eje Largo,mm,18.46,Bajo,22.24,Bajo,3.77,20.42
+case_0686,Diametro Eje Largo,mm,101.74,Medio-Alto,101.6,Medio-Alto,0.13,0.13
+case_0688,Diametro Eje Largo,mm,14.58,Bajo,21.54,Bajo,6.97,47.8
+case_0690,Diametro Eje Largo,mm,37.45,Moderado,74.21,Medio-Alto,36.76,98.16
+case_0691,Diametro Eje Largo,mm,70.13,Medio-Alto,88.61,Medio-Alto,18.49,26.36
+case_0694,Diametro Eje Largo,mm,135.25,Alto,111.63,Alto,23.62,17.46
+case_0695,Diametro Eje Largo,mm,14.14,Bajo,22.55,Bajo,8.41,59.47
+case_0697,Diametro Eje Largo,mm,58.4,Medio-Alto,98.37,Medio-Alto,39.97,68.45
+case_0700,Diametro Eje Largo,mm,79.4,Medio-Alto,55.35,Moderado,24.04,30.28
+case_0702,Diametro Eje Largo,mm,175.51,Alto,77.96,Medio-Alto,97.55,55.58
+case_0704,Diametro Eje Largo,mm,61.28,Medio-Alto,98.14,Medio-Alto,36.86,60.15
+case_0707,Diametro Eje Largo,mm,106.91,Medio-Alto,33.27,Moderado,73.64,68.88
+case_0708,Diametro Eje Largo,mm,137.68,Alto,82.95,Medio-Alto,54.73,39.75
+case_0709,Diametro Eje Largo,mm,172.8,Alto,59.78,Medio-Alto,113.02,65.4
+case_0714,Diametro Eje Largo,mm,156.25,Alto,101.62,Medio-Alto,54.64,34.97
+case_0715,Diametro Eje Largo,mm,71.14,Medio-Alto,90.11,Medio-Alto,18.97,26.66
+case_0716,Diametro Eje Largo,mm,139.62,Alto,139.47,Alto,0.15,0.11
+case_0717,Diametro Eje Largo,mm,21.38,Bajo,25.65,Bajo,4.27,19.95
+case_0719,Diametro Eje Largo,mm,15.26,Bajo,20.51,Bajo,5.25,34.4
+case_0720,Diametro Eje Largo,mm,60.14,Medio-Alto,57.89,Medio-Alto,2.25,3.74
+case_0725,Diametro Eje Largo,mm,90.55,Medio-Alto,111.62,Alto,21.07,23.27
+case_0727,Diametro Eje Largo,mm,54.25,Moderado,41.56,Moderado,12.69,23.4
+case_0731,Diametro Eje Largo,mm,42.74,Moderado,26.54,Bajo,16.2,37.91
+case_0732,Diametro Eje Largo,mm,31.13,Moderado,55.75,Moderado,24.61,79.05
+case_0737,Diametro Eje Largo,mm,114.7,Alto,53.33,Moderado,61.37,53.5
+case_0738,Diametro Eje Largo,mm,44.5,Moderado,94.75,Medio-Alto,50.25,112.92
+case_0740,Diametro Eje Largo,mm,22.19,Bajo,45.4,Moderado,23.21,104.59
+case_0742,Diametro Eje Largo,mm,191.57,Alto,65.64,Medio-Alto,125.93,65.73
+case_0745,Diametro Eje Largo,mm,109.63,Alto,81.98,Medio-Alto,27.65,25.22
+case_0746,Diametro Eje Largo,mm,120.49,Alto,85.08,Medio-Alto,35.41,29.39
+case_0748,Diametro Eje Largo,mm,67.77,Medio-Alto,57.17,Moderado,10.6,15.64
+case_0749,Diametro Eje Largo,mm,13.6,Bajo,46.57,Moderado,32.97,242.48
+case_0751,Diametro Eje Largo,mm,79.05,Medio-Alto,131.92,Alto,52.86,66.87
+case_0752,Diametro Eje Largo,mm,61.82,Medio-Alto,64.58,Medio-Alto,2.77,4.48
+case_0754,Diametro Eje Largo,mm,50.77,Moderado,60.9,Medio-Alto,10.13,19.95
+case_0758,Diametro Eje Largo,mm,31.13,Moderado,33.9,Moderado,2.77,8.91
+case_0761,Diametro Eje Largo,mm,43.49,Moderado,35.56,Moderado,7.93,18.23
+case_0763,Diametro Eje Largo,mm,133.44,Alto,95.43,Medio-Alto,38.0,28.48
+case_0764,Diametro Eje Largo,mm,38.18,Moderado,34.95,Moderado,3.23,8.47
+case_0765,Diametro Eje Largo,mm,31.95,Moderado,27.87,Bajo,4.07,12.75
+case_0766,Diametro Eje Largo,mm,51.3,Moderado,49.51,Moderado,1.79,3.49
+case_0767,Diametro Eje Largo,mm,22.79,Bajo,27.9,Bajo,5.11,22.41
+case_0768,Diametro Eje Largo,mm,23.09,Bajo,39.23,Moderado,16.14,69.9
+case_0769,Diametro Eje Largo,mm,18.55,Bajo,21.51,Bajo,2.96,15.94
+case_0771,Diametro Eje Largo,mm,164.09,Alto,125.0,Alto,39.09,23.82
+case_0772,Diametro Eje Largo,mm,43.0,Moderado,72.04,Medio-Alto,29.04,67.54
+case_0773,Diametro Eje Largo,mm,20.89,Bajo,36.57,Moderado,15.68,75.08
+case_0774,Diametro Eje Largo,mm,38.78,Moderado,64.16,Medio-Alto,25.38,65.45
+case_0775,Diametro Eje Largo,mm,123.7,Alto,87.38,Medio-Alto,36.32,29.36
+case_0782,Diametro Eje Largo,mm,81.94,Medio-Alto,64.36,Medio-Alto,17.58,21.46
+case_0784,Diametro Eje Largo,mm,25.85,Bajo,33.2,Moderado,7.35,28.45
+case_0786,Diametro Eje Largo,mm,33.84,Moderado,27.59,Bajo,6.25,18.48
+case_0788,Diametro Eje Largo,mm,42.61,Moderado,90.81,Medio-Alto,48.2,113.12
+case_0790,Diametro Eje Largo,mm,19.66,Bajo,39.41,Moderado,19.75,100.48
+case_0792,Diametro Eje Largo,mm,34.38,Moderado,43.87,Moderado,9.49,27.59
+case_0793,Diametro Eje Largo,mm,24.42,Bajo,33.71,Moderado,9.29,38.05
+case_0795,Diametro Eje Largo,mm,144.84,Alto,95.59,Medio-Alto,49.25,34.01
+case_0796,Diametro Eje Largo,mm,41.48,Moderado,36.61,Moderado,4.88,11.75
+case_0798,Diametro Eje Largo,mm,27.67,Bajo,32.83,Moderado,5.16,18.63
+case_0799,Diametro Eje Largo,mm,32.77,Moderado,71.11,Medio-Alto,38.34,117.02
+case_0800,Diametro Eje Largo,mm,30.67,Moderado,53.93,Moderado,23.25,75.82
+case_0802,Diametro Eje Largo,mm,115.98,Alto,118.61,Alto,2.63,2.27
+case_0803,Diametro Eje Largo,mm,28.56,Bajo,33.59,Moderado,5.03,17.61
+case_0804,Diametro Eje Largo,mm,40.45,Moderado,81.61,Medio-Alto,41.16,101.77
+case_0808,Diametro Eje Largo,mm,126.55,Alto,140.25,Alto,13.69,10.82
+case_0817,Diametro Eje Largo,mm,20.96,Bajo,26.56,Bajo,5.6,26.73
+case_0818,Diametro Eje Largo,mm,68.77,Medio-Alto,81.73,Medio-Alto,12.95,18.84
+case_0820,Diametro Eje Largo,mm,29.85,Moderado,65.64,Medio-Alto,35.79,119.88
+case_0823,Diametro Eje Largo,mm,159.91,Alto,82.98,Medio-Alto,76.94,48.11
+case_0825,Diametro Eje Largo,mm,27.37,Bajo,32.71,Moderado,5.35,19.54
+case_0826,Diametro Eje Largo,mm,25.88,Bajo,29.81,Moderado,3.93,15.2
+case_0827,Diametro Eje Largo,mm,83.55,Medio-Alto,71.81,Medio-Alto,11.73,14.04
+case_0831,Diametro Eje Largo,mm,19.79,Bajo,21.38,Bajo,1.58,7.99
+case_0832,Diametro Eje Largo,mm,141.54,Alto,120.47,Alto,21.08,14.89
+case_0833,Diametro Eje Largo,mm,127.79,Alto,52.99,Moderado,74.81,58.54
+case_0837,Diametro Eje Largo,mm,96.15,Medio-Alto,122.74,Alto,26.58,27.64
+case_0838,Diametro Eje Largo,mm,18.89,Bajo,23.97,Bajo,5.08,26.88
+case_0847,Diametro Eje Largo,mm,108.34,Medio-Alto,72.14,Medio-Alto,36.2,33.42
+case_0849,Diametro Eje Largo,mm,20.96,Bajo,31.5,Moderado,10.54,50.29
+case_0856,Diametro Eje Largo,mm,18.19,Bajo,42.91,Moderado,24.73,135.97
+case_0857,Diametro Eje Largo,mm,109.93,Alto,115.43,Alto,5.5,5.01
+case_0858,Diametro Eje Largo,mm,21.38,Bajo,35.8,Moderado,14.43,67.49
+case_0860,Diametro Eje Largo,mm,14.57,Bajo,19.56,Bajo,4.98,34.19
+case_0863,Diametro Eje Largo,mm,21.82,Bajo,25.74,Bajo,3.93,18.0
+case_0865,Diametro Eje Largo,mm,76.46,Medio-Alto,71.79,Medio-Alto,4.67,6.11
+case_0866,Diametro Eje Largo,mm,169.73,Alto,64.38,Medio-Alto,105.36,62.07
+case_0868,Diametro Eje Largo,mm,80.66,Medio-Alto,79.22,Medio-Alto,1.44,1.79
+case_0869,Diametro Eje Largo,mm,61.29,Medio-Alto,75.75,Medio-Alto,14.46,23.59
+case_0872,Diametro Eje Largo,mm,174.78,Alto,136.79,Alto,37.98,21.73
+case_0874,Diametro Eje Largo,mm,125.27,Alto,66.82,Medio-Alto,58.45,46.66
+case_0880,Diametro Eje Largo,mm,33.3,Moderado,38.73,Moderado,5.43,16.3
+case_0883,Diametro Eje Largo,mm,134.61,Alto,45.79,Moderado,88.82,65.98
+case_0885,Diametro Eje Largo,mm,19.64,Bajo,69.5,Medio-Alto,49.86,253.86
+case_0887,Diametro Eje Largo,mm,33.74,Moderado,42.08,Moderado,8.34,24.71
+case_0890,Diametro Eje Largo,mm,109.62,Alto,83.94,Medio-Alto,25.69,23.43
+case_0895,Diametro Eje Largo,mm,19.56,Bajo,30.65,Moderado,11.09,56.69
+case_0897,Diametro Eje Largo,mm,79.45,Medio-Alto,80.21,Medio-Alto,0.76,0.96
+case_0902,Diametro Eje Largo,mm,150.21,Alto,72.22,Medio-Alto,77.99,51.92
+case_0903,Diametro Eje Largo,mm,20.08,Bajo,30.44,Moderado,10.35,51.54
+case_0906,Diametro Eje Largo,mm,15.15,Bajo,22.7,Bajo,7.55,49.81
+case_0909,Diametro Eje Largo,mm,32.17,Moderado,43.05,Moderado,10.89,33.85
+case_0911,Diametro Eje Largo,mm,37.93,Moderado,48.15,Moderado,10.22,26.94
+case_0922,Diametro Eje Largo,mm,52.57,Moderado,30.39,Moderado,22.18,42.2
+case_0926,Diametro Eje Largo,mm,30.14,Moderado,45.77,Moderado,15.63,51.85
+case_0927,Diametro Eje Largo,mm,51.84,Moderado,41.92,Moderado,9.92,19.13
+case_0931,Diametro Eje Largo,mm,55.32,Moderado,63.06,Medio-Alto,7.74,13.99
+case_0932,Diametro Eje Largo,mm,46.78,Moderado,40.36,Moderado,6.42,13.73
+case_0933,Diametro Eje Largo,mm,33.5,Moderado,30.29,Moderado,3.21,9.58
+case_0934,Diametro Eje Largo,mm,18.78,Bajo,21.33,Bajo,2.55,13.59
+case_0935,Diametro Eje Largo,mm,23.64,Bajo,37.13,Moderado,13.49,57.08
+case_0938,Diametro Eje Largo,mm,38.41,Moderado,76.46,Medio-Alto,38.05,99.06
+case_0939,Diametro Eje Largo,mm,88.69,Medio-Alto,104.64,Medio-Alto,15.95,17.98
+case_0941,Diametro Eje Largo,mm,77.43,Medio-Alto,27.78,Bajo,49.65,64.13
+case_0942,Diametro Eje Largo,mm,105.9,Medio-Alto,112.47,Alto,6.58,6.21
+case_0943,Diametro Eje Largo,mm,23.83,Bajo,28.3,Bajo,4.47,18.74
+case_0944,Diametro Eje Largo,mm,36.59,Moderado,34.79,Moderado,1.8,4.92
+case_0945,Diametro Eje Largo,mm,74.25,Medio-Alto,86.9,Medio-Alto,12.64,17.03
+case_0946,Diametro Eje Largo,mm,125.5,Alto,93.48,Medio-Alto,32.02,25.52
+case_0948,Diametro Eje Largo,mm,88.16,Medio-Alto,70.74,Medio-Alto,17.42,19.76
+case_0949,Diametro Eje Largo,mm,28.26,Bajo,41.41,Moderado,13.15,46.55
+case_0951,Diametro Eje Largo,mm,33.71,Moderado,52.96,Moderado,19.25,57.09
+case_0952,Diametro Eje Largo,mm,20.22,Bajo,36.09,Moderado,15.87,78.45
+case_0954,Diametro Eje Largo,mm,147.3,Alto,76.77,Medio-Alto,70.53,47.88
+case_0955,Diametro Eje Largo,mm,24.56,Bajo,36.08,Moderado,11.52,46.91
+case_0958,Diametro Eje Largo,mm,95.01,Medio-Alto,92.1,Medio-Alto,2.91,3.06
+case_0962,Diametro Eje Largo,mm,68.61,Medio-Alto,41.86,Moderado,26.75,38.99
+case_0964,Diametro Eje Largo,mm,98.97,Medio-Alto,123.93,Alto,24.96,25.21
+case_0966,Diametro Eje Largo,mm,99.61,Medio-Alto,84.5,Medio-Alto,15.11,15.17
+case_0967,Diametro Eje Largo,mm,30.83,Moderado,41.2,Moderado,10.37,33.65
+case_0969,Diametro Eje Largo,mm,82.44,Medio-Alto,77.77,Medio-Alto,4.67,5.66
+case_0972,Diametro Eje Largo,mm,23.37,Bajo,26.95,Bajo,3.58,15.32
+case_0973,Diametro Eje Largo,mm,127.39,Alto,37.53,Moderado,89.86,70.54
+case_0974,Diametro Eje Largo,mm,45.74,Moderado,59.45,Medio-Alto,13.71,29.97
+case_0977,Diametro Eje Largo,mm,25.69,Bajo,36.26,Moderado,10.57,41.15
+case_0979,Diametro Eje Largo,mm,33.84,Moderado,38.12,Moderado,4.28,12.63
+case_0980,Diametro Eje Largo,mm,24.42,Bajo,30.98,Moderado,6.55,26.84
+case_0982,Diametro Eje Largo,mm,29.5,Moderado,27.07,Bajo,2.44,8.26
+case_0985,Diametro Eje Largo,mm,84.81,Medio-Alto,58.83,Medio-Alto,25.99,30.64
+case_0986,Diametro Eje Largo,mm,37.57,Moderado,32.45,Moderado,5.12,13.64
+case_0988,Diametro Eje Largo,mm,68.85,Medio-Alto,83.28,Medio-Alto,14.43,20.96
+case_0989,Diametro Eje Largo,mm,21.61,Bajo,31.5,Moderado,9.89,45.77
+case_0992,Diametro Eje Largo,mm,68.82,Medio-Alto,19.87,Bajo,48.95,71.13
+case_0993,Diametro Eje Largo,mm,23.44,Bajo,31.81,Moderado,8.37,35.7
+case_0995,Diametro Eje Largo,mm,74.24,Medio-Alto,37.32,Moderado,36.92,49.73
+case_0997,Diametro Eje Largo,mm,41.37,Moderado,60.82,Medio-Alto,19.45,47.01
+case_1002,Diametro Eje Largo,mm,82.8,Medio-Alto,36.87,Moderado,45.92,55.47
+case_1003,Diametro Eje Largo,mm,117.24,Alto,120.28,Alto,3.04,2.59
+case_1007,Diametro Eje Largo,mm,109.0,Alto,44.55,Moderado,64.45,59.13
+case_1010,Diametro Eje Largo,mm,120.76,Alto,112.71,Alto,8.05,6.66
+case_1012,Diametro Eje Largo,mm,39.99,Moderado,45.53,Moderado,5.54,13.85
+case_1013,Diametro Eje Largo,mm,23.67,Bajo,23.6,Bajo,0.08,0.32
+case_1017,Diametro Eje Largo,mm,31.41,Moderado,37.36,Moderado,5.95,18.93
+case_1018,Diametro Eje Largo,mm,22.16,Bajo,26.44,Bajo,4.27,19.28
+case_1019,Diametro Eje Largo,mm,53.75,Moderado,102.84,Medio-Alto,49.09,91.34
+case_1020,Diametro Eje Largo,mm,59.65,Medio-Alto,39.31,Moderado,20.34,34.1
+case_1021,Diametro Eje Largo,mm,118.39,Alto,113.13,Alto,5.26,4.44
+case_1022,Diametro Eje Largo,mm,27.78,Bajo,37.0,Moderado,9.22,33.2
+case_1023,Diametro Eje Largo,mm,27.38,Bajo,41.6,Moderado,14.22,51.93
+case_1034,Diametro Eje Largo,mm,20.02,Bajo,26.11,Bajo,6.1,30.45
+case_1042,Diametro Eje Largo,mm,37.29,Moderado,88.31,Medio-Alto,51.01,136.79
+case_1044,Diametro Eje Largo,mm,18.92,Bajo,25.14,Bajo,6.22,32.85
+case_1045,Diametro Eje Largo,mm,127.79,Alto,37.11,Moderado,90.69,70.96
+case_1047,Diametro Eje Largo,mm,40.39,Moderado,48.29,Moderado,7.91,19.58
+case_1051,Diametro Eje Largo,mm,100.95,Medio-Alto,43.9,Moderado,57.05,56.51
+case_1057,Diametro Eje Largo,mm,36.07,Moderado,43.39,Moderado,7.32,20.29
+case_1060,Diametro Eje Largo,mm,82.99,Medio-Alto,53.94,Moderado,29.06,35.01
+case_1062,Diametro Eje Largo,mm,23.24,Bajo,30.6,Moderado,7.37,31.7
+case_1064,Diametro Eje Largo,mm,63.87,Medio-Alto,53.44,Moderado,10.43,16.33
+case_1065,Diametro Eje Largo,mm,72.61,Medio-Alto,50.63,Moderado,21.98,30.27
+case_1067,Diametro Eje Largo,mm,138.1,Alto,52.58,Moderado,85.52,61.92
+case_1071,Diametro Eje Largo,mm,13.34,Bajo,21.28,Bajo,7.94,59.51
+case_1072,Diametro Eje Largo,mm,84.93,Medio-Alto,77.38,Medio-Alto,7.55,8.89
+case_1076,Diametro Eje Largo,mm,19.47,Bajo,25.72,Bajo,6.25,32.08
+case_1077,Diametro Eje Largo,mm,22.34,Bajo,28.45,Bajo,6.11,27.34
+case_1081,Diametro Eje Largo,mm,37.31,Moderado,49.44,Moderado,12.13,32.5
+case_1082,Diametro Eje Largo,mm,67.04,Medio-Alto,55.77,Moderado,11.26,16.8
+case_1084,Diametro Eje Largo,mm,43.3,Moderado,66.51,Medio-Alto,23.21,53.61
+case_1085,Diametro Eje Largo,mm,164.86,Alto,91.01,Medio-Alto,73.85,44.79
+case_1088,Diametro Eje Largo,mm,34.56,Moderado,38.93,Moderado,4.37,12.65
+case_1090,Diametro Eje Largo,mm,18.31,Bajo,33.97,Moderado,15.66,85.52
+case_1091,Diametro Eje Largo,mm,25.22,Bajo,51.26,Moderado,26.04,103.25
+case_1092,Diametro Eje Largo,mm,35.87,Moderado,49.14,Moderado,13.27,37.0
+case_1093,Diametro Eje Largo,mm,116.18,Alto,91.1,Medio-Alto,25.08,21.59
+case_1096,Diametro Eje Largo,mm,63.19,Medio-Alto,99.1,Medio-Alto,35.91,56.83
+case_1097,Diametro Eje Largo,mm,43.8,Moderado,67.23,Medio-Alto,23.42,53.47
+case_1098,Diametro Eje Largo,mm,112.9,Alto,69.59,Medio-Alto,43.32,38.37
+case_1100,Diametro Eje Largo,mm,128.04,Alto,80.16,Medio-Alto,47.88,37.39

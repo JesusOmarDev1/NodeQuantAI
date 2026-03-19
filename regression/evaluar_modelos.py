@@ -1,18 +1,28 @@
 """
-evaluar_modelos.py — Evaluación multi-target con 9-Fold CV optimizado
-=====================================================================
-12 modelos con Pipeline(StandardScaler) + GridSearchCV/RandomizedSearchCV.
-Targets: Volumen (mm³), Eje Corto (mm), Eje Largo (mm)
-Features: 42 radiómicas (firstorder + glcm) de ganglios_master.csv
-Validación: 9-Fold CV × 3 repeticiones (90% train, 10% test)
+evaluar_modelos.py - Evaluación modular multi-target con feature selection
+=========================================================================
+12 modelos organizados en funciones individuales para facilitar modificaciones.
+Incluye selección de features (VarianceThreshold, correlación, LassoCV),
+log-transform para volumen, Pearson r como métrica adicional,
+deduplicación automática por Paciente_ID y visualización demográfica.
 
-Mejoras:
-  - Creación de targets desde shape_* y eliminación posterior (data leakage)
-  - 9-Fold CV en lugar de LOO-CV (más rápido, resultados comparables)
-  - Detección de overfitting con Gap% train vs test
-  - RandomizedSearchCV para modelos con espacio de búsqueda grande
-  - Feature importance de modelos tree-based
-  - Curvas de aprendizaje para evaluar necesidad de más datos
+Pipeline por modelo: StandardScaler + Estimador + GridSearchCV/RandomizedSearchCV
+Targets: Volumen (mm³), Eje Corto (mm), Eje Largo (mm)
+Validación: 5-Fold CV × 2 repeticiones + tuning interno 3-Fold
+
+Funciones de evaluación:
+  - evaluar_reg_simple()       Regresión lineal simple (1 feature)
+  - evaluar_reg_multiple()     Regresión lineal múltiple
+  - evaluar_polinomica()       Regresión polinómica (Ridge + PolynomialFeatures)
+  - evaluar_ridge()            Ridge (L2)
+  - evaluar_lasso()            Lasso (L1)
+  - evaluar_elasticnet()       ElasticNet (L1 + L2)
+  - evaluar_knn()              K-Nearest Neighbors
+  - evaluar_svr()              Support Vector Regression
+  - evaluar_arbol()            Árbol de decisión
+  - evaluar_random_forest()    Random Forest
+  - evaluar_gradient_boost()   Gradient Boosting
+  - evaluar_xgboost()          XGBoost
 """
 
 import os
@@ -26,12 +36,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.patches import Patch
 
 from sklearn.model_selection import (
     KFold, GridSearchCV, RandomizedSearchCV, learning_curve,
 )
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.linear_model import (
+    LinearRegression, Ridge, Lasso, ElasticNet, LassoCV,
+)
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
@@ -43,37 +56,46 @@ from sklearn.metrics import (
     median_absolute_error, max_error,
     explained_variance_score, mean_absolute_percentage_error,
 )
+from sklearn.feature_selection import VarianceThreshold, SelectFromModel
+from scipy.stats import pearsonr
 from xgboost import XGBRegressor
 
 w.filterwarnings("ignore")
 
-# ── Rutas ──
+# -- Rutas --
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 RUTA_CSV = os.path.join(base_dir, "db", "ganglios_master.csv")
-CARPETA_METRICAS = os.path.join(base_dir, "metrics")
+CARPETA_METRICAS = os.path.join(base_dir, "regression", "metrics")
 os.makedirs(CARPETA_METRICAS, exist_ok=True)
 
-# ── Configuración de validación ──
-N_SPLITS = 5          # 5-Fold → 80% train, 20% test (más rápido)
-N_REPEATS = 2         # 2 repeticiones para estimar varianza (más rápido)
-INNER_CV = 3          # Folds internos para tuning de hiperparámetros (más rápido)
+# -- Configuración de validación --
+N_SPLITS = 5          # 5-Fold -> 80% train, 20% test
+N_REPEATS = 2         # 2 repeticiones para estimar varianza
+INNER_CV = 3          # Folds internos para tuning de hiperparámetros
 OVERFITTING_UMBRAL = 15.0   # Gap% > 15% indica overfitting
 
-# ── Targets ──
+# -- Feature selection --
+CORR_UMBRAL = 0.05         # Mínimo |correlación| con el target
+INTER_CORR_UMBRAL = 0.95   # Máx inter-correlación entre features
+
+# -- Targets --
 TARGETS = [
     {"nombre": "Volumen Tumoral",    "col": "target_regresion",
-     "origen": "shape_VoxelVolume",  "u": "mm³", "u2": "mm⁶", "slug": "volumen"},
+     "origen": "shape_VoxelVolume",  "u": "mm3", "u2": "mm6", "slug": "volumen"},
     {"nombre": "Diámetro Eje Corto", "col": "target_eje_corto",
-     "origen": "shape_MinorAxisLength", "u": "mm", "u2": "mm²", "slug": "eje_corto"},
+     "origen": "shape_MinorAxisLength", "u": "mm", "u2": "mm2", "slug": "eje_corto"},
     {"nombre": "Diámetro Eje Largo", "col": "target_eje_largo",
-     "origen": "shape_MajorAxisLength", "u": "mm", "u2": "mm²", "slug": "eje_largo"},
+     "origen": "shape_MajorAxisLength", "u": "mm", "u2": "mm2", "slug": "eje_largo"},
 ]
 COLS_TARGET = [t["col"] for t in TARGETS]
 
+# -- Columnas clínicas (solo para gráficas, NO entran al pipeline ML) --
+COLS_CLINICAS = ["body_part_examined", "patient_sex", "primary_condition"]
 
-# ══════════════════════════════════════════════════════════════
+
+# ==============================================================
 #  PREPARACIÓN DE DATOS
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 
 def preparar_datos_regresion(df):
     """
@@ -103,7 +125,7 @@ def preparar_datos_regresion(df):
     for t in TARGETS:
         df_clean[t["col"]] = df[t["origen"]]
 
-    # Eliminar TODAS las columnas shape_* → prevención data leakage
+    # Eliminar TODAS las columnas shape_* -> prevención data leakage
     shape_cols = [c for c in df_clean.columns if c.startswith("shape_")]
     df_clean = df_clean.drop(columns=shape_cols)
 
@@ -121,186 +143,113 @@ def preparar_datos_regresion(df):
     return df_clean, info
 
 
-# ══════════════════════════════════════════════════════════════
-#  DEFINICIÓN DE MODELOS
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
+#  SELECCIÓN DE FEATURES
+# ==============================================================
 
-# ── Modelos + grids de hiperparámetros ──
-def definir_modelos(mejor_feat):
+def seleccionar_features(X, y, nombre_target):
     """
-    12 modelos con Pipeline(StandardScaler) y param_grid.
-    - search_type='grid'   → GridSearchCV        (pocas combinaciones)
-    - search_type='random' → RandomizedSearchCV   (muchas combinaciones)
+    Pipeline de selección de features en 4 pasos:
+      1. VarianceThreshold(0)   → elimina features constantes
+      2. Correlación con target → mantiene |r| > CORR_UMBRAL
+      3. Inter-correlación      → elimina redundantes |r| > INTER_CORR_UMBRAL
+      4. LassoCV + SelectFromModel → selección automática final
+
+    Parámetros
+    ----------
+    X : DataFrame con features candidatas (42 firstorder + glcm)
+    y : array con valores del target
+    nombre_target : str para identificar en consola
+
+    Retorna
+    -------
+    cols_final : lista de nombres de columnas seleccionadas
     """
-    return {
-        # ── Lineales ──
-        "Reg. Simple": {
-            "pipe": Pipeline([("s", StandardScaler()), ("m", LinearRegression())]),
-            "params": {},
-            "search_type": "grid",
-            "cols": [mejor_feat],
-        },
-        "Reg. Multiple": {
-            "pipe": Pipeline([("s", StandardScaler()), ("m", LinearRegression())]),
-            "params": {},
-            "search_type": "grid",
-            "cols": None,
-        },
-        "Polinomica": {
-            "pipe": Pipeline([
-                ("s", StandardScaler()),
-                ("p", PolynomialFeatures(include_bias=False)),
-                ("m", Ridge()),
-            ]),
-            "params": {
-                "p__degree": [2],
-                "m__alpha": [10.0, 100.0, 1000.0],
-            },
-            "search_type": "grid",
-            "cols": None,
-        },
-        # ── Regularizados ──
-        "Ridge": {
-            "pipe": Pipeline([("s", StandardScaler()), ("m", Ridge())]),
-            "params": {"m__alpha": [0.01, 0.1, 1.0, 10.0, 100.0]},
-            "search_type": "grid",
-            "cols": None,
-        },
-        "Lasso": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", Lasso(max_iter=10000))]),
-            "params": {"m__alpha": [0.01, 0.1, 1.0, 10.0]},
-            "search_type": "grid",
-            "cols": None,
-        },
-        "ElasticNet": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", ElasticNet(max_iter=10000))]),
-            "params": {
-                "m__alpha":    [0.01, 0.1, 1.0],
-                "m__l1_ratio": [0.2, 0.5, 0.8],
-            },
-            "search_type": "grid",
-            "cols": None,
-        },
-        # ── KNN ──
-        "KNN": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", KNeighborsRegressor())]),
-            "params": {
-                "m__n_neighbors": [15, 20, 30, 50],
-                "m__weights":     ["uniform", "distance"],
-                "m__p":           [1, 2],
-            },
-            "search_type": "grid",    # 4×2×2 = 16 combinaciones → Grid OK
-            "cols": None,
-        },
-        # ── SVM ──
-        "SVR": {
-            "pipe": Pipeline([("s", StandardScaler()), ("m", SVR())]),
-            "params": {
-                "m__C":       [0.001, 0.01, 0.1, 1],
-                "m__epsilon": [0.1, 0.5, 1.0],
-                "m__kernel":  ["linear", "rbf"],
-            },
-            "search_type": "grid",    # 4×3×2 = 24 → Grid OK
-            "cols": None,
-        },
-        # ── Árboles ──
-        "Arbol Decision": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", DecisionTreeRegressor(random_state=42))]),
-            "params": {
-                "m__max_depth":        [1, 2, 3],
-                "m__min_samples_leaf": [4, 8, 16],
-            },
-            "search_type": "grid",    # 3×3 = 9 → Grid OK
-            "cols": None,
-        },
-        # ── Random Forest ──
-        "Random Forest": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", RandomForestRegressor(random_state=42))]),
-            "params": {
-                "m__n_estimators":     [50, 100],
-                "m__max_depth":        [2, 3],
-                "m__min_samples_leaf": [8, 16],
-            },
-            "search_type": "grid",    # 2×2×2 = 8 → Grid OK
-            "cols": None,
-        },
-        # ── Gradient Boosting ──
-        "Gradient Boost": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", GradientBoostingRegressor(
-                                  random_state=42,
-                                  subsample=0.7,
-                                  max_features=0.7))]),
-            "params": {
-                "m__n_estimators":      [10, 15, 25],
-                "m__max_depth":         [1],
-                "m__learning_rate":     [0.1, 0.2, 0.3],
-                "m__min_samples_leaf":  [16, 32, 48],
-                "m__min_samples_split": [15, 25],
-            },
-            "search_type": "random",  # 3×1×3×3×2 = 54 → Random
-            "n_iter": 20,
-            "cols": None,
-        },
-        # ── XGBoost ──
-        "XGBoost": {
-            "pipe": Pipeline([("s", StandardScaler()),
-                              ("m", XGBRegressor(
-                                  random_state=42,
-                                  verbosity=0,
-                                  subsample=0.8,
-                                  colsample_bytree=0.8))]),
-            "params": {
-                "m__n_estimators":    [15, 25, 50],
-                "m__max_depth":       [1],
-                "m__learning_rate":   [0.1, 0.2, 0.3],
-                "m__reg_alpha":       [5, 10],
-                "m__reg_lambda":      [10, 20],
-                "m__min_child_weight": [10, 20, 30],
-            },
-            "search_type": "random",  # 3×1×3×2×2×3 = 108 → Random
-            "n_iter": 25,
-            "cols": None,
-        },
-    }
+    n_original = X.shape[1]
+
+    # Paso 1: eliminar features con varianza cero
+    vt = VarianceThreshold(threshold=0)
+    vt.fit(X)
+    cols_var = X.columns[vt.get_support()].tolist()
+
+    # Paso 2: correlación con target (|r| > CORR_UMBRAL)
+    corrs = X[cols_var].corrwith(pd.Series(y, index=X.index)).abs()
+    cols_corr = corrs[corrs > CORR_UMBRAL].index.tolist()
+
+    if len(cols_corr) < 3:
+        cols_corr = cols_var
+
+    # Paso 3: eliminar features redundantes por inter-correlación
+    X_tmp = X[cols_corr]
+    corr_matrix = X_tmp.corr().abs()
+    upper = corr_matrix.where(
+        np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    to_drop = set()
+    for col in upper.columns:
+        redundantes = upper.index[upper[col] > INTER_CORR_UMBRAL].tolist()
+        for red in redundantes:
+            # Eliminar la que tiene menor correlación con el target
+            if corrs.get(red, 0) < corrs.get(col, 0):
+                to_drop.add(red)
+            else:
+                to_drop.add(col)
+    cols_inter = [c for c in cols_corr if c not in to_drop]
+
+    if len(cols_inter) < 3:
+        cols_inter = cols_corr
+
+    # Paso 4: LassoCV + SelectFromModel
+    X_scaled = StandardScaler().fit_transform(X[cols_inter])
+    lasso = LassoCV(cv=5, random_state=42, max_iter=10000)
+    lasso.fit(X_scaled, y)
+    selector = SelectFromModel(lasso, prefit=True)
+    mask = selector.get_support()
+    cols_final = [c for c, keep in zip(cols_inter, mask) if keep]
+
+    # Fallback: si LassoCV descarta demasiadas, usar las del paso 3
+    if len(cols_final) < 3:
+        cols_final = cols_inter
+
+    print(f"    Features: {n_original} → {len(cols_var)} (var) → "
+          f"{len(cols_corr)} (corr) → {len(cols_inter)} (inter) → "
+          f"{len(cols_final)} (lasso) para {nombre_target}")
+
+    return cols_final
 
 
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 #  MÉTRICAS
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 
 def calcular_metricas(y_real, y_pred):
-    """Calcula 8 métricas de regresión."""
+    """Calcula 9 métricas de regresión incluyendo Pearson r."""
     mse = mean_squared_error(y_real, y_pred)
+    r, _ = pearsonr(y_real, y_pred)
     return {
-        "MAE":    round(mean_absolute_error(y_real, y_pred), 2),
-        "MSE":    round(mse, 2),
-        "RMSE":   round(np.sqrt(mse), 2),
-        "R²":     round(r2_score(y_real, y_pred), 4),
-        "MedAE":  round(median_absolute_error(y_real, y_pred), 2),
-        "MaxErr": round(max_error(y_real, y_pred), 2),
-        "MAPE %": round(mean_absolute_percentage_error(y_real, y_pred) * 100, 2),
-        "EVS":    round(explained_variance_score(y_real, y_pred), 4),
+        "MAE":       round(mean_absolute_error(y_real, y_pred), 2),
+        "MSE":       round(mse, 2),
+        "RMSE":      round(np.sqrt(mse), 2),
+        "R2":        round(r2_score(y_real, y_pred), 4),
+        "Pearson_r": round(r, 4),
+        "MedAE":     round(median_absolute_error(y_real, y_pred), 2),
+        "MaxErr":    round(max_error(y_real, y_pred), 2),
+        "MAPE %":    round(mean_absolute_percentage_error(y_real, y_pred) * 100, 2),
+        "EVS":       round(explained_variance_score(y_real, y_pred), 4),
     }
 
 
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 #  DETECCIÓN DE OVERFITTING
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 
 def analizar_overfitting(train_maes, test_maes, nombre_modelo):
     """
     Compara MAE de train vs test promediando sobre todos los folds/repeticiones.
 
-    Gap% = (test_mae − train_mae) / test_mae × 100
-      > 15%  → overfitting (modelo memoriza train)
-      < −10% → underfitting (modelo muy simple)
-      else   → balance adecuado
+    Gap% = (test_mae - train_mae) / test_mae × 100
+      > 15%  -> overfitting (modelo memoriza train)
+      < -10% -> underfitting (modelo muy simple)
+      else   -> balance adecuado
 
     Returns
     -------
@@ -346,13 +295,13 @@ def analizar_overfitting(train_maes, test_maes, nombre_modelo):
 
 def _recomendacion_color(diagnostico):
     """Retorna símbolo según diagnóstico."""
-    return {"OK": "✓", "OVERFITTING": "⚠", "UNDERFITTING": "▽"}.get(
+    return {"OK": "[OK]", "OVERFITTING": "[!]", "UNDERFITTING": "[v]"}.get(
         diagnostico, "?")
 
 
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 #  PARAMS MÁS FRECUENTES
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 
 def _params_mas_frecuentes(lista_params):
     """Devuelve los hiperparámetros más elegidos entre los folds."""
@@ -363,59 +312,348 @@ def _params_mas_frecuentes(lista_params):
     return ", ".join(f"{k.split('__')[1]}={v}" for k, v in mas_comun)
 
 
-# ══════════════════════════════════════════════════════════════
-#  FASE 1: EVALUACIÓN (cómputo sin gráficas)
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
+#  CORE: EVALUACIÓN CON VALIDACIÓN CRUZADA
+# ==============================================================
+
+def _evaluar_modelo_cv(nombre, pipe, params, X, y,
+                       search_type="grid", n_iter=10, usar_log=False):
+    """
+    Evaluación core: KFold × N_REPEATS con tuning interno.
+
+    Si usar_log=True, entrena en log-space (log1p) y reporta métricas
+    en escala original (expm1). Ideal para targets con distribución
+    sesgada como Volumen Tumoral.
+
+    Parámetros
+    ----------
+    nombre      : str, nombre del modelo para reportes
+    pipe        : Pipeline de sklearn (template, se clona internamente)
+    params      : dict, grid de hiperparámetros para tuning
+    X           : DataFrame con features
+    y           : array con target en escala original
+    search_type : 'grid' o 'random'
+    n_iter      : int, iteraciones para RandomizedSearchCV
+    usar_log    : bool, aplicar log1p/expm1 al target
+
+    Retorna
+    -------
+    resultado : dict con métricas + metadata interna (_pipe, _y_pred, etc.)
+    ovf_dict  : dict con diagnóstico de overfitting
+    """
+    N = len(y)
+    y_pred_acum = np.zeros(N)
+    conteo_acum = np.zeros(N)
+    train_maes = []
+    test_maes = []
+    mejores_params = []
+
+    for rep in range(N_REPEATS):
+        kfold = KFold(n_splits=N_SPLITS, shuffle=True, random_state=42 + rep)
+
+        for train_idx, test_idx in kfold.split(X):
+            X_tr = X.iloc[train_idx]
+            X_te = X.iloc[test_idx]
+            y_tr = y[train_idx]
+            y_te = y[test_idx]
+
+            # Log transform para entrenamiento
+            y_tr_fit = np.log1p(y_tr) if usar_log else y_tr
+
+            pipe_clone = clone(pipe)
+
+            if params:
+                inner_cv = KFold(n_splits=INNER_CV, shuffle=True,
+                                 random_state=42)
+
+                if search_type == "random":
+                    searcher = RandomizedSearchCV(
+                        pipe_clone, params, n_iter=n_iter,
+                        cv=inner_cv, scoring="neg_mean_absolute_error",
+                        n_jobs=1, random_state=42)
+                else:
+                    searcher = GridSearchCV(
+                        pipe_clone, params, cv=inner_cv,
+                        scoring="neg_mean_absolute_error", n_jobs=1)
+                searcher.fit(X_tr, y_tr_fit)
+                modelo_fit = searcher.best_estimator_
+                mejores_params.append(searcher.best_params_)
+            else:
+                pipe_clone.fit(X_tr, y_tr_fit)
+                modelo_fit = pipe_clone
+
+            # Predicciones
+            pred_te = modelo_fit.predict(X_te)
+            pred_tr = modelo_fit.predict(X_tr)
+
+            # Invertir log transform
+            if usar_log:
+                pred_te = np.expm1(pred_te)
+                pred_tr = np.expm1(pred_tr)
+
+            # Acumular predicciones test (promedio entre repeticiones)
+            y_pred_acum[test_idx] += pred_te
+            conteo_acum[test_idx] += 1
+
+            # MAE por fold para análisis de overfitting (escala original)
+            train_maes.append(mean_absolute_error(y_tr, pred_tr))
+            test_maes.append(mean_absolute_error(y_te, pred_te))
+
+    # Promediar predicciones sobre repeticiones
+    mask = conteo_acum > 0
+    y_pred = np.where(mask, y_pred_acum / conteo_acum, 0)
+
+    # Métricas globales (escala original)
+    m = calcular_metricas(y, y_pred)
+
+    # Análisis de overfitting
+    ovf = analizar_overfitting(train_maes, test_maes, nombre)
+    m["Train_MAE"] = ovf["Train_MAE"]
+    m["Gap_%"]     = ovf["Gap_%"]
+
+    # Params más frecuentes
+    m["Best_Params"] = _params_mas_frecuentes(mejores_params)
+
+    resultado = {
+        "Modelo": nombre, **m,
+        # Metadata interna (no se escribe a CSV, prefijo _ )
+        "_pipe": pipe, "_params": params,
+        "_search_type": search_type, "_n_iter": n_iter,
+        "_feature_cols": list(X.columns),
+        "_y_pred": y_pred.copy(),
+    }
+    ovf_dict = {"Modelo": nombre, **ovf}
+
+    return resultado, ovf_dict
+
+
+# ==============================================================
+#  FUNCIONES DE EVALUACIÓN POR MODELO
+# ==============================================================
+# Cada función define su pipeline + hiperparámetros y delega a
+# _evaluar_modelo_cv(). Para modificar un modelo específico, editar
+# solo su función. Para agregar un modelo nuevo, crear una función
+# y añadirla a la lista EVALUADORES al final de esta sección.
+# ==============================================================
+
+def evaluar_reg_simple(X, y, mejor_feat, usar_log=False):
+    """Regresión lineal simple con la feature de mayor correlación."""
+    pipe = Pipeline([("s", StandardScaler()), ("m", LinearRegression())])
+    return _evaluar_modelo_cv("Reg. Simple", pipe, {}, X[[mejor_feat]], y,
+                              usar_log=usar_log)
+
+
+def evaluar_reg_multiple(X, y, usar_log=False):
+    """Regresión lineal múltiple con todas las features seleccionadas."""
+    pipe = Pipeline([("s", StandardScaler()), ("m", LinearRegression())])
+    return _evaluar_modelo_cv("Reg. Multiple", pipe, {}, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_polinomica(X, y, usar_log=False):
+    """Regresión polinómica (grado 2) con regularización Ridge."""
+    pipe = Pipeline([
+        ("s", StandardScaler()),
+        ("p", PolynomialFeatures(include_bias=False)),
+        ("m", Ridge()),
+    ])
+    params = {"p__degree": [2], "m__alpha": [10.0, 100.0, 1000.0]}
+    return _evaluar_modelo_cv("Polinomica", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_ridge(X, y, usar_log=False):
+    """Regresión Ridge (regularización L2)."""
+    pipe = Pipeline([("s", StandardScaler()), ("m", Ridge())])
+    params = {"m__alpha": [0.01, 0.1, 1.0, 10.0, 100.0]}
+    return _evaluar_modelo_cv("Ridge", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_lasso(X, y, usar_log=False):
+    """Regresión Lasso (regularización L1)."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", Lasso(max_iter=10000))])
+    params = {"m__alpha": [0.01, 0.1, 1.0, 10.0]}
+    return _evaluar_modelo_cv("Lasso", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_elasticnet(X, y, usar_log=False):
+    """Regresión ElasticNet (L1 + L2)."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", ElasticNet(max_iter=10000))])
+    params = {
+        "m__alpha":    [0.01, 0.1, 1.0],
+        "m__l1_ratio": [0.2, 0.5, 0.8],
+    }
+    return _evaluar_modelo_cv("ElasticNet", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_knn(X, y, usar_log=False):
+    """K-Nearest Neighbors Regressor."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", KNeighborsRegressor())])
+    params = {
+        "m__n_neighbors": [15, 20, 30, 50],
+        "m__weights":     ["uniform", "distance"],
+        "m__p":           [1, 2],
+    }
+    return _evaluar_modelo_cv("KNN", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_svr(X, y, usar_log=False):
+    """Support Vector Regression."""
+    pipe = Pipeline([("s", StandardScaler()), ("m", SVR())])
+    params = {
+        "m__C":       [0.001, 0.01, 0.1, 1],
+        "m__epsilon": [0.1, 0.5, 1.0],
+        "m__kernel":  ["linear", "rbf"],
+    }
+    return _evaluar_modelo_cv("SVR", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_arbol(X, y, usar_log=False):
+    """Árbol de decisión."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", DecisionTreeRegressor(random_state=42))])
+    params = {
+        "m__max_depth":        [1, 2, 3],
+        "m__min_samples_leaf": [4, 8, 16],
+    }
+    return _evaluar_modelo_cv("Arbol Decision", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_random_forest(X, y, usar_log=False):
+    """Random Forest Regressor."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", RandomForestRegressor(random_state=42))])
+    params = {
+        "m__n_estimators":     [50, 100],
+        "m__max_depth":        [2, 3],
+        "m__min_samples_leaf": [8, 16],
+    }
+    return _evaluar_modelo_cv("Random Forest", pipe, params, X, y,
+                              usar_log=usar_log)
+
+
+def evaluar_gradient_boost(X, y, usar_log=False):
+    """Gradient Boosting Regressor."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", GradientBoostingRegressor(
+                         random_state=42, subsample=0.7, max_features=0.7))])
+    params = {
+        "m__n_estimators":      [10, 15, 25],
+        "m__max_depth":         [1],
+        "m__learning_rate":     [0.1, 0.2, 0.3],
+        "m__min_samples_leaf":  [16, 32, 48],
+        "m__min_samples_split": [15, 25],
+    }
+    return _evaluar_modelo_cv("Gradient Boost", pipe, params, X, y,
+                              search_type="random", n_iter=20,
+                              usar_log=usar_log)
+
+
+def evaluar_xgboost(X, y, usar_log=False):
+    """XGBoost Regressor."""
+    pipe = Pipeline([("s", StandardScaler()),
+                     ("m", XGBRegressor(
+                         random_state=42, verbosity=0,
+                         subsample=0.8, colsample_bytree=0.8))])
+    params = {
+        "m__n_estimators":     [15, 25, 50],
+        "m__max_depth":        [1],
+        "m__learning_rate":    [0.1, 0.2, 0.3],
+        "m__reg_alpha":        [5, 10],
+        "m__reg_lambda":       [10, 20],
+        "m__min_child_weight": [10, 20, 30],
+    }
+    return _evaluar_modelo_cv("XGBoost", pipe, params, X, y,
+                              search_type="random", n_iter=25,
+                              usar_log=usar_log)
+
+
+# -- Registro de evaluadores --
+# Para agregar un modelo nuevo: crear función evaluar_xxx() y añadirla aquí.
+EVALUADORES = [
+    ("Reg. Simple",     evaluar_reg_simple),
+    ("Reg. Multiple",   evaluar_reg_multiple),
+    ("Polinomica",      evaluar_polinomica),
+    ("Ridge",           evaluar_ridge),
+    ("Lasso",           evaluar_lasso),
+    ("ElasticNet",      evaluar_elasticnet),
+    ("KNN",             evaluar_knn),
+    ("SVR",             evaluar_svr),
+    ("Arbol Decision",  evaluar_arbol),
+    ("Random Forest",   evaluar_random_forest),
+    ("Gradient Boost",  evaluar_gradient_boost),
+    ("XGBoost",         evaluar_xgboost),
+]
+
+
+# ==============================================================
+#  ORQUESTADOR: EVALUACIÓN MULTI-TARGET
+# ==============================================================
 
 def ejecutar_evaluacion():
     """
-    9-Fold CV × 3 repeticiones con análisis de overfitting:
-      • Outer loop  → KFold(9) para evaluación imparcial (90/10).
-      • Inner loop  → GridSearchCV / RandomizedSearchCV con 5-Fold para tuning.
-      • Overfitting → Compara MAE train vs test por fold.
+    Evaluación completa: feature selection + 12 modelos × 3 targets.
+    Log-transform automático para Volumen Tumoral.
 
     Returns
     -------
-    todos : dict con resultados por target (slug → {cfg, resultados, df})
+    todos : dict con resultados por target para generar_graficas()
     """
-    # ── Cargar y validar ──
+    # -- Cargar y validar --
     df_raw = pd.read_csv(RUTA_CSV)
 
-    print("\n" + "═" * 80)
+    # Deduplicar por Paciente_ID (cada caso puede aparecer >1 vez en el CSV)
+    n_antes = len(df_raw)
+    df_raw = df_raw.drop_duplicates(subset="Paciente_ID").reset_index(drop=True)
+    n_despues = len(df_raw)
+
+    print("\n" + "=" * 80)
     print("  VALIDACIÓN DE DATOS DE ENTRADA")
-    print("═" * 80)
+    print("=" * 80)
+    if n_antes != n_despues:
+        print(f"  [OK] Deduplicado: {n_antes} → {n_despues} filas únicas")
 
     required = ["Paciente_ID", "target_riesgo"] + [t["origen"] for t in TARGETS]
     missing = [c for c in required if c not in df_raw.columns]
     if missing:
-        raise ValueError(f"❌ Columnas requeridas faltantes: {missing}")
+        raise ValueError(f"[X] Columnas requeridas faltantes: {missing}")
 
     shape_n = sum(1 for c in df_raw.columns if c.startswith("shape_"))
     fo_n    = sum(1 for c in df_raw.columns if c.startswith("firstorder_"))
     glcm_n  = sum(1 for c in df_raw.columns if c.startswith("glcm_"))
-    print(f"  ✓ CSV cargado: {len(df_raw)} filas × {len(df_raw.columns)} columnas")
-    print(f"  ✓ shape: {shape_n} | firstorder: {fo_n} | glcm: {glcm_n}")
+    print(f"  [OK] CSV cargado: {len(df_raw)} filas x {len(df_raw.columns)} columnas")
+    print(f"  [OK] shape: {shape_n} | firstorder: {fo_n} | glcm: {glcm_n}")
 
-    # ── Preparar datos (crear targets + eliminar shape_*) ──
+    # -- Preparar datos (crear targets + eliminar shape_*) --
     df, prep_info = preparar_datos_regresion(df_raw)
 
     print(f"\n  PREPARACIÓN:")
-    print(f"  ✓ Targets creados: {', '.join(prep_info['targets_creados'])}")
-    print(f"  ✓ shape_* eliminadas: {prep_info['shape_eliminadas']} columnas")
-    print(f"  ✓ Features finales: {prep_info['n_features']} (firstorder + glcm)")
+    print(f"  [OK] Targets creados: {', '.join(prep_info['targets_creados'])}")
+    print(f"  [OK] shape_* eliminadas: {prep_info['shape_eliminadas']} columnas")
+    print(f"  [OK] Features iniciales: {prep_info['n_features']} (firstorder + glcm)")
 
-    # ── Separar X (features) de targets y metadatos ──
-    cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET
-    X = df.drop(columns=[c for c in cols_drop if c in df.columns])
+    # -- Separar X (features) de targets y metadatos --
+    cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET + COLS_CLINICAS
+    X_all = df.drop(columns=[c for c in cols_drop if c in df.columns])
     N = len(df)
 
-    print(f"\n" + "═" * 80)
+    print(f"\n" + "=" * 80)
     print(f"  EVALUACIÓN DE MODELOS DE REGRESIÓN")
-    print("═" * 80)
-    print(f"  Dataset: {N} muestras × {X.shape[1]} features")
-    print(f"  Validación: {N_SPLITS}-Fold CV × {N_REPEATS} repeticiones")
+    print("=" * 80)
+    print(f"  Dataset: {N} muestras x {X_all.shape[1]} features iniciales")
+    print(f"  Validación: {N_SPLITS}-Fold CV x {N_REPEATS} repeticiones")
     print(f"  Tuning interno: {INNER_CV}-Fold CV")
     print(f"  Umbral overfitting: Gap% > {OVERFITTING_UMBRAL}%")
+    print(f"  Feature selection: corr>{CORR_UMBRAL} + inter<{INTER_CORR_UMBRAL} + LassoCV")
     print()
 
     todos = {}
@@ -424,116 +662,45 @@ def ejecutar_evaluacion():
     for t in TARGETS:
         y = df[t["col"]].values
         u = t["u"]
+        usar_log = (t["slug"] == "volumen")
 
-        # Mejor feature para regresión simple (correlación absoluta)
-        corr = X.corrwith(pd.Series(y, index=X.index)).abs()
+        print(f"\n{'-' * 80}")
+        print(f"> {t['nombre']} ({u})")
+
+        # Feature selection por target
+        cols_sel = seleccionar_features(X_all, y, t["nombre"])
+        X_sel = X_all[cols_sel]
+
+        # Mejor feature para regresión simple (entre las seleccionadas)
+        corr = X_sel.corrwith(pd.Series(y, index=X_sel.index)).abs()
         mejor_feat = corr.idxmax()
 
-        modelos = definir_modelos(mejor_feat)
-
-        print(f"\n{'─' * 80}")
-        print(f"▶ {t['nombre']} ({u})")
-        print(f"  Rango: {y.min():.2f} – {y.max():.2f} {u} | "
+        print(f"  Rango: {y.min():.2f} - {y.max():.2f} {u} | "
               f"Media: {y.mean():.2f} {u} | "
               f"Mejor feature: {mejor_feat} (r={corr[mejor_feat]:.3f})")
+        if usar_log:
+            print(f"  [LOG] Log-transform activado para {t['nombre']}")
         print()
 
         resultados = []
         overfitting_info = []
 
-        for nombre, cfg in modelos.items():
-            X_usar = X[cfg["cols"]] if cfg["cols"] else X
-            params = cfg["params"]
-            search_type = cfg.get("search_type", "grid")
-            n_iter = cfg.get("n_iter", 10)
-
+        for nombre, fn in EVALUADORES:
             try:
-                # Acumuladores para todas las repeticiones
-                y_pred_acum = np.zeros(N)
-                conteo_acum = np.zeros(N)
-                train_maes_folds = []
-                test_maes_folds = []
-                mejores_params = []
-
-                for rep in range(N_REPEATS):
-                    kfold = KFold(n_splits=N_SPLITS, shuffle=True,
-                                  random_state=42 + rep)
-
-                    for train_idx, test_idx in kfold.split(X_usar):
-                        X_tr = X_usar.iloc[train_idx]
-                        X_te = X_usar.iloc[test_idx]
-                        y_tr = y[train_idx]
-                        y_te = y[test_idx]
-
-                        pipe = clone(cfg["pipe"])
-
-                        if params:
-                            inner_cv = KFold(n_splits=INNER_CV, shuffle=True,
-                                             random_state=42)
-
-                            if search_type == "random":
-                                searcher = RandomizedSearchCV(
-                                    pipe, params,
-                                    n_iter=n_iter,
-                                    cv=inner_cv,
-                                    scoring="neg_mean_absolute_error",
-                                    n_jobs=1,
-                                    random_state=42,
-                                )
-                            else:
-                                searcher = GridSearchCV(
-                                    pipe, params,
-                                    cv=inner_cv,
-                                    scoring="neg_mean_absolute_error",
-                                    n_jobs=1,
-                                )
-                            searcher.fit(X_tr, y_tr)
-                            modelo_fit = searcher.best_estimator_
-                            mejores_params.append(searcher.best_params_)
-                        else:
-                            pipe.fit(X_tr, y_tr)
-                            modelo_fit = pipe
-
-                        # Predicciones
-                        pred_te = modelo_fit.predict(X_te)
-                        pred_tr = modelo_fit.predict(X_tr)
-
-                        # Acumular predicciones test (promedio entre repeticiones)
-                        y_pred_acum[test_idx] += pred_te
-                        conteo_acum[test_idx] += 1
-
-                        # MAE por fold para análisis de overfitting
-                        train_maes_folds.append(
-                            mean_absolute_error(y_tr, pred_tr))
-                        test_maes_folds.append(
-                            mean_absolute_error(y_te, pred_te))
-
-                # Promediar predicciones sobre repeticiones
-                mask = conteo_acum > 0
-                y_pred = np.where(mask, y_pred_acum / conteo_acum, 0)
-
-                # Métricas globales
-                m = calcular_metricas(y, y_pred)
-
-                # Análisis de overfitting
-                ovf = analizar_overfitting(train_maes_folds, test_maes_folds,
-                                           nombre)
-                m["Train_MAE"] = ovf["Train_MAE"]
-                m["Gap_%"]     = ovf["Gap_%"]
-
-                # Params más frecuentes
-                m["Best_Params"] = _params_mas_frecuentes(mejores_params)
-
-                resultados.append({"Modelo": nombre, **m})
-                overfitting_info.append({"Modelo": nombre, **ovf})
-
+                if nombre == "Reg. Simple":
+                    res, ovf = fn(X_sel, y, mejor_feat, usar_log)
+                else:
+                    res, ovf = fn(X_sel, y, usar_log)
+                resultados.append(res)
+                overfitting_info.append(ovf)
             except Exception as e:
                 print(f"  {nombre:18s} | ERROR: {e}")
                 nan_row = {
                     "Modelo": nombre, "MAE": np.nan, "MSE": np.nan,
-                    "RMSE": np.nan, "R²": np.nan, "MedAE": np.nan,
-                    "MaxErr": np.nan, "MAPE %": np.nan, "EVS": np.nan,
-                    "Train_MAE": np.nan, "Gap_%": np.nan, "Best_Params": "",
+                    "RMSE": np.nan, "R2": np.nan, "Pearson_r": np.nan,
+                    "MedAE": np.nan, "MaxErr": np.nan, "MAPE %": np.nan,
+                    "EVS": np.nan, "Train_MAE": np.nan, "Gap_%": np.nan,
+                    "Best_Params": "",
                 }
                 resultados.append(nan_row)
                 overfitting_info.append({
@@ -542,18 +709,21 @@ def ejecutar_evaluacion():
                     "Diagnostico": "ERROR", "Recomendacion": str(e),
                 })
 
-        # ── Tabla compacta de resultados ──
-        df_res = pd.DataFrame(resultados).sort_values("MAE")
-        print(f"\n  {'Modelo':<18} {'R²':>7} {'MAE':>10} {'Train':>8} "
+        # -- Tabla compacta de resultados (sin columnas internas) --
+        clean_results = [{k: v for k, v in r.items() if not k.startswith("_")}
+                         for r in resultados]
+        df_res = pd.DataFrame(clean_results).sort_values("MAE")
+
+        print(f"\n  {'Modelo':<18} {'R2':>7} {'MAE':>10} {'Train':>8} "
               f"{'Gap%':>7} {'MAPE':>7}  Dx")
-        print("  " + "═" * 70)
+        print("  " + "=" * 70)
         for _, row in df_res.iterrows():
             if pd.notna(row["MAE"]):
                 ovf_dx = next(
                     (o for o in overfitting_info if o["Modelo"] == row["Modelo"]),
                     {"Diagnostico": "?"})
                 sym = _recomendacion_color(ovf_dx["Diagnostico"])
-                print(f"  {row['Modelo']:<18} {row['R²']:>7.3f} "
+                print(f"  {row['Modelo']:<18} {row['R2']:>7.3f} "
                       f"{row['MAE']:>8.1f}{u:>2} {row['Train_MAE']:>7.1f} "
                       f"{row['Gap_%']:>6.1f}% {row['MAPE %']:>6.1f}%  "
                       f"{sym} {ovf_dx['Diagnostico']}")
@@ -562,8 +732,8 @@ def ejecutar_evaluacion():
         validos = [r for r in resultados if not np.isnan(r["MAE"])]
         if validos:
             mejor = min(validos, key=lambda r: r["MAE"])
-            print(f"\n  ✓ Mejor: {mejor['Modelo']} | "
-                  f"MAE={mejor['MAE']:.1f} {u} | R²={mejor['R²']:.3f} | "
+            print(f"\n  [OK] Mejor: {mejor['Modelo']} | "
+                  f"MAE={mejor['MAE']:.1f} {u} | R2={mejor['R2']:.3f} | "
                   f"MAPE={mejor['MAPE %']:.1f}%")
             if mejor.get("Best_Params"):
                 print(f"    Params: {mejor['Best_Params']}")
@@ -572,20 +742,21 @@ def ejecutar_evaluacion():
         ovf_modelos = [o for o in overfitting_info
                        if o["Diagnostico"] == "OVERFITTING"]
         if ovf_modelos:
-            print(f"\n  ⚠ Modelos con overfitting ({len(ovf_modelos)}):")
+            print(f"\n  [!] Modelos con overfitting ({len(ovf_modelos)}):")
             for o in ovf_modelos:
                 print(f"    • {o['Modelo']:18s} Gap={o['Gap_%']:>5.1f}% "
-                      f"→ {o['Recomendacion']}")
+                      f"-> {o['Recomendacion']}")
 
         todos[t["slug"]] = {
             "cfg": t,
             "resultados": resultados,
             "overfitting": overfitting_info,
             "df": df_res,
+            "X_sel": X_sel,
         }
         print()
 
-    # ── CSV consolidado ──
+    # -- CSV consolidado --
     frames = []
     for slug, data in todos.items():
         df_tmp = data["df"].copy()
@@ -599,48 +770,55 @@ def ejecutar_evaluacion():
     df_all.to_csv(csv_path, index=False)
 
     t_total = time.time() - t_inicio
-    print(f"\n{'═' * 80}")
+    print(f"\n{'=' * 80}")
     print(f"  Tiempo total: {t_total:.1f}s ({t_total/60:.1f} min)")
     print(f"  Resultados: metrics/comparativa_general.csv")
-    print(f"{'═' * 80}")
+    print(f"{'=' * 80}")
 
     # Guardar X y df para uso en visualizaciones
-    todos["_X"] = X
+    todos["_X"] = X_all
     todos["_df"] = df
+
+    # Datos clínicos para gráfica demográfica
+    cols_clin_presentes = [c for c in COLS_CLINICAS if c in df.columns]
+    if cols_clin_presentes:
+        todos["_df_clinico"] = df[["Paciente_ID"] + cols_clin_presentes].copy()
 
     return todos
 
 
-
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 #  FASE 2: VISUALIZACIÓN
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 
 def generar_graficas(todos):
     """
-    Crea 5 figuras resumen:
+    Crea 7 figuras resumen:
       1. R² comparativo (barras agrupadas)
       2. Heatmap mejor modelo por target
       3. Análisis de overfitting (Gap% por modelo)
       4. Feature importance (top 15)
       5. Curvas de aprendizaje
+      6. Scatter: predicción vs valor real (mejor modelo por target)
+      7. Distribución demográfica (sexo, región anatómica, diagnóstico)
     """
     plt.close("all")
 
-    X = todos.pop("_X")
+    X_all = todos.pop("_X")
     df = todos.pop("_df")
+    df_clinico = todos.pop("_df_clinico", None)
 
     slugs = [s for s in todos.keys()]
     n_tgt = len(slugs)
 
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     #  GRÁFICA 1: R² COMPARATIVO
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     modelos_set = []
     for slug in slugs:
         for r in todos[slug]["resultados"]:
             if (r["Modelo"] not in modelos_set
-                    and not np.isnan(r.get("R²", np.nan))):
+                    and not np.isnan(r.get("R2", np.nan))):
                 modelos_set.append(r["Modelo"])
 
     n_mod = len(modelos_set)
@@ -651,8 +829,8 @@ def generar_graficas(todos):
     fig1, ax1 = plt.subplots(figsize=(13, max(6, n_mod * 0.55)))
     for i, slug in enumerate(slugs):
         cfg = todos[slug]["cfg"]
-        r2_map = {r["Modelo"]: r["R²"] for r in todos[slug]["resultados"]
-                  if not np.isnan(r.get("R²", np.nan))}
+        r2_map = {r["Modelo"]: r["R2"] for r in todos[slug]["resultados"]
+                  if not np.isnan(r.get("R2", np.nan))}
         vals = [r2_map.get(m, np.nan) for m in modelos_set]
         offset = (i - n_tgt / 2 + 0.5) * altura
         bars = ax1.barh(y_pos + offset, vals, height=altura * 0.9,
@@ -671,20 +849,20 @@ def generar_graficas(todos):
     ax1.set_yticklabels(modelos_set, fontsize=9)
     ax1.axvline(x=0, color="#2c3e50", linewidth=1, alpha=0.8)
     ax1.set_xlabel("R²", fontsize=11)
-    ax1.set_title(f"R² por Modelo y Target — {N_SPLITS}-Fold CV × "
-                  f"{N_REPEATS} rep + GridSearchCV/RandomizedSearchCV\n"
+    ax1.set_title(f"R² por Modelo y Target - {N_SPLITS}-Fold CV x "
+                  f"{N_REPEATS} rep + Feature Selection + Log-Transform\n"
                   "1.0 = perfecto  |  0 = media  |  < 0 = peor que la media",
                   fontweight="bold", fontsize=12)
     ax1.legend(loc="lower right", fontsize=9)
     fig1.tight_layout()
 
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     #  GRÁFICA 2: HEATMAP MEJORES MODELOS
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     filas = []
     row_labels = []
-    cols_heat = ["MAE", "RMSE", "R²", "MedAE", "MaxErr", "MAPE %", "EVS",
-                 "Gap_%"]
+    cols_heat = ["MAE", "RMSE", "R2", "Pearson_r", "MedAE", "MaxErr",
+                 "MAPE %", "EVS", "Gap_%"]
 
     for slug in slugs:
         cfg = todos[slug]["cfg"]
@@ -698,7 +876,7 @@ def generar_graficas(todos):
 
     df_h = pd.DataFrame(filas, columns=cols_heat, index=row_labels)
 
-    mayor_mejor = ["R²", "EVS"]
+    mayor_mejor = ["R2", "EVS", "Pearson_r"]
     df_n = df_h.copy()
     for col in df_n.columns:
         d = df_n[col].dropna()
@@ -712,12 +890,12 @@ def generar_graficas(todos):
         else:
             df_n[col] = (d - d.min()) / r
 
-    fig2, ax2 = plt.subplots(figsize=(14, 4))
+    fig2, ax2 = plt.subplots(figsize=(15, 4))
     sns.heatmap(df_n, annot=df_h.values, fmt=".2f", cmap="RdYlGn_r",
                 linewidths=2, linecolor="white", ax=ax2,
-                cbar_kws={"label": "← Mejor          Peor →", "shrink": 0.8},
+                cbar_kws={"label": "← Mejor          Peor ->", "shrink": 0.8},
                 annot_kws={"size": 10, "fontweight": "bold"})
-    ax2.set_title("Mejor Modelo por Target — Métricas + Overfitting\n"
+    ax2.set_title("Mejor Modelo por Target - Métricas + Overfitting\n"
                   "(verde = mejor, rojo = peor)", fontweight="bold",
                   fontsize=12)
     ax2.set_ylabel("")
@@ -726,9 +904,9 @@ def generar_graficas(todos):
     ax2.set_yticklabels(ax2.get_yticklabels(), rotation=0, fontsize=10)
     fig2.tight_layout()
 
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     #  GRÁFICA 3: ANÁLISIS DE OVERFITTING (Gap% por modelo)
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     fig3, axes3 = plt.subplots(1, n_tgt, figsize=(6 * n_tgt, 6),
                                sharey=False)
     if n_tgt == 1:
@@ -776,26 +954,27 @@ def generar_graficas(todos):
                      fontweight="bold", fontsize=11)
         ax.legend(loc="lower right", fontsize=8)
 
-    fig3.suptitle(f"Análisis de Overfitting — "
+    fig3.suptitle(f"Análisis de Overfitting - "
                   f"Umbral: Gap% > {OVERFITTING_UMBRAL}%",
                   fontweight="bold", fontsize=13, y=1.02)
     fig3.tight_layout()
 
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     #  GRÁFICA 4: FEATURE IMPORTANCE (modelos tree-based)
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     tree_names = ["Random Forest", "Gradient Boost", "XGBoost",
                   "Arbol Decision"]
 
-    fig4, axes4 = plt.subplots(1, n_tgt, figsize=(6 * n_tgt, 7),
-)
+    fig4, axes4 = plt.subplots(1, n_tgt, figsize=(6 * n_tgt, 7))
     if n_tgt == 1:
         axes4 = [axes4]
 
     for i, slug in enumerate(slugs):
         ax = axes4[i]
         cfg_t = todos[slug]["cfg"]
+        X_sel = todos[slug]["X_sel"]
         y = df[cfg_t["col"]].values
+        y_fit = np.log1p(y) if slug == "volumen" else y
 
         # Buscar mejor modelo tree-based
         validos_tree = [r for r in todos[slug]["resultados"]
@@ -810,23 +989,24 @@ def generar_graficas(todos):
             continue
 
         mejor_tree = min(validos_tree, key=lambda r: r["MAE"])
-        nombre_tree = mejor_tree["Modelo"]
 
-        # Re-entrenar para extraer feature importance
-        corr = X.corrwith(pd.Series(y, index=X.index)).abs()
-        mejor_f = corr.idxmax()
-        modelos_def = definir_modelos(mejor_f)
-        cfg_m = modelos_def[nombre_tree]
-        pipe_tree = clone(cfg_m["pipe"])
+        # Re-entrenar con pipe/params almacenados
+        pipe_tree = clone(mejor_tree["_pipe"])
+        params = mejor_tree["_params"]
+        feature_cols = mejor_tree.get("_feature_cols",
+                                      X_sel.columns.tolist())
+        X_usar = (X_sel[feature_cols]
+                  if set(feature_cols).issubset(X_sel.columns)
+                  else X_sel)
 
-        params = cfg_m["params"]
         if params:
-            inner_cv = KFold(n_splits=INNER_CV, shuffle=True, random_state=42)
-            st = cfg_m.get("search_type", "grid")
+            st = mejor_tree.get("_search_type", "grid")
+            inner_cv = KFold(n_splits=INNER_CV, shuffle=True,
+                             random_state=42)
             if st == "random":
                 gs = RandomizedSearchCV(
                     pipe_tree, params,
-                    n_iter=cfg_m.get("n_iter", 10),
+                    n_iter=mejor_tree.get("_n_iter", 10),
                     cv=inner_cv,
                     scoring="neg_mean_absolute_error",
                     n_jobs=1, random_state=42)
@@ -834,17 +1014,17 @@ def generar_graficas(todos):
                 gs = GridSearchCV(
                     pipe_tree, params, cv=inner_cv,
                     scoring="neg_mean_absolute_error", n_jobs=1)
-            gs.fit(X, y)
+            gs.fit(X_usar, y_fit)
             final_model = gs.best_estimator_
         else:
-            pipe_tree.fit(X, y)
+            pipe_tree.fit(X_usar, y_fit)
             final_model = pipe_tree
 
         modelo_interno = final_model.named_steps["m"]
         if hasattr(modelo_interno, "feature_importances_"):
             importancias = pd.Series(
                 modelo_interno.feature_importances_,
-                index=X.columns
+                index=X_usar.columns
             ).sort_values(ascending=True)
 
             top15 = importancias.tail(15)
@@ -855,57 +1035,56 @@ def generar_graficas(todos):
             top15.index = labels
             top15.plot.barh(ax=ax, color=colores, edgecolor="white")
             ax.set_xlabel("Importancia", fontsize=10)
-            ax.set_title(f"{cfg_t['nombre']}\n{nombre_tree} "
-                         f"(R²={mejor_tree['R²']:.3f})",
+            ax.set_title(f"{cfg_t['nombre']}\n{mejor_tree['Modelo']} "
+                         f"(R²={mejor_tree['R2']:.3f})",
                          fontweight="bold", fontsize=11)
 
-            from matplotlib.patches import Patch
             legend_elements = [
                 Patch(facecolor="#3498db", label="First Order"),
                 Patch(facecolor="#e67e22", label="GLCM"),
             ]
             ax.legend(handles=legend_elements, loc="lower right", fontsize=8)
         else:
-            ax.text(0.5, 0.5, f"{nombre_tree}\nno tiene\nfeature_importances_",
+            ax.text(0.5, 0.5,
+                    f"{mejor_tree['Modelo']}\nno tiene\nfeature_importances_",
                     ha="center", va="center", fontsize=10,
                     transform=ax.transAxes)
             ax.set_title(f"{cfg_t['nombre']}")
 
-    fig4.suptitle("Feature Importance — Top 15 Features por Target",
+    fig4.suptitle("Feature Importance - Top 15 Features por Target",
                   fontweight="bold", fontsize=13, y=1.02)
     fig4.tight_layout()
 
-    # ══════════════════════════════════════════════════════════
+    # ==========================================================
     #  GRÁFICA 5: CURVAS DE APRENDIZAJE
-    # ══════════════════════════════════════════════════════════
-    fig5, axes5 = plt.subplots(1, n_tgt, figsize=(6 * n_tgt, 5),
-)
+    # ==========================================================
+    fig5, axes5 = plt.subplots(1, n_tgt, figsize=(6 * n_tgt, 5))
     if n_tgt == 1:
         axes5 = [axes5]
 
     for i, slug in enumerate(slugs):
         ax = axes5[i]
         cfg_t = todos[slug]["cfg"]
+        X_sel = todos[slug]["X_sel"]
         y = df[cfg_t["col"]].values
+        y_lc = np.log1p(y) if slug == "volumen" else y
 
         validos = [r for r in todos[slug]["resultados"]
                    if not np.isnan(r.get("MAE", np.nan))]
         if not validos:
             continue
         mejor = min(validos, key=lambda r: r["MAE"])
-        nombre_mejor = mejor["Modelo"]
 
-        corr = X.corrwith(pd.Series(y, index=X.index)).abs()
-        mejor_f = corr.idxmax()
-        modelos_def = definir_modelos(mejor_f)
-        cfg_m = modelos_def[nombre_mejor]
-        X_lc = X[cfg_m["cols"]] if cfg_m["cols"] else X
-        pipe_lc = clone(cfg_m["pipe"])
+        feature_cols = mejor.get("_feature_cols", X_sel.columns.tolist())
+        X_lc = (X_sel[feature_cols]
+                if set(feature_cols).issubset(X_sel.columns)
+                else X_sel)
+        pipe_lc = clone(mejor["_pipe"])
 
         try:
             train_sizes = np.linspace(0.2, 1.0, 6)
             train_sizes_abs, train_scores, test_scores = learning_curve(
-                pipe_lc, X_lc, y,
+                pipe_lc, X_lc, y_lc,
                 train_sizes=train_sizes,
                 cv=KFold(n_splits=N_SPLITS, shuffle=True, random_state=42),
                 scoring="neg_mean_absolute_error",
@@ -929,9 +1108,11 @@ def generar_graficas(todos):
                             test_mae - test_std, test_mae + test_std,
                             alpha=0.1, color="#e74c3c")
 
+            y_label = ("MAE (log-mm³)" if slug == "volumen"
+                       else f"MAE ({cfg_t['u']})")
             ax.set_xlabel("Tamaño del Dataset de Entrenamiento", fontsize=10)
-            ax.set_ylabel(f"MAE ({cfg_t['u']})", fontsize=10)
-            ax.set_title(f"{cfg_t['nombre']}\n{nombre_mejor}",
+            ax.set_ylabel(y_label, fontsize=10)
+            ax.set_title(f"{cfg_t['nombre']}\n{mejor['Modelo']}",
                          fontweight="bold", fontsize=11)
             ax.legend(loc="upper right", fontsize=9)
             ax.grid(alpha=0.3)
@@ -940,53 +1121,194 @@ def generar_graficas(todos):
             ax.text(0.5, 0.5, f"Error:\n{str(e)[:60]}",
                     ha="center", va="center", fontsize=9,
                     transform=ax.transAxes)
-            ax.set_title(f"{cfg_t['nombre']}\n{nombre_mejor}")
+            ax.set_title(f"{cfg_t['nombre']}\n{mejor['Modelo']}")
 
-    fig5.suptitle("Curvas de Aprendizaje — ¿Más datos mejorarían el modelo?",
+    fig5.suptitle("Curvas de Aprendizaje - ¿Más datos mejorarían el modelo?",
                   fontweight="bold", fontsize=13, y=1.02)
     fig5.tight_layout()
 
-    # Guardar todas las figuras en metrics/
-    metrics_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "metrics")
+    # ==========================================================
+    #  GRÁFICA 6: SCATTER PREDICCIÓN vs VALOR REAL
+    # ==========================================================
+    fig6, axes6 = plt.subplots(1, n_tgt, figsize=(6 * n_tgt, 5))
+    if n_tgt == 1:
+        axes6 = [axes6]
+
+    for i, slug in enumerate(slugs):
+        ax = axes6[i]
+        cfg_t = todos[slug]["cfg"]
+        y_true = df[cfg_t["col"]].values
+
+        validos = [r for r in todos[slug]["resultados"]
+                   if not np.isnan(r.get("MAE", np.nan))]
+        if not validos:
+            continue
+        mejor = min(validos, key=lambda r: r["MAE"])
+        y_pred = mejor.get("_y_pred")
+        if y_pred is None:
+            continue
+
+        ax.scatter(y_true, y_pred, alpha=0.6, edgecolors="white",
+                   linewidth=0.5, s=40, color="#3498db")
+
+        # Línea identidad
+        all_vals = np.concatenate([y_true, y_pred])
+        min_val, max_val = all_vals.min(), all_vals.max()
+        margin = (max_val - min_val) * 0.05
+        lims = [min_val - margin, max_val + margin]
+        ax.plot(lims, lims, "k--", alpha=0.5, linewidth=1, label="Identidad")
+        ax.set_xlim(lims)
+        ax.set_ylim(lims)
+
+        # Anotaciones
+        r2_val = mejor.get("R2", np.nan)
+        pr_val = mejor.get("Pearson_r", np.nan)
+        ax.text(0.05, 0.92,
+                f"R²={r2_val:.3f}\nr={pr_val:.3f}",
+                transform=ax.transAxes, fontsize=10,
+                verticalalignment="top",
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                          alpha=0.8))
+
+        ax.set_xlabel(f"Valor Real ({cfg_t['u']})", fontsize=10)
+        ax.set_ylabel(f"Predicción ({cfg_t['u']})", fontsize=10)
+        ax.set_title(f"{cfg_t['nombre']}\n{mejor['Modelo']}",
+                     fontweight="bold", fontsize=11)
+        ax.legend(loc="lower right", fontsize=9)
+        ax.grid(alpha=0.3)
+
+    fig6.suptitle("Predicción vs Valor Real - Mejor Modelo por Target",
+                  fontweight="bold", fontsize=13, y=1.02)
+    fig6.tight_layout()
+
+    # ==========================================================
+    #  GRÁFICA 7: DISTRIBUCIÓN DEMOGRÁFICA
+    # ==========================================================
+    if df_clinico is not None and not df_clinico.empty:
+        n_paneles = sum([
+            "patient_sex" in df_clinico.columns,
+            "body_part_examined" in df_clinico.columns,
+            "primary_condition" in df_clinico.columns,
+        ])
+        if n_paneles > 0:
+            fig7, axes7 = plt.subplots(1, n_paneles,
+                                       figsize=(6 * n_paneles, 5))
+            if n_paneles == 1:
+                axes7 = [axes7]
+
+            idx_ax = 0
+            paleta_demo = ["#3498db", "#e74c3c", "#2ecc71", "#f39c12",
+                           "#9b59b6", "#1abc9c", "#e67e22", "#34495e",
+                           "#d35400", "#c0392b", "#7f8c8d"]
+
+            # (a) Sexo del paciente
+            if "patient_sex" in df_clinico.columns:
+                ax = axes7[idx_ax]
+                conteo = df_clinico["patient_sex"].value_counts()
+                bars = ax.bar(conteo.index, conteo.values,
+                              color=paleta_demo[:len(conteo)],
+                              edgecolor="white", width=0.5)
+                for bar, val in zip(bars, conteo.values):
+                    ax.text(bar.get_x() + bar.get_width() / 2, val + 0.3,
+                            str(val), ha="center", fontweight="bold",
+                            fontsize=11)
+                ax.set_title("Sexo del Paciente", fontweight="bold",
+                             fontsize=11)
+                ax.set_ylabel("Cantidad", fontsize=10)
+                ax.set_xlabel("")
+                idx_ax += 1
+
+            # (b) Región anatómica
+            if "body_part_examined" in df_clinico.columns:
+                ax = axes7[idx_ax]
+                conteo = df_clinico["body_part_examined"].value_counts()
+                bars = ax.bar(conteo.index, conteo.values,
+                              color=paleta_demo[:len(conteo)],
+                              edgecolor="white", width=0.5)
+                for bar, val in zip(bars, conteo.values):
+                    ax.text(bar.get_x() + bar.get_width() / 2, val + 0.3,
+                            str(val), ha="center", fontweight="bold",
+                            fontsize=11)
+                ax.set_title("Región Anatómica", fontweight="bold",
+                             fontsize=11)
+                ax.set_ylabel("Cantidad", fontsize=10)
+                ax.set_xlabel("")
+                ax.tick_params(axis="x", rotation=15)
+                idx_ax += 1
+
+            # (c) Diagnóstico primario (top 10 + Otros)
+            if "primary_condition" in df_clinico.columns:
+                ax = axes7[idx_ax]
+                conteo_full = df_clinico["primary_condition"].value_counts()
+                if len(conteo_full) > 10:
+                    top10 = conteo_full.head(10)
+                    otros = conteo_full.iloc[10:].sum()
+                    conteo = pd.concat([top10, pd.Series({"Otros": otros})])
+                else:
+                    conteo = conteo_full
+                bars = ax.barh(conteo.index[::-1], conteo.values[::-1],
+                               color=paleta_demo[:len(conteo)],
+                               edgecolor="white", height=0.6)
+                for bar, val in zip(bars, conteo.values[::-1]):
+                    ax.text(val + 0.2,
+                            bar.get_y() + bar.get_height() / 2,
+                            str(val), va="center", fontweight="bold",
+                            fontsize=9)
+                ax.set_title("Diagnóstico Primario", fontweight="bold",
+                             fontsize=11)
+                ax.set_xlabel("Cantidad", fontsize=10)
+                idx_ax += 1
+
+            n_total = len(df_clinico)
+            fig7.suptitle(
+                f"Distribución Demográfica del Dataset (n={n_total})",
+                fontweight="bold", fontsize=13, y=1.02)
+            fig7.tight_layout()
+
+    # Guardar todas las figuras en regression/metrics/
+    metrics_dir = CARPETA_METRICAS
     os.makedirs(metrics_dir, exist_ok=True)
     for i, fig in enumerate(plt.get_fignums(), 1):
         f = plt.figure(fig)
         ruta = os.path.join(metrics_dir, f"grafica_{i}.png")
         f.savefig(ruta, dpi=150, bbox_inches="tight")
     plt.close("all")
-    print(f"\n  ✓ 5 gráficas guardadas en metrics/grafica_1..5.png")
+    n_figs = len([f for f in os.listdir(metrics_dir)
+                  if f.startswith("grafica_") and f.endswith(".png")])
+    print(f"\n  [OK] {n_figs} gráficas guardadas en metrics/grafica_1..{n_figs}.png")
 
 
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 #  GLOSARIO
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 
 def imprimir_glosario():
     print("\nGLOSARIO DE MÉTRICAS:")
-    print("━" * 80)
+    print("-" * 80)
     metricas = [
-        ("R²",        "Varianza explicada: 1=perfecto, >0=bueno, ≤0=malo"),
+        ("R²",        "Varianza explicada: 1=perfecto, >0=bueno, <=0=malo"),
+        ("Pearson_r", "Correlación lineal Pearson: 1=perfecto, 0=sin relación"),
         ("MAE",       "Error absoluto medio (mismas unidades que el target)"),
         ("RMSE",      "Raíz del error cuadrático medio (penaliza outliers)"),
         ("MAPE",      "Error porcentual medio (%)"),
-        ("Gap%",      f"(Test−Train)/Test×100: >{OVERFITTING_UMBRAL}%=overfitting"),
+        ("Gap%",      f"(Test-Train)/Testx100: >{OVERFITTING_UMBRAL}%=overfitting"),
         ("Train_MAE", "MAE sobre datos de entrenamiento"),
         ("MedAE",     "Error absoluto mediano (robusto a outliers)"),
         ("MaxErr",    "Error máximo (peor caso)"),
         ("EVS",       "Explained Variance Score (similar a R²)"),
     ]
     for metrica, desc in metricas:
-        print(f"  {metrica:10s} → {desc}")
+        print(f"  {metrica:10s} -> {desc}")
     print()
     print("DIAGNÓSTICOS DE OVERFITTING:")
-    print("━" * 80)
-    print(f"  ✓ OK           → Gap% ≤ {OVERFITTING_UMBRAL}% y ≥ −10%")
-    print(f"  ⚠ OVERFITTING  → Gap% > {OVERFITTING_UMBRAL}% (modelo memoriza train)")
-    print(f"  ▽ UNDERFITTING → Gap% < −10% (modelo muy simple)")
+    print("-" * 80)
+    print(f"  [OK] OK           -> Gap% <= {OVERFITTING_UMBRAL}% y >= -10%")
+    print(f"  [!] OVERFITTING  -> Gap% > {OVERFITTING_UMBRAL}% (modelo memoriza train)")
+    print(f"  [v] UNDERFITTING -> Gap% < -10% (modelo muy simple)")
     print()
 
 
-# ══════════════════════════════════════════════════════════════
+# ==============================================================
 if __name__ == "__main__":
     resultados = ejecutar_evaluacion()
     imprimir_glosario()

@@ -1,23 +1,27 @@
 """
-entrenar_modelo.py — Gradient Boosting con validación dual (10-Fold + LOO)
-========================================================================
-Modelado Predictivo de Regresión: Estimación precisa del volumen tumoral
-y diámetros axiales para seguimiento del progreso de la enfermedad.
+entrenar_modelo.py - Modelado predictivo con Stacking Ensemble
+==============================================================
+Estimacion de volumen tumoral y diametros axiales de ganglios
+linfaticos mediastinicos mediante features radiomicas.
 
-Pipeline: StandardScaler + GradientBoostingRegressor (log-transform)
-Targets:  Volumen (mm³), Eje Corto (mm), Eje Largo (mm)
-Features: radiómicas (firstorder + glcm) — shape_* eliminadas (data leakage)
+Modelo: StackingRegressor (XGBoost + Random Forest + Gradient Boosting)
+        Meta-learner: Ridge | StandardScaler + log1p transform
+Features: radiomicas (firstorder + glcm) + derivadas - shape_* eliminadas
 
-Optimizaciones:
-  - Log-transform de targets → reduce MAPE (errores proporcionales)
-  - Feature selection por correlación → elimina ruido
-  - LOO-CV con params fijos del KFold → ~6x más rápido
+Validacion:
+  - 10-Fold CV (out-of-fold predictions)
+  - Deteccion de overfitting (Gap% train vs test)
+  - Verificacion con casos de prueba independientes
 
-Validación:
-  - 10-Fold CV × 2 rep (90/10 split) → tuning + estimación rápida
-  - LOO-CV con params fijos → evaluación exhaustiva imparcial
-  - Detección de overfitting: Gap% train vs test
-  - Verificación con casos de prueba independientes (casos_prueba.csv)
+Graficas (8 PNGs en regression/metrics/):
+  1. Panel de rendimiento (R2 como gauge)
+  2. Tasa de acierto por umbral de error
+  3. Scatter real vs predicho con bandas de error
+  4. Distribucion del error (histogramas)
+  5. Top 20 pacientes con mayor error
+  6. Metricas de validacion y Gap%
+  7. Feature importance (top 10)
+  8. Verificacion en casos de prueba
 """
 
 import os
@@ -27,15 +31,17 @@ import warnings
 
 import numpy as np
 import pandas as pd
-import SimpleITK as sitk
 import matplotlib
-matplotlib.use("TkAgg")
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.patches import Wedge
 
-from collections import Counter
-from sklearn.model_selection import LeaveOneOut, KFold, RandomizedSearchCV
+from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import (
+    RandomForestRegressor, GradientBoostingRegressor, StackingRegressor,
+)
+from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.base import clone
 from sklearn.metrics import (
@@ -43,128 +49,302 @@ from sklearn.metrics import (
     median_absolute_error, max_error,
     explained_variance_score, mean_absolute_percentage_error,
 )
+from sklearn.feature_selection import mutual_info_regression
+
+try:
+    from xgboost import XGBRegressor
+except ImportError:
+    raise ImportError("XGBoost requerido: pip install xgboost")
 
 sys.path.insert(0, os.path.dirname(__file__))
-from optimizacion import evaluar_kfold, detectar_overfitting
+from optimizacion import detectar_overfitting
 
 warnings.filterwarnings("ignore")
 
-# ── Rutas ──
+# ---------------------------------------------------------------------------
+#  Rutas
+# ---------------------------------------------------------------------------
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RUTA_CSV = os.path.join(base_dir, "db", "ganglios_master.csv")
 RUTA_PRUEBA = os.path.join(base_dir, "db", "casos_prueba.csv")
-CARPETA_METRICAS = os.path.join(base_dir, "metrics")
+CARPETA_METRICAS = os.path.join(base_dir, "regression", "metrics")
 CARPETA_NIFIT = os.path.join(base_dir, "Dataset_NIFIT")
 os.makedirs(CARPETA_METRICAS, exist_ok=True)
 
-# ── Configuración de validación ──
-N_SPLITS = 10         # 10-Fold → 90% train, 10% test
-N_REPEATS = 2         # Repeticiones (2×10 = 20 evals, suficiente)
-INNER_CV = 5          # Folds internos para tuning
+# ---------------------------------------------------------------------------
+#  Configuracion
+# ---------------------------------------------------------------------------
+N_SPLITS = 10
+N_REPEATS = 1
 OVERFITTING_UMBRAL = 15.0
-CORR_UMBRAL = 0.05    # Mínimo |correlación| con algún target
-INTER_CORR_UMBRAL = 0.95  # Máx inter-correlación entre features
+CORR_UMBRAL = 0.03
+INTER_CORR_UMBRAL = 0.95
 
-# ── Targets (origen: shape_*, eliminadas post-creación) ──
+COLS_CLINICAS = ["body_part_examined", "patient_sex", "primary_condition"]
+
 TARGETS = [
     {"nombre": "Volumen Tumoral",    "col": "target_regresion",
-     "origen": "shape_VoxelVolume",  "u": "mm³", "slug": "volumen"},
-    {"nombre": "Diámetro Eje Corto", "col": "target_eje_corto",
+     "origen": "shape_VoxelVolume",  "u": "mm\u00b3", "slug": "volumen"},
+    {"nombre": "Diametro Eje Corto", "col": "target_eje_corto",
      "origen": "shape_MinorAxisLength", "u": "mm", "slug": "eje_corto"},
-    {"nombre": "Diámetro Eje Largo", "col": "target_eje_largo",
+    {"nombre": "Diametro Eje Largo", "col": "target_eje_largo",
      "origen": "shape_MajorAxisLength", "u": "mm", "slug": "eje_largo"},
 ]
 COLS_TARGET = [t["col"] for t in TARGETS]
 
+# Colores globales para graficas
+_COLORES_TARGET = ["#3498db", "#e74c3c", "#2ecc71"]
+_NOMBRES_CORTOS = {
+    "Volumen Tumoral": "Volumen",
+    "Diametro Eje Corto": "Eje Corto",
+    "Diametro Eje Largo": "Eje Largo",
+}
 
-def _crear_pipeline():
-    """Pipeline: StandardScaler + GradientBoostingRegressor."""
+# ---------------------------------------------------------------------------
+#  Estilo global matplotlib (tipo poster)
+# ---------------------------------------------------------------------------
+plt.rcParams.update({
+    "figure.facecolor": "white",
+    "axes.facecolor": "#FAFAFA",
+    "axes.edgecolor": "#CCCCCC",
+    "axes.grid": True,
+    "grid.alpha": 0.3,
+    "grid.linestyle": ":",
+    "grid.color": "#D0D0D0",
+    "font.family": "sans-serif",
+    "font.size": 10,
+    "axes.titleweight": "bold",
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+})
+
+
+# ===========================================================================
+#  Stacking Pipeline
+# ===========================================================================
+def _crear_stacking_pipeline():
+    """
+    Retorna (Pipeline, nombre_modelo) con StackingRegressor.
+    Base estimators: XGBoost + Random Forest + Gradient Boosting.
+    Meta-learner: Ridge(alpha=10).
+    """
+    estimators = [
+        ("xgb", XGBRegressor(
+            n_estimators=200, max_depth=3, learning_rate=0.05,
+            reg_alpha=5, reg_lambda=10, min_child_weight=10,
+            subsample=0.8, colsample_bytree=0.8,
+            random_state=42, verbosity=0)),
+        ("rf", RandomForestRegressor(
+            n_estimators=200, max_depth=7,
+            min_samples_leaf=4, max_features=0.8,
+            random_state=42)),
+        ("gb", GradientBoostingRegressor(
+            n_estimators=200, max_depth=3, learning_rate=0.05,
+            subsample=0.8, min_samples_leaf=5,
+            random_state=42)),
+    ]
     pipe = Pipeline([
         ("scaler", StandardScaler()),
-        ("model", GradientBoostingRegressor(
-            random_state=42, subsample=0.7, max_features=0.7))
+        ("model", StackingRegressor(
+            estimators=estimators,
+            final_estimator=Ridge(alpha=10.0),
+            cv=5,
+            n_jobs=-1,
+        )),
     ])
-    params = {
-        "model__n_estimators":      [50, 100, 200],
-        "model__max_depth":         [1, 2],
-        "model__learning_rate":     [0.05, 0.1],
-        "model__min_samples_leaf":  [16, 32, 48],
-        "model__min_samples_split": [15, 25],
-    }
-    return pipe, params
+    return pipe, "Stacking (XGB+RF+GB)"
 
 
-def seleccionar_features(X, targets_dict):
+def _extraer_importances_stacking(pipe, feature_names):
+    """Importances ponderadas: base estimators x coef Ridge."""
+    stacking = pipe.named_steps["model"]
+    coefs = stacking.final_estimator_.coef_
+    importances = np.zeros(len(feature_names))
+
+    for est, coef in zip(stacking.estimators_, coefs):
+        if hasattr(est, "feature_importances_"):
+            importances += est.feature_importances_ * abs(coef)
+
+    total = importances.sum()
+    if total > 0:
+        importances /= total
+
+    return dict(zip(feature_names, importances))
+
+
+# ===========================================================================
+#  Feature engineering
+# ===========================================================================
+def crear_features_derivadas(X):
     """
-    Filtra features por correlación con targets y elimina redundantes.
-    1. Mantiene features con |corr| > CORR_UMBRAL con al menos un target
-    2. Elimina features con inter-correlación > INTER_CORR_UMBRAL
+    Genera ~25 features derivadas a partir de las 42 features originales:
+      - Ratios entre pares informativos
+      - Transformaciones log, cuadrado, raiz cubica
+      - Diferencias e interacciones cruzadas
+      - Coeficiente de variacion y rango inter-percentil
     """
-    # Correlación de cada feature con cada target
-    max_corr = pd.Series(0.0, index=X.columns)
-    for col_target, y_arr in targets_dict.items():
-        corrs = X.corrwith(pd.Series(y_arr, index=X.index)).abs()
-        max_corr = np.maximum(max_corr, corrs.fillna(0))
+    Xd = X.copy()
 
-    # Paso 1: mantener features con |corr| > umbral
-    cols_ok = max_corr[max_corr > CORR_UMBRAL].index.tolist()
-    X_filtrado = X[cols_ok]
+    # Ratios informativos (denominador protegido contra division por cero)
+    _eps = 1e-9
+    if "firstorder_Energy" in X.columns and "firstorder_Entropy" in X.columns:
+        Xd["ratio_Energy_Entropy"] = X["firstorder_Energy"] / (X["firstorder_Entropy"].abs() + _eps)
+    if "firstorder_Mean" in X.columns and "firstorder_Variance" in X.columns:
+        Xd["ratio_Mean_Variance"] = X["firstorder_Mean"] / (X["firstorder_Variance"].abs() + _eps)
+    if "firstorder_90Percentile" in X.columns and "firstorder_10Percentile" in X.columns:
+        Xd["ratio_90p_10p"] = X["firstorder_90Percentile"] / (X["firstorder_10Percentile"].abs() + _eps)
+    if "firstorder_Median" in X.columns and "firstorder_Mean" in X.columns:
+        Xd["ratio_Median_Mean"] = X["firstorder_Median"] / (X["firstorder_Mean"].abs() + _eps)
+    if "glcm_Correlation" in X.columns and "glcm_Contrast" in X.columns:
+        Xd["ratio_Corr_Contrast"] = X["glcm_Correlation"] / (X["glcm_Contrast"].abs() + _eps)
+    if "glcm_Homogeneity1" in X.columns and "glcm_Contrast" in X.columns:
+        Xd["ratio_Homog_Contrast"] = X["glcm_Homogeneity1"] / (X["glcm_Contrast"].abs() + _eps)
+    if "glcm_JointEnergy" in X.columns and "glcm_JointEntropy" in X.columns:
+        Xd["ratio_JE_JEntropy"] = X["glcm_JointEnergy"] / (X["glcm_JointEntropy"].abs() + _eps)
+    if "glcm_SumAverage" in X.columns and "glcm_SumEntropy" in X.columns:
+        Xd["ratio_SumAvg_SumEnt"] = X["glcm_SumAverage"] / (X["glcm_SumEntropy"].abs() + _eps)
 
-    # Paso 2: eliminar features redundantes (inter-corr > 0.95)
-    corr_matrix = X_filtrado.corr().abs()
-    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    # Coeficiente de variacion
+    if "firstorder_Variance" in X.columns and "firstorder_Mean" in X.columns:
+        Xd["cv_intensidad"] = np.sqrt(X["firstorder_Variance"].abs()) / (X["firstorder_Mean"].abs() + _eps)
+
+    # Rango inter-percentil
+    if "firstorder_90Percentile" in X.columns and "firstorder_10Percentile" in X.columns:
+        Xd["rango_interpercentil"] = X["firstorder_90Percentile"] - X["firstorder_10Percentile"]
+
+    # Log transforms
+    if "firstorder_Energy" in X.columns:
+        Xd["log_Energy"] = np.log1p(X["firstorder_Energy"].abs())
+    if "firstorder_TotalEnergy" in X.columns:
+        Xd["log_TotalEnergy"] = np.log1p(X["firstorder_TotalEnergy"].abs())
+    if "firstorder_Variance" in X.columns:
+        Xd["log_Variance"] = np.log1p(X["firstorder_Variance"].abs())
+    if "firstorder_Range" in X.columns:
+        Xd["log_Range"] = np.log1p(X["firstorder_Range"].abs())
+
+    # Squared
+    if "firstorder_Energy" in X.columns:
+        Xd["sq_Energy"] = X["firstorder_Energy"] ** 2
+    if "firstorder_RootMeanSquared" in X.columns:
+        Xd["sq_RMS"] = X["firstorder_RootMeanSquared"] ** 2
+    if "glcm_Autocorrelation" in X.columns:
+        Xd["sq_Autocorrelation"] = X["glcm_Autocorrelation"] ** 2
+    if "glcm_SumAverage" in X.columns:
+        Xd["sq_SumAverage"] = X["glcm_SumAverage"] ** 2
+
+    # Cube roots
+    if "firstorder_TotalEnergy" in X.columns:
+        Xd["cbrt_TotalEnergy"] = np.cbrt(X["firstorder_TotalEnergy"])
+    if "firstorder_Energy" in X.columns:
+        Xd["cbrt_Energy"] = np.cbrt(X["firstorder_Energy"])
+
+    # Diferencias
+    if "firstorder_Median" in X.columns and "firstorder_10Percentile" in X.columns:
+        Xd["diff_Median_10p"] = X["firstorder_Median"] - X["firstorder_10Percentile"]
+    if "firstorder_Maximum" in X.columns and "firstorder_Minimum" in X.columns:
+        Xd["diff_Max_Min"] = X["firstorder_Maximum"] - X["firstorder_Minimum"]
+
+    # Interacciones cruzadas
+    if "firstorder_Energy" in X.columns and "glcm_JointEnergy" in X.columns:
+        Xd["inter_Energy_JointEnergy"] = X["firstorder_Energy"] * X["glcm_JointEnergy"]
+    if "firstorder_TotalEnergy" in X.columns and "glcm_Autocorrelation" in X.columns:
+        Xd["inter_TotalEnergy_Autocorr"] = X["firstorder_TotalEnergy"] * X["glcm_Autocorrelation"]
+    if "firstorder_RootMeanSquared" in X.columns and "glcm_SumAverage" in X.columns:
+        Xd["inter_RMS_SumAvg"] = X["firstorder_RootMeanSquared"] * X["glcm_SumAverage"]
+    if "firstorder_Entropy" in X.columns and "glcm_JointEntropy" in X.columns:
+        Xd["inter_Entropy_JEntropy"] = X["firstorder_Entropy"] * X["glcm_JointEntropy"]
+
+    # Reemplazar inf/NaN
+    Xd = Xd.replace([np.inf, -np.inf], np.nan).fillna(0)
+
+    return Xd
+
+
+# ===========================================================================
+#  Feature selection (por target)
+# ===========================================================================
+def seleccionar_features(X, y_target):
+    """
+    Selecciona features para UN target especifico:
+      1. |corr| > CORR_UMBRAL con el target (relaciones lineales)
+      2. Mutual information > percentil 20 (relaciones no lineales)
+      3. Union de ambos criterios
+      4. Elimina redundantes con inter-corr > INTER_CORR_UMBRAL
+    """
+    corrs = X.corrwith(pd.Series(y_target, index=X.index)).abs().fillna(0)
+
+    # Criterio 1: correlacion lineal
+    cols_corr = set(corrs[corrs > CORR_UMBRAL].index)
+
+    # Criterio 2: mutual information (captura no-linealidades)
+    mi = mutual_info_regression(X, y_target, random_state=42, n_neighbors=5)
+    mi_series = pd.Series(mi, index=X.columns)
+    mi_umbral = np.percentile(mi_series.values, 20)
+    cols_mi = set(mi_series[mi_series > mi_umbral].index)
+
+    # Union de ambos criterios
+    cols_ok = list(cols_corr | cols_mi)
+    if not cols_ok:
+        return list(X.columns)
+
+    X_filt = X[cols_ok]
+    corr_matrix = X_filt.corr().abs()
+    upper = corr_matrix.where(
+        np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
     to_drop = set()
     for col in upper.columns:
-        redundantes = upper.index[upper[col] > INTER_CORR_UMBRAL].tolist()
-        for red in redundantes:
-            # Eliminar la que tiene menor correlación con targets
-            if max_corr[red] < max_corr[col]:
+        for red in upper.index[upper[col] > INTER_CORR_UMBRAL]:
+            if corrs[red] < corrs[col]:
                 to_drop.add(red)
             else:
                 to_drop.add(col)
 
-    cols_final = [c for c in cols_ok if c not in to_drop]
-    return cols_final
+    return [c for c in cols_ok if c not in to_drop]
 
 
+# ===========================================================================
+#  Preparacion de datos
+# ===========================================================================
 def preparar_datos(df_raw):
     """
-    Crea targets desde shape_* y elimina shape_* para prevenir data leakage.
-    Returns: X (42 features), dict de targets {col: array}, ids, info
+    Deduplica, crea targets desde shape_*, elimina shape_* (data leakage).
+    Returns: X, dict_targets, ids, info
     """
-    df = df_raw.copy()
+    n_raw = len(df_raw)
+    df_raw = df_raw.drop_duplicates(subset="Paciente_ID")
+    n_dedup = len(df_raw)
+    df_raw = df_raw.reset_index(drop=True)
 
-    # Crear targets ANTES de eliminar shape_*
+    df = df_raw.copy()
     for t in TARGETS:
         df[t["col"]] = df_raw[t["origen"]]
 
-    # Eliminar shape_* → prevención data leakage
     shape_cols = [c for c in df.columns if c.startswith("shape_")]
     df = df.drop(columns=shape_cols)
 
-    # Separar features de metadatos y targets
-    cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET
+    cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET + COLS_CLINICAS
     X = df.drop(columns=[c for c in cols_drop if c in df.columns])
+
     ids = df_raw["Paciente_ID"].values
     targets = {t["col"]: df[t["col"]].values for t in TARGETS}
 
     info = {
-        "n_muestras": len(df),
+        "n_raw": n_raw,
+        "n_muestras": n_dedup,
         "n_features": X.shape[1],
         "shape_eliminadas": len(shape_cols),
-        "features": list(X.columns),
     }
     return X, targets, ids, info
 
 
 def calcular_metricas(y_real, y_pred):
-    """Calcula 8 métricas de regresión."""
+    """8 metricas de regresion."""
     mse = mean_squared_error(y_real, y_pred)
     return {
         "MAE":    round(mean_absolute_error(y_real, y_pred), 4),
         "MSE":    round(mse, 4),
         "RMSE":   round(np.sqrt(mse), 4),
-        "R²":     round(r2_score(y_real, y_pred), 4),
+        "R2":     round(r2_score(y_real, y_pred), 4),
         "MedAE":  round(median_absolute_error(y_real, y_pred), 4),
         "MaxErr": round(max_error(y_real, y_pred), 4),
         "MAPE %": round(mean_absolute_percentage_error(y_real, y_pred) * 100, 2),
@@ -174,51 +354,39 @@ def calcular_metricas(y_real, y_pred):
 
 def categorizar_nivel(valor, y_total):
     """Clasifica en Bajo/Moderado/Medio-Alto/Alto por cuartiles."""
-    q1 = np.percentile(y_total, 25)
-    q2 = np.percentile(y_total, 50)
-    q3 = np.percentile(y_total, 75)
-    
+    q1, q2, q3 = np.percentile(y_total, [25, 50, 75])
     if valor <= q1:
         return "Bajo"
-    elif valor <= q2:
+    if valor <= q2:
         return "Moderado"
-    elif valor <= q3:
+    if valor <= q3:
         return "Medio-Alto"
-    else:
-        return "Alto"
+    return "Alto"
 
 
+# ===========================================================================
+#  Entrenamiento y evaluacion
+# ===========================================================================
 def entrenar_y_evaluar():
     """
-    Validación dual por target:
-      1) 10-Fold CV × 3 rep → estimación rápida con tuning interno (5-Fold)
-      2) Nested LOO-CV → evaluación exhaustiva imparcial
-      3) Detección de overfitting (Gap% train vs test)
-      4) Modelo final con hiperparámetros más frecuentes del LOO
-
+    Entrena StackingRegressor por target con 10-Fold CV.
     Returns: df_pred, resultados_globales, informacion_modelos
     """
     df_raw = pd.read_csv(RUTA_CSV)
-    X, targets_dict, ids, info = preparar_datos(df_raw)
+    X_all, targets_dict, ids, info = preparar_datos(df_raw)
+
+    # Feature engineering: agregar ratios e interacciones
+    n_orig = X_all.shape[1]
+    X_all = crear_features_derivadas(X_all)
+    n_derivadas = X_all.shape[1] - n_orig
+
     N = info["n_muestras"]
 
-    # ── Feature Selection ──
-    cols_selected = seleccionar_features(X, targets_dict)
-    n_orig = X.shape[1]
-    X = X[cols_selected]
-    info["n_features_orig"] = n_orig
-    info["n_features"] = len(cols_selected)
-    info["features"] = cols_selected
-
-    print("\n" + "═" * 70)
-    print("  GRADIENT BOOSTING (log-transform) — MODELADO PREDICTIVO")
-    print("═" * 70)
-    print(f"  Dataset: {N} muestras × {info['n_features']} features (de {n_orig} originales)")
-    print(f"  shape_* eliminadas: {info['shape_eliminadas']} (data leakage)")
-    print(f"  Feature selection: |corr|>{CORR_UMBRAL} + inter-corr<{INTER_CORR_UMBRAL}")
-    print(f"  Log-transform: np.log1p(y) → entrena en log-space, métricas en escala original")
-    print(f"  Validación: {N_SPLITS}-Fold CV ×{N_REPEATS} rep (tuning) + LOO-CV (params fijos)")
-    print(f"  Tuning interno: {INNER_CV}-Fold CV | Umbral overfitting: {OVERFITTING_UMBRAL}%")
+    print(f"\nMODELADO PREDICTIVO")
+    print(f"  {info['n_raw']} filas -> {N} unicas")
+    print(f"  {info['n_features']} features base + {n_derivadas} derivadas = {X_all.shape[1]} total")
+    print(f"  shape eliminadas: {info['shape_eliminadas']}")
+    print(f"  Validacion: {N_SPLITS}-Fold CV x{N_REPEATS}")
 
     resultados_globales = []
     predicciones_totales = []
@@ -226,402 +394,549 @@ def entrenar_y_evaluar():
     t_inicio = time.time()
 
     for t in TARGETS:
+        slug = t["slug"]
         y_orig = targets_dict[t["col"]]
-        y_log = np.log1p(y_orig)  # Log-transform
+        y_train_space = np.log1p(y_orig)
         u = t["u"]
-        pipe_tmpl, params = _crear_pipeline()
 
-        print(f"\n{'─' * 70}")
-        print(f"▶ {t['nombre']} ({u})  [{y_orig.min():.1f} – {y_orig.max():.1f}]  Media: {y_orig.mean():.1f}")
-        print(f"  Log-space: [{y_log.min():.2f} – {y_log.max():.2f}]")
+        pipe_tmpl, nombre_modelo = _crear_stacking_pipeline()
 
-        # ════════════════════════════════════════════════════
-        # FASE 1: 10-Fold CV × 2 rep (tuning en log-space)
-        # ════════════════════════════════════════════════════
-        print(f"\n  ── {N_SPLITS}-Fold CV ×{N_REPEATS} rep ──")
+        # Feature selection especifica para este target
+        cols_sel = seleccionar_features(X_all, y_orig)
+        X = X_all[cols_sel]
+        n_feat = len(cols_sel)
 
-        all_y_pred_kf = np.zeros(N)  # acumula en escala original
+        print(f"\n  {t['nombre']} ({u}) | {nombre_modelo} | {n_feat} features")
+        print(f"    Rango: [{y_orig.min():.1f}, {y_orig.max():.1f}]  Media: {y_orig.mean():.1f}")
+
+        # ---------------------------------------------------------------
+        #  KFold CV (out-of-fold predictions)
+        # ---------------------------------------------------------------
+        all_y_pred_kf = np.zeros(N)
         all_y_count_kf = np.zeros(N)
-        kf_best_params = []
         kf_train_maes = []
         kf_test_maes = []
 
         for rep in range(N_REPEATS):
             kf = KFold(n_splits=N_SPLITS, shuffle=True, random_state=42 + rep)
-
             for train_idx, test_idx in kf.split(X):
                 X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
-                y_tr_log = y_log[train_idx]
+                y_tr = y_train_space[train_idx]
                 y_te_orig = y_orig[test_idx]
 
-                inner_search = RandomizedSearchCV(
-                    clone(pipe_tmpl), params,
-                    n_iter=30, cv=INNER_CV,
-                    scoring="neg_mean_absolute_error",
-                    n_jobs=-1, random_state=42,
-                )
-                inner_search.fit(X_tr, y_tr_log)
+                fold_pipe = clone(pipe_tmpl)
+                fold_pipe.fit(X_tr, y_tr)
 
-                pred_tr_log = inner_search.predict(X_tr)
-                pred_te_log = inner_search.predict(X_te)
-                pred_tr_orig = np.expm1(pred_tr_log)
-                pred_te_orig = np.expm1(pred_te_log)
+                pred_tr = np.expm1(fold_pipe.predict(X_tr))
+                pred_te = np.expm1(fold_pipe.predict(X_te))
 
-                kf_best_params.append(inner_search.best_params_)
-                kf_train_maes.append(mean_absolute_error(
-                    np.expm1(y_tr_log), pred_tr_orig))
-                kf_test_maes.append(mean_absolute_error(
-                    y_te_orig, pred_te_orig))
+                kf_train_maes.append(mean_absolute_error(np.expm1(y_tr), pred_tr))
+                kf_test_maes.append(mean_absolute_error(y_te_orig, pred_te))
 
-                all_y_pred_kf[test_idx] += pred_te_orig
+                all_y_pred_kf[test_idx] += pred_te
                 all_y_count_kf[test_idx] += 1
 
-        # Promediar predicciones sobre repeticiones (escala original)
         y_pred_kf = all_y_pred_kf / np.maximum(all_y_count_kf, 1)
         metricas_kf = calcular_metricas(y_orig, y_pred_kf)
 
         kf_train_mae = np.mean(kf_train_maes)
         kf_test_mae = np.mean(kf_test_maes)
-        kf_gap = ((kf_test_mae - kf_train_mae) / kf_test_mae * 100) if kf_test_mae != 0 else 0
+        kf_gap = ((kf_test_mae - kf_train_mae) / kf_test_mae * 100
+                   ) if kf_test_mae != 0 else 0
 
-        dx_kf = "OVERFITTING" if kf_gap > OVERFITTING_UMBRAL else ("UNDERFITTING" if kf_gap < -10 else "OK")
-        dx_sym = {"OK": "✓", "OVERFITTING": "⚠", "UNDERFITTING": "▽"}[dx_kf]
+        print(f"    KFold  R2={metricas_kf['R2']:.4f}  MAE={metricas_kf['MAE']:.1f}  "
+              f"Gap={kf_gap:.1f}%")
 
-        # Mejores params por votación del KFold
-        mejores_params = {}
-        for key in kf_best_params[0]:
-            values = [p[key] for p in kf_best_params]
-            mejores_params[key] = Counter(values).most_common(1)[0][0]
-
-        params_str = ", ".join(f"{k.split('__')[1]}={v}" for k, v in mejores_params.items())
-        print(f"  R²={metricas_kf['R²']:.4f} | MAE={metricas_kf['MAE']:.1f} {u} | "
-              f"RMSE={metricas_kf['RMSE']:.1f} {u} | MAPE={metricas_kf['MAPE %']:.1f}%")
-        print(f"  Train MAE={kf_train_mae:.1f} | Test MAE={kf_test_mae:.1f} | "
-              f"Gap={kf_gap:.1f}% {dx_sym} {dx_kf}")
-        print(f"  Mejores params (votación): {params_str}")
-
-        # ════════════════════════════════════════════════════
-        # FASE 2: LOO-CV con params fijos (sin re-tuning)
-        # ════════════════════════════════════════════════════
-        print(f"\n  ── LOO-CV ({N} folds, params fijos) ──")
-
-        loo = LeaveOneOut()
-        y_pred_loo = np.zeros(N)  # escala original
-
-        for train_idx, test_idx in loo.split(X):
-            X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
-            y_tr_log = y_log[train_idx]
-
-            pipe_loo = clone(pipe_tmpl)
-            pipe_loo.set_params(**mejores_params)
-            pipe_loo.fit(X_tr, y_tr_log)
-            y_pred_loo[test_idx] = np.expm1(pipe_loo.predict(X_te))
-
-        metricas_loo = calcular_metricas(y_orig, y_pred_loo)
-
-        print(f"  R²={metricas_loo['R²']:.4f} | MAE={metricas_loo['MAE']:.1f} {u} | "
-              f"RMSE={metricas_loo['RMSE']:.1f} {u} | MAPE={metricas_loo['MAPE %']:.1f}%")
-
-        # ════════════════════════════════════════════════════
-        # COMPARACIÓN KFold vs LOO
-        # ════════════════════════════════════════════════════
-        print(f"\n  ── Comparación ──")
-        print(f"  {'Métrica':<10} {'KFold':>10} {'LOO':>10}")
-        print(f"  {'─'*32}")
-        for m in ["R²", "MAE", "RMSE", "MAPE %"]:
-            print(f"  {m:<10} {metricas_kf[m]:>10} {metricas_loo[m]:>10}")
-
-        # ════════════════════════════════════════════════════
-        # MODELO FINAL (entrenado con todos los datos en log-space)
-        # ════════════════════════════════════════════════════
+        # ---------------------------------------------------------------
+        #  Modelo final (todos los datos)
+        # ---------------------------------------------------------------
         pipe_final = clone(pipe_tmpl)
-        pipe_final.set_params(**mejores_params)
-        pipe_final.fit(X, y_log)
+        pipe_final.fit(X, y_train_space)
 
-        importances = pipe_final.named_steps["model"].feature_importances_
-        top_idx = np.argsort(importances)[::-1][:10]
-        top_features = [(X.columns[i], importances[i]) for i in top_idx]
-        print(f"\n  Top 10 features (importancia):")
-        for feat, imp in top_features:
-            print(f"    {feat}: {imp:.4f}")
+        imp_dict = _extraer_importances_stacking(pipe_final, list(X.columns))
+        top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
 
-        # Overfitting check con modelo final (en log-space)
-        ovf = detectar_overfitting(pipe_final, X, y_log, n_splits=N_SPLITS,
-                                   umbral=OVERFITTING_UMBRAL)
-        kfold_eval = evaluar_kfold(pipe_final, X, y_log, n_splits=N_SPLITS,
-                                   n_repeats=N_REPEATS)
+        ovf = detectar_overfitting(pipe_final, X, y_train_space,
+                                   n_splits=N_SPLITS, umbral=OVERFITTING_UMBRAL)
 
         informacion_modelos[t["nombre"]] = {
+            "nombre_modelo": nombre_modelo,
+            "slug": slug,
             "features": [f for f, _ in top_features],
+            "importances": {f: v for f, v in top_features},
             "X": X, "y": y_orig,
             "y_pred_kf": y_pred_kf,
-            "y_pred_loo": y_pred_loo,
             "metricas_kf": metricas_kf,
-            "metricas_loo": metricas_loo,
             "mejor_pipe": pipe_final,
-            "best_params": mejores_params,
             "overfitting": ovf,
-            "kfold_eval": kfold_eval,
             "unidad": u,
             "use_log": True,
             "cols_selected": list(X.columns),
+            "kf_gap": round(kf_gap, 2),
         }
 
         resultados_globales.append({
-            "Target": t["nombre"],
-            "Modelo": "GradientBoosting (log)",
-            "Validacion": "KFold",
-            **metricas_kf,
+            "Target": t["nombre"], "Modelo": nombre_modelo,
+            "Validacion": "KFold", **metricas_kf,
             "Gap_%": round(kf_gap, 2),
-            "Dx": dx_kf,
-        })
-        resultados_globales.append({
-            "Target": t["nombre"],
-            "Modelo": "GradientBoosting (log)",
-            "Validacion": "LOO",
-            **metricas_loo,
         })
 
-        # ═══ Predicciones por paciente (usando LOO como referencia) ═══
-        datos_pacientes = []
+        # Predicciones KFold por paciente
         for i in range(N):
-            nivel_real = categorizar_nivel(y_orig[i], y_orig)
-            nivel_pred = categorizar_nivel(y_pred_loo[i], y_orig)
-            fila = {
+            err_abs = abs(y_orig[i] - y_pred_kf[i])
+            err_pct = err_abs / max(abs(y_orig[i]), 1e-9) * 100
+            predicciones_totales.append({
                 "Paciente_ID": ids[i],
                 "Target": t["nombre"],
                 "Unidad": u,
                 "Real": round(y_orig[i], 2),
-                "Nivel_Real": nivel_real,
-                "Predicho": round(y_pred_loo[i], 2),
-                "Nivel_Predicho": nivel_pred,
-                "Error": round(abs(y_orig[i] - y_pred_loo[i]), 2),
-                "Error %": round(abs(y_orig[i] - y_pred_loo[i]) / max(abs(y_orig[i]), 1e-9) * 100, 2),
-            }
-            predicciones_totales.append(fila)
-            datos_pacientes.append(fila)
+                "Nivel_Real": categorizar_nivel(y_orig[i], y_orig),
+                "Predicho": round(y_pred_kf[i], 2),
+                "Nivel_Predicho": categorizar_nivel(y_pred_kf[i], y_orig),
+                "Error": round(err_abs, 2),
+                "Error %": round(err_pct, 2),
+            })
 
-        # Resumen de errores (compacto en vez de 508 filas)
-        errores_pct = [f["Error %"] for f in datos_pacientes]
-        datos_sorted = sorted(datos_pacientes, key=lambda x: x["Error %"], reverse=True)
+        # Resumen compacto
+        errores = [abs(y_orig[i] - y_pred_kf[i]) / max(abs(y_orig[i]), 1e-9) * 100
+                   for i in range(N)]
+        n15 = sum(1 for e in errores if e < 15)
+        print(f"    Errores: P50={np.median(errores):.1f}%  "
+              f"P90={np.percentile(errores, 90):.1f}%  "
+              f"<15%: {n15}/{N} ({n15/N*100:.0f}%)")
 
-        print(f"\n  Top 5 mayores errores:")
-        print(f"  {'Paciente':<12} {'Real':>8} {'Pred':>8} {'Err':>8} {'Err%':>7} {'Nivel':>12} {'Pred':>12}")
-        print(f"  {'─'*70}")
-        for f in datos_sorted[:5]:
-            pac = f["Paciente_ID"].replace("case_", "")
-            cambio = " ⚠" if f["Nivel_Real"] != f["Nivel_Predicho"] else ""
-            print(f"  {pac:<12} {f['Real']:>8.1f} {f['Predicho']:>8.1f} "
-                  f"{f['Error']:>8.1f} {f['Error %']:>6.1f}% "
-                  f"{f['Nivel_Real']:>12} {(f['Nivel_Predicho']+cambio):>12}")
-
-        n_bajo15 = sum(1 for e in errores_pct if e < 15)
-        n_15_30 = sum(1 for e in errores_pct if 15 <= e < 30)
-        n_30 = sum(1 for e in errores_pct if e >= 30)
-        print(f"\n  Distribución errores: median={np.median(errores_pct):.1f}% | "
-              f"P75={np.percentile(errores_pct, 75):.1f}% | P90={np.percentile(errores_pct, 90):.1f}%")
-        print(f"  <15%: {n_bajo15}/{N} ({n_bajo15/N*100:.0f}%) | "
-              f"15-30%: {n_15_30}/{N} ({n_15_30/N*100:.0f}%) | "
-              f"≥30%: {n_30}/{N} ({n_30/N*100:.0f}%)")
-
-    # ── CSVs ──
+    # CSVs
     df_pred = pd.DataFrame(predicciones_totales)
-    df_pred.to_csv(os.path.join(CARPETA_METRICAS, "predicciones_loo.csv"), index=False)
-
+    df_pred.to_csv(os.path.join(CARPETA_METRICAS, "predicciones_kfold.csv"),
+                   index=False)
     df_res = pd.DataFrame(resultados_globales)
-    df_res.to_csv(os.path.join(CARPETA_METRICAS, "metricas_modelos_finales.csv"), index=False)
+    df_res.to_csv(os.path.join(CARPETA_METRICAS, "metricas_modelos_finales.csv"),
+                  index=False)
 
-    # ═══ REPORTE DE OVERFITTING ═══
-    print(f"\n{'═' * 70}")
-    print(f"  DIAGNÓSTICO DE OVERFITTING")
-    print(f"{'═' * 70}")
-    print(f"  {'Target':<25} {'Train MAE':>10} {'Test MAE':>10} {'Gap%':>8} {'Diagnóstico':>15}")
-    print(f"  {'─'*68}")
+    # Overfitting
+    print(f"\n  {'Target':<22} {'Modelo':<22} {'TrainMAE':>9} {'TestMAE':>9} {'Gap%':>7}")
+    print(f"  {'-'*71}")
     for t in TARGETS:
-        info = informacion_modelos[t["nombre"]]
-        ovf = info["overfitting"]
-        u = t["u"]
-        dx_sym = {"OK": "✓", "OVERFITTING": "⚠", "UNDERFITTING": "▽"}.get(ovf["Diagnostico"], "?")
-        print(f"  {t['nombre']:<25} {ovf['Train_MAE']:>9.1f}{u} {ovf['Test_MAE']:>9.1f}{u} "
-              f"{ovf['Gap_%']:>7.1f}% {dx_sym} {ovf['Diagnostico']:>12}")
-    print(f"\n  Umbral: Gap > {OVERFITTING_UMBRAL}% → OVERFITTING | Gap < -10% → UNDERFITTING")
-    print(f"  Fórmula: Gap% = (Test_MAE − Train_MAE) / Test_MAE × 100")
-    print(f"{'═' * 70}")
+        im = informacion_modelos[t["nombre"]]
+        ovf = im["overfitting"]
+        print(f"  {t['nombre']:<22} {im['nombre_modelo']:<22} "
+              f"{ovf['Train_MAE']:>9.1f} {ovf['Test_MAE']:>9.1f} "
+              f"{ovf['Gap_%']:>6.1f}%  {ovf['Diagnostico']}")
 
     t_total = time.time() - t_inicio
-    print(f"\n{'═' * 70}")
-    print(f"  Tiempo total: {t_total:.1f}s ({t_total/60:.1f} min)")
-    print(f"  Resultados: metrics/predicciones_loo.csv, metrics/metricas_modelos_finales.csv")
-    print(f"{'═' * 70}")
+    print(f"\n  Tiempo: {t_total:.1f}s | CSVs en regression/metrics/")
 
     return df_pred, resultados_globales, informacion_modelos
 
 
-# -- Visualizacion --
+# ===========================================================================
+#  GRAFICAS PROFESIONALES (8 PNGs)
+# ===========================================================================
+
+def _guardar(fig, nombre):
+    """Guarda figura en metrics/ como PNG 200 dpi."""
+    ruta = os.path.join(CARPETA_METRICAS, nombre)
+    fig.savefig(ruta, dpi=200, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print(f"    {nombre}")
+
+
+def _dibujar_gauge(ax, valor, titulo, subtitulo, color_val):
+    """Dibuja un arco semicircular tipo gauge con valor porcentual."""
+    ax.set_xlim(-1.3, 1.3)
+    ax.set_ylim(-0.4, 1.3)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    # Fondo del arco
+    fondo = Wedge((0, 0), 1.0, 0, 180, width=0.25,
+                  facecolor="#E8E8E8", edgecolor="white", linewidth=2)
+    ax.add_patch(fondo)
+
+    # Arco de valor (0-100 mapeado a 0-180 grados)
+    angulo = max(0, min(180, valor * 1.8))
+    if angulo > 0:
+        arco = Wedge((0, 0), 1.0, 180 - angulo, 180, width=0.25,
+                      facecolor=color_val, edgecolor="white", linewidth=2)
+        ax.add_patch(arco)
+
+    # Valor central
+    ax.text(0, 0.35, f"{valor:.1f}%", ha="center", va="center",
+            fontsize=28, fontweight="bold", color=color_val)
+    # Titulo
+    ax.text(0, -0.05, titulo, ha="center", va="center",
+            fontsize=11, fontweight="bold", color="#333")
+    # Subtitulo
+    ax.text(0, -0.25, subtitulo, ha="center", va="center",
+            fontsize=8.5, color="#777", style="italic")
+
+
 def generar_graficas(df_pred, informacion_modelos):
-    """Scatter Real vs Predicho por target (LOO y KFold)."""
+    """Genera 7 graficas profesionales y las guarda como PNG."""
     plt.close("all")
 
-    targets_unicos = df_pred["Target"].unique()
-    n = len(targets_unicos)
-    fig, axes = plt.subplots(1, n, figsize=(7 * n, 6), num="Real vs Predicho (LOO)")
+    targets = [t for t in TARGETS]
+    n = len(targets)
+    print("\n  Generando graficas:")
+
+    # ===================================================================
+    #  GRAFICA 1: Panel de rendimiento (gauges R2)
+    # ===================================================================
+    fig1, axes1 = plt.subplots(1, n, figsize=(6 * n, 4))
     if n == 1:
-        axes = [axes]
+        axes1 = [axes1]
 
-    colores = ["#5B8DBE", "#D97560", "#70AD9F"]
+    for i, t in enumerate(targets):
+        info = informacion_modelos.get(t["nombre"], {})
+        r2 = info.get("metricas_kf", {}).get("R2", 0)
+        mae = info.get("metricas_kf", {}).get("MAE", 0)
+        modelo = info.get("nombre_modelo", "?")
+        u = t["u"]
+        N_m = len(info.get("y", []))
 
-    for i, target in enumerate(targets_unicos):
-        ax = axes[i]
-        sub = df_pred[df_pred["Target"] == target]
+        r2_pct = max(0, r2 * 100)
+        if r2_pct >= 60:
+            color = "#27ae60"
+        elif r2_pct >= 30:
+            color = "#f39c12"
+        else:
+            color = "#e74c3c"
+
+        sub = f"{modelo} | MAE={mae:.1f} {u} | n={N_m}"
+        _dibujar_gauge(axes1[i], r2_pct,
+                       _NOMBRES_CORTOS.get(t["nombre"], t["nombre"]),
+                       sub, color)
+
+    fig1.suptitle("Capacidad Predictiva del Modelo",
+                  fontsize=16, fontweight="bold", y=1.02, color="#222")
+    fig1.text(0.5, -0.02,
+              "Porcentaje de la variabilidad explicada por el modelo (R2 x 100)",
+              ha="center", fontsize=9, color="#888")
+    fig1.tight_layout()
+    _guardar(fig1, "entrenamiento_01_panel_rendimiento.png")
+
+    # ===================================================================
+    #  GRAFICA 2: Tasa de acierto
+    # ===================================================================
+    umbrales = [10, 15, 25, 50]
+    fig2, ax2 = plt.subplots(figsize=(10, 5.5))
+
+    x = np.arange(len(umbrales))
+    ancho = 0.8 / n
+
+    for i, t in enumerate(targets):
+        sub = df_pred[df_pred["Target"] == t["nombre"]]
+        errores = sub["Error %"].values
+        tasas = [np.sum(errores < u) / len(errores) * 100 for u in umbrales]
+
+        offset = (i - n / 2 + 0.5) * ancho
+        bars = ax2.bar(x + offset, tasas, ancho * 0.9,
+                       label=_NOMBRES_CORTOS.get(t["nombre"], t["nombre"]),
+                       color=_COLORES_TARGET[i], alpha=0.85,
+                       edgecolor="white", linewidth=0.8)
+        for bar, val in zip(bars, tasas):
+            ax2.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
+                     f"{val:.0f}%", ha="center", va="bottom",
+                     fontsize=9, fontweight="bold", color=_COLORES_TARGET[i])
+
+    ax2.set_xticks(x)
+    ax2.set_xticklabels([f"Error < {u}%" for u in umbrales], fontsize=10)
+    ax2.set_ylabel("Pacientes predichos correctamente (%)", fontsize=10)
+    ax2.set_ylim(0, 110)
+    ax2.set_title("Tasa de Acierto por Umbral de Error",
+                  fontsize=14, fontweight="bold", pad=12)
+    ax2.legend(fontsize=9, loc="upper left")
+    ax2.text(0.5, -0.1,
+             "Porcentaje de pacientes cuyo error de prediccion "
+             "esta por debajo de cada umbral",
+             ha="center", fontsize=8, color="#888", transform=ax2.transAxes)
+    fig2.tight_layout()
+    _guardar(fig2, "entrenamiento_02_tasa_acierto.png")
+
+    # ===================================================================
+    #  GRAFICA 3: Scatter real vs predicho con bandas
+    # ===================================================================
+    fig3, axes3 = plt.subplots(1, n, figsize=(6.5 * n, 6))
+    if n == 1:
+        axes3 = [axes3]
+
+    for i, t in enumerate(targets):
+        ax = axes3[i]
+        sub = df_pred[df_pred["Target"] == t["nombre"]]
         real = sub["Real"].values
         pred = sub["Predicho"].values
-        u = sub["Unidad"].iloc[0]
+        errs = sub["Error %"].values
+        u = t["u"]
+        info = informacion_modelos.get(t["nombre"], {})
+        r2 = info.get("metricas_kf", {}).get("R2", 0)
+        mae = info.get("metricas_kf", {}).get("MAE", 0)
+        modelo = info.get("nombre_modelo", "?")
 
-        r2 = r2_score(real, pred)
-        mae = mean_absolute_error(real, pred)
-        rmse = np.sqrt(mean_squared_error(real, pred))
+        # Linea identidad y bandas
+        all_v = np.concatenate([real, pred])
+        vmin, vmax = all_v.min(), all_v.max()
+        margin = (vmax - vmin) * 0.08
+        lims = [max(0, vmin - margin), vmax + margin]
+        xs = np.linspace(lims[0], lims[1], 200)
 
-        ax.scatter(real, pred, c=colores[i], s=110, edgecolors="white",
-                   linewidth=1.5, zorder=3, alpha=0.85, label="Predicciones")
+        ax.fill_between(xs, xs * 0.70, xs * 1.30,
+                        alpha=0.06, color="#f39c12", label="Banda +/-30%")
+        ax.fill_between(xs, xs * 0.85, xs * 1.15,
+                        alpha=0.10, color="#27ae60", label="Banda +/-15%")
+        ax.plot(xs, xs, "--", color="#888", linewidth=1.5, alpha=0.7,
+                label="Prediccion perfecta")
 
-        lims = [min(real.min(), pred.min()), max(real.max(), pred.max())]
-        m = (lims[1] - lims[0]) * 0.08
-        lims = [lims[0] - m, lims[1] + m]
-        ax.plot(lims, lims, "--", color="#A8A8A8", linewidth=2, alpha=0.6,
-                label="Predicción perfecta", zorder=2)
-
-        for _, row in sub.iterrows():
-            pac = row["Paciente_ID"].replace("case_", "")
-            err = row["Error %"]
-            cambio = "*" if row.get("Nivel_Real", "") != row.get("Nivel_Predicho", "") else ""
-            c_lbl = "#2D7F3F" if err < 15 else ("#D89D3D" if err < 30 else "#A63C37")
-            ax.annotate(f"{pac}{cambio}", (row["Real"], row["Predicho"]),
-                        fontsize=8, fontweight="bold", ha="left", va="bottom",
-                        xytext=(5, 5), textcoords="offset points", color=c_lbl)
+        # Puntos coloreados por error
+        colores_pts = np.where(errs < 15, "#27ae60",
+                      np.where(errs < 30, "#f39c12", "#e74c3c"))
+        ax.scatter(real, pred, c=colores_pts, s=30, alpha=0.7,
+                   edgecolors="white", linewidth=0.4, zorder=3)
 
         ax.set_xlim(lims)
         ax.set_ylim(lims)
         ax.set_aspect("equal")
-        ax.set_xlabel(f"Valor Real ({u})", fontsize=10, color="#333")
-        ax.set_ylabel(f"Valor Predicho ({u})", fontsize=10, color="#333")
+        ax.set_xlabel(f"Valor Real ({u})", fontsize=10)
+        ax.set_ylabel(f"Prediccion ({u})", fontsize=10)
+        ax.set_title(f"{_NOMBRES_CORTOS.get(t['nombre'], t['nombre'])}\n"
+                     f"{modelo}  |  R2={r2:.3f}  |  MAE={mae:.1f} {u}",
+                     fontsize=11, pad=8)
+        ax.legend(fontsize=7.5, loc="upper left", framealpha=0.9)
 
-        # Añadir info de overfitting si existe
-        info_t = informacion_modelos.get(target, {})
-        ovf = info_t.get("overfitting", {})
-        dx = ovf.get("Diagnostico", "")
-        gap_str = f" | Gap={ovf.get('Gap_%', 0):.1f}%" if dx else ""
+    fig3.suptitle("Prediccion vs Valor Real",
+                  fontsize=14, fontweight="bold", y=1.01)
+    fig3.text(0.5, -0.02,
+              "Cada punto = 1 paciente. "
+              "Mas cerca de la linea diagonal = mejor prediccion. "
+              "Verde: error<15%  Naranja: 15-30%  Rojo: >30%",
+              ha="center", fontsize=8, color="#888")
+    fig3.tight_layout()
+    _guardar(fig3, "entrenamiento_03_scatter_prediccion.png")
 
-        ax.set_title(f"{target}\nR²={r2:.3f} | MAE={mae:.1f} {u} | RMSE={rmse:.1f} {u}{gap_str}",
-                     fontweight="bold", fontsize=11, pad=10, color="#222")
+    # ===================================================================
+    #  GRAFICA 4: Distribucion del error (histogramas)
+    # ===================================================================
+    fig4, axes4 = plt.subplots(1, n, figsize=(6 * n, 5))
+    if n == 1:
+        axes4 = [axes4]
 
-        ax.legend(loc="upper left", fontsize=8, framealpha=0.9)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_color("#999")
-        ax.spines["bottom"].set_color("#999")
-        ax.grid(True, alpha=0.2, linestyle=":", color="#D0D0D0")
-        ax.set_axisbelow(True)
-        ax.tick_params(labelsize=9, colors="#666")
+    for i, t in enumerate(targets):
+        ax = axes4[i]
+        sub = df_pred[df_pred["Target"] == t["nombre"]]
+        errs = sub["Error %"].values
 
-    fig.suptitle(f"Gradient Boosting Nested LOO-CV + {N_SPLITS}-Fold CV ×{N_REPEATS} — Real vs Predicho",
-                 fontweight="bold", fontsize=13, y=0.98, color="#222")
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    fig.text(0.5, 0.005,
-             "Verde: err<15% | Naranja: 15-30% | Rojo: >30% | * cambio de categoría",
-             ha="center", fontsize=8, style="italic", color="#888")
+        bins = np.arange(0, max(errs.max() + 5, 55), 5)
+        colores_bins = []
+        for b in bins[:-1]:
+            if b < 15:
+                colores_bins.append("#27ae60")
+            elif b < 30:
+                colores_bins.append("#f39c12")
+            else:
+                colores_bins.append("#e74c3c")
 
+        _, _, patches = ax.hist(errs, bins=bins, edgecolor="white",
+                                linewidth=0.8, alpha=0.85)
+        for patch, color in zip(patches, colores_bins):
+            patch.set_facecolor(color)
 
-def visualizar_casos(df_pred):
-    """Grid CT + mascara por paciente con anotaciones de prediccion."""
-    pacientes = df_pred["Paciente_ID"].unique()
-    N = len(pacientes)
+        # Percentiles
+        p50 = np.median(errs)
+        p75 = np.percentile(errs, 75)
+        p90 = np.percentile(errs, 90)
+        for pval, label, ls in [(p50, "P50", "-"), (p75, "P75", "--"), (p90, "P90", ":")]:
+            ax.axvline(pval, color="#2c3e50", linestyle=ls, linewidth=1.5,
+                       alpha=0.7)
+            ax.text(pval + 0.5, ax.get_ylim()[1] * 0.92, f"{label}={pval:.0f}%",
+                    fontsize=8, fontweight="bold", color="#2c3e50", rotation=0)
 
-    fig, axes = plt.subplots(N, 2, figsize=(10, 4.5 * N), num="Verificacion CT + Mascara")
-    if N == 1:
-        axes = axes[np.newaxis, :]
+        n_bajo15 = np.sum(errs < 15)
+        pct15 = n_bajo15 / len(errs) * 100
+        ax.text(0.95, 0.85,
+                f"{pct15:.0f}% de pacientes\ncon error < 15%",
+                transform=ax.transAxes, ha="right", fontsize=9,
+                fontweight="bold", color="#27ae60",
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                          alpha=0.9, edgecolor="#27ae60"))
 
-    for row, pac_id in enumerate(pacientes):
-        ruta_ct = os.path.join(CARPETA_NIFIT, pac_id, "image.nii.gz")
-        ruta_seg = os.path.join(CARPETA_NIFIT, pac_id, "mask.nii.gz")
+        ax.set_xlabel("Error de Prediccion (%)", fontsize=10)
+        ax.set_ylabel("Cantidad de Pacientes", fontsize=10)
+        ax.set_title(_NOMBRES_CORTOS.get(t["nombre"], t["nombre"]),
+                     fontsize=11, pad=8)
 
-        if not os.path.exists(ruta_ct) or not os.path.exists(ruta_seg):
-            for c in range(2):
-                axes[row, c].text(0.5, 0.5, f"{pac_id}\nArchivos no encontrados",
-                                  ha="center", va="center", fontsize=11, color="#999")
-                axes[row, c].axis("off")
+    fig4.suptitle("Distribucion del Error de Prediccion",
+                  fontsize=14, fontweight="bold", y=1.01)
+    fig4.text(0.5, -0.02,
+              "Verde: error<15%  Naranja: 15-30%  Rojo: >30%  |  "
+              "Lineas: percentiles P50, P75, P90",
+              ha="center", fontsize=8, color="#888")
+    fig4.tight_layout()
+    _guardar(fig4, "entrenamiento_04_distribucion_error.png")
+
+    # ===================================================================
+    #  GRAFICA 5: Top 20 pacientes con mayor error
+    # ===================================================================
+    fig5, axes5 = plt.subplots(1, n, figsize=(6 * n, 7))
+    if n == 1:
+        axes5 = [axes5]
+
+    for i, t in enumerate(targets):
+        ax = axes5[i]
+        sub = df_pred[df_pred["Target"] == t["nombre"]].copy()
+        top20 = sub.nlargest(20, "Error %")
+
+        pacs = [p.replace("case_", "") for p in top20["Paciente_ID"].values]
+        errs = top20["Error %"].values
+
+        colores_bar = ["#27ae60" if e < 15 else "#f39c12" if e < 30 else "#e74c3c"
+                       for e in errs]
+
+        y_pos = np.arange(len(pacs))
+        ax.barh(y_pos, errs[::-1], color=colores_bar[::-1],
+                edgecolor="white", height=0.7)
+
+        for j, (pac, err) in enumerate(zip(pacs[::-1], errs[::-1])):
+            ax.text(err + 0.5, j, f"{err:.0f}%", va="center",
+                    fontsize=8, fontweight="bold", color="#555")
+
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(pacs[::-1], fontsize=8)
+        ax.set_xlabel("Error (%)", fontsize=10)
+        ax.set_title(_NOMBRES_CORTOS.get(t["nombre"], t["nombre"]),
+                     fontsize=11, pad=8)
+
+    fig5.suptitle("Top 20 Pacientes con Mayor Error de Prediccion",
+                  fontsize=14, fontweight="bold", y=1.01)
+    fig5.tight_layout()
+    _guardar(fig5, "entrenamiento_05_top_errores.png")
+
+    # ===================================================================
+    #  GRAFICA 6: Comparacion KFold vs LOO + overfitting
+    # ===================================================================
+    metricas_keys = ["R2", "MAE", "RMSE"]
+    fig6, axes6 = plt.subplots(1, n, figsize=(6 * n, 5))
+    if n == 1:
+        axes6 = [axes6]
+
+    for i, t in enumerate(targets):
+        ax = axes6[i]
+        info = informacion_modelos.get(t["nombre"], {})
+        m_kf = info.get("metricas_kf", {})
+        ovf = info.get("overfitting", {})
+        gap = info.get("kf_gap", 0)
+        dx = ovf.get("Diagnostico", "OK")
+
+        x_mk = np.arange(len(metricas_keys))
+        vals_kf = [m_kf.get(k, 0) for k in metricas_keys]
+
+        bars = ax.bar(x_mk, vals_kf, 0.5, color=_COLORES_TARGET[i],
+                      alpha=0.85, edgecolor="white")
+
+        for bar, val in zip(bars, vals_kf):
+            ax.text(bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() + max(vals_kf) * 0.02,
+                    f"{val:.3f}", ha="center", fontsize=9, fontweight="bold")
+
+        ax.set_xticks(x_mk)
+        ax.set_xticklabels(metricas_keys, fontsize=10)
+
+        # Semaforo
+        if dx == "OVERFITTING":
+            sem_color = "#e74c3c"
+        elif dx == "UNDERFITTING":
+            sem_color = "#f39c12"
+        else:
+            sem_color = "#27ae60"
+
+        ax.text(0.95, 0.92,
+                f"Gap: {gap:.1f}%\n{dx}",
+                transform=ax.transAxes, ha="right", fontsize=9,
+                fontweight="bold", color=sem_color,
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                          alpha=0.9, edgecolor=sem_color))
+
+        ax.set_title(f"{_NOMBRES_CORTOS.get(t['nombre'], t['nombre'])}"
+                     f"  ({info.get('nombre_modelo', '')})",
+                     fontsize=11, pad=8)
+
+    fig6.suptitle("Metricas de Validacion Cruzada (10-Fold)",
+                  fontsize=14, fontweight="bold", y=1.01)
+    fig6.text(0.5, -0.02,
+              "Gap% bajo indica estabilidad del modelo (sin sobreajuste).",
+              ha="center", fontsize=8, color="#888")
+    fig6.tight_layout()
+    _guardar(fig6, "entrenamiento_06_validacion_cruzada.png")
+
+    # ===================================================================
+    #  GRAFICA 7: Feature importance (top 10)
+    # ===================================================================
+    fig7, axes7 = plt.subplots(1, n, figsize=(6 * n, 5.5))
+    if n == 1:
+        axes7 = [axes7]
+
+    for i, t in enumerate(targets):
+        ax = axes7[i]
+        info = informacion_modelos.get(t["nombre"], {})
+        imp_dict = info.get("importances", {})
+        if not imp_dict:
+            ax.text(0.5, 0.5, "Sin datos", ha="center", va="center",
+                    transform=ax.transAxes, fontsize=12, color="#999")
             continue
 
-        # Leer con SimpleITK
-        ct_arr = sitk.GetArrayFromImage(sitk.ReadImage(ruta_ct))
-        seg_arr = sitk.GetArrayFromImage(sitk.ReadImage(ruta_seg))
+        imp_series = pd.Series(imp_dict).sort_values()
+        top10 = imp_series.tail(10)
 
-        # Slice con mayor area de mascara
-        area_por_slice = np.sum(seg_arr, axis=(1, 2))
-        idx_slice = int(np.argmax(area_por_slice))
-        if area_por_slice[idx_slice] == 0:
-            idx_slice = ct_arr.shape[0] // 2
+        colores_feat = ["#3498db" if f.startswith("firstorder_")
+                        else "#e67e22" if f.startswith("glcm_")
+                        else "#9b59b6" for f in top10.index]
+        labels = [f.replace("firstorder_", "fo_").replace("glcm_", "gl_")
+                  for f in top10.index]
 
-        ct_slice = ct_arr[idx_slice, :, :]
-        seg_slice = seg_arr[idx_slice, :, :]
+        bars = ax.barh(range(len(top10)), top10.values, color=colores_feat,
+                       edgecolor="white", height=0.7)
+        ax.set_yticks(range(len(top10)))
+        ax.set_yticklabels(labels, fontsize=8.5)
+        ax.set_xlabel("Importancia Ponderada", fontsize=10)
 
-        # Col 0: CT original
-        ax0 = axes[row, 0]
-        ax0.imshow(ct_slice, cmap="gray", vmin=-160, vmax=240)
-        ax0.set_title(f"{pac_id} - CT (slice {idx_slice})", fontsize=10, fontweight="bold", color="#222")
-        ax0.axis("off")
+        for bar, val in zip(bars, top10.values):
+            ax.text(val + top10.max() * 0.02,
+                    bar.get_y() + bar.get_height() / 2,
+                    f"{val:.3f}", va="center", fontsize=7.5, color="#555")
 
-        # Col 1: CT + mascara overlay
-        ax1 = axes[row, 1]
-        ax1.imshow(ct_slice, cmap="gray", vmin=-160, vmax=240)
-        ax1.imshow(seg_slice, cmap="Reds", alpha=0.5, interpolation="none")
-        ax1.set_title(f"{pac_id} - CT + Mascara", fontsize=10, fontweight="bold", color="#222")
-        ax1.axis("off")
+        ax.set_title(f"{_NOMBRES_CORTOS.get(t['nombre'], t['nombre'])}"
+                     f"  ({info.get('nombre_modelo', '')})",
+                     fontsize=11, pad=8)
 
-        # Anotacion con predicciones de los 3 targets
-        sub = df_pred[df_pred["Paciente_ID"] == pac_id]
-        partes = []
-        max_err = 0.0
-        for _, r in sub.iterrows():
-            nombre_corto = r["Target"].replace("Volumen Tumoral", "Vol") \
-                                       .replace("Diametro Eje Corto", "Corto") \
-                                       .replace("Diametro Eje Largo", "Largo") \
-                                       .replace("Di\u00e1metro Eje Corto", "Corto") \
-                                       .replace("Di\u00e1metro Eje Largo", "Largo")
-            partes.append(f"{nombre_corto}: {r['Real']:.0f}->{r['Predicho']:.0f} {r['Unidad']} ({r['Error %']:.0f}%)")
-            max_err = max(max_err, r["Error %"])
+    fig7.suptitle("Caracteristicas mas Importantes para la Prediccion",
+                  fontsize=14, fontweight="bold", y=1.01)
+    fig7.text(0.5, -0.02,
+              "Azul: First Order  |  Naranja: GLCM  |  "
+              "Morado: Features derivadas  |  Ponderado por Ridge",
+              ha="center", fontsize=8, color="#888")
+    fig7.tight_layout()
+    _guardar(fig7, "entrenamiento_07_feature_importance.png")
 
-        texto = "  |  ".join(partes)
-        color_txt = "#2D7F3F" if max_err < 15 else ("#D89D3D" if max_err < 30 else "#A63C37")
-
-        # Texto debajo de la fila
-        fig.text(0.5, 1.0 - (row + 0.97) / N,
-                 texto, ha="center", fontsize=8.5, color=color_txt, fontweight="bold")
-
-    fig.suptitle("Verificacion de Casos - CT + Mascara de Segmentacion",
-                 fontsize=13, fontweight="bold", y=0.995, color="#222")
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
-    plt.subplots_adjust(hspace=0.25)
+    print(f"  7 graficas guardadas en regression/metrics/")
 
 
+# ===========================================================================
+#  Prediccion sobre casos de prueba
+# ===========================================================================
 def predecir_casos_prueba(informacion_modelos):
-    """
-    Predice sobre casos de prueba independientes (casos_prueba.csv).
-    Usa los modelos finales entrenados para verificar generalización.
-    Compara predicción vs valor real (shape_*) para cada target.
-    """
+    """Predice sobre casos_prueba.csv y guarda verificacion."""
     if not os.path.exists(RUTA_PRUEBA):
-        print("\n  ⚠ No se encontró casos_prueba.csv — omitiendo verificación")
+        print("\n  casos_prueba.csv no encontrado, omitiendo verificacion")
         return None
 
     df_prueba = pd.read_csv(RUTA_PRUEBA)
-    print(f"\n{'═' * 70}")
-    print(f"  VERIFICACIÓN CON CASOS DE PRUEBA ({len(df_prueba)} casos)")
-    print(f"{'═' * 70}")
+    print(f"\n  VERIFICACION CASOS DE PRUEBA ({len(df_prueba)} casos)")
 
-    # Preparar features (misma transformación que entrenamiento)
     shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
-    cols_drop = ["Paciente_ID", "target_riesgo"] + shape_cols
-    X_prueba = df_prueba.drop(columns=[c for c in cols_drop if c in df_prueba.columns])
+    cols_drop = ["Paciente_ID", "target_riesgo"] + shape_cols + COLS_CLINICAS
+    X_prueba = df_prueba.drop(
+        columns=[c for c in cols_drop if c in df_prueba.columns])
+
+    # Aplicar las mismas features derivadas que en entrenamiento
+    X_prueba = crear_features_derivadas(X_prueba)
 
     resultados_prueba = []
 
@@ -636,133 +951,146 @@ def predecir_casos_prueba(informacion_modelos):
         y_train = info["y"]
         cols_sel = info.get("cols_selected")
 
-        # Usar mismas features seleccionadas que entrenamiento
         X_pred = X_prueba[cols_sel] if cols_sel else X_prueba
 
-        # Valores reales desde shape_* del CSV de prueba
         y_real = df_prueba[t["origen"]].values
         y_pred_raw = pipe.predict(X_pred)
         y_pred = np.expm1(y_pred_raw) if info.get("use_log") else y_pred_raw
 
         metricas = calcular_metricas(y_real, y_pred)
-
-        print(f"\n  ▶ {nombre} ({u})")
-        print(f"    R²={metricas['R²']:.4f} | MAE={metricas['MAE']:.1f} {u} | "
-              f"RMSE={metricas['RMSE']:.1f} {u} | MAPE={metricas['MAPE %']:.1f}%")
-        print(f"\n    {'Paciente':<12} {'Real':>10} {'Predicho':>10} {'Error':>8} {'Error%':>8} {'Nivel Real':>12} {'Nivel Pred':>12}")
-        print(f"    {'─'*75}")
+        print(f"    {nombre}: R2={metricas['R2']:.4f}  "
+              f"MAE={metricas['MAE']:.1f} {u}  "
+              f"MAPE={metricas['MAPE %']:.1f}%")
 
         for i in range(len(df_prueba)):
             pac = df_prueba["Paciente_ID"].iloc[i]
-            real = y_real[i]
-            pred = y_pred[i]
-            err = abs(real - pred)
-            err_pct = err / max(abs(real), 1e-9) * 100
-            nivel_r = categorizar_nivel(real, y_train)
-            nivel_p = categorizar_nivel(pred, y_train)
-            cambio = " ⚠" if nivel_r != nivel_p else ""
-
-            print(f"    {pac:<12} {real:>10.1f} {pred:>10.1f} {err:>8.1f} {err_pct:>7.1f}% {nivel_r:>12} {(nivel_p+cambio):>12}")
-
+            real_v = y_real[i]
+            pred_v = y_pred[i]
+            err = abs(real_v - pred_v)
+            err_pct = err / max(abs(real_v), 1e-9) * 100
             resultados_prueba.append({
                 "Paciente_ID": pac,
                 "Target": nombre,
                 "Unidad": u,
-                "Real": round(real, 2),
-                "Predicho": round(pred, 2),
+                "Real": round(real_v, 2),
+                "Predicho": round(pred_v, 2),
                 "Error": round(err, 2),
                 "Error %": round(err_pct, 2),
-                "Nivel_Real": nivel_r,
-                "Nivel_Predicho": nivel_p,
+                "Nivel_Real": categorizar_nivel(real_v, y_train),
+                "Nivel_Predicho": categorizar_nivel(pred_v, y_train),
             })
 
-    # Guardar CSV de verificación
     df_verif = pd.DataFrame(resultados_prueba)
     verif_path = os.path.join(CARPETA_METRICAS, "verificacion_casos_prueba.csv")
     df_verif.to_csv(verif_path, index=False)
-    print(f"\n  ✓ Verificación guardada: metrics/verificacion_casos_prueba.csv")
-    print(f"{'═' * 70}")
+    print(f"    Guardado: regression/metrics/verificacion_casos_prueba.csv")
 
     return df_verif
 
 
-def visualizar_casos_prueba(df_verif):
-    """Grid CT + máscara para casos de prueba con predicciones y margen de error."""
+def generar_grafica_casos_prueba(df_verif, informacion_modelos):
+    """Grafica 8: scatter + tabla visual de casos de prueba."""
     if df_verif is None or df_verif.empty:
         return
 
-    pacientes = df_verif["Paciente_ID"].unique()
-    N = len(pacientes)
+    targets = [t for t in TARGETS]
+    n = len(targets)
 
-    fig, axes = plt.subplots(N, 2, figsize=(10, 4.5 * N),
-                             num="Verificación Casos de Prueba")
-    if N == 1:
-        axes = axes[np.newaxis, :]
+    fig, axes = plt.subplots(2, n, figsize=(6 * n, 9),
+                             gridspec_kw={"height_ratios": [2, 1]})
+    if n == 1:
+        axes = axes.reshape(2, 1)
 
-    for row, pac_id in enumerate(pacientes):
-        ruta_ct = os.path.join(CARPETA_NIFIT, pac_id, "image.nii.gz")
-        ruta_seg = os.path.join(CARPETA_NIFIT, pac_id, "mask.nii.gz")
-
-        if not os.path.exists(ruta_ct) or not os.path.exists(ruta_seg):
-            for c in range(2):
-                axes[row, c].text(0.5, 0.5, f"{pac_id}\nArchivos no encontrados",
-                                  ha="center", va="center", fontsize=11, color="#999")
-                axes[row, c].axis("off")
+    for i, t in enumerate(targets):
+        sub = df_verif[df_verif["Target"] == t["nombre"]]
+        if sub.empty:
             continue
 
-        ct_arr = sitk.GetArrayFromImage(sitk.ReadImage(ruta_ct))
-        seg_arr = sitk.GetArrayFromImage(sitk.ReadImage(ruta_seg))
+        real = sub["Real"].values
+        pred = sub["Predicho"].values
+        errs = sub["Error %"].values
+        u = t["u"]
+        info = informacion_modelos.get(t["nombre"], {})
+        modelo = info.get("nombre_modelo", "?")
 
-        area_por_slice = np.sum(seg_arr, axis=(1, 2))
-        idx_slice = int(np.argmax(area_por_slice))
-        if area_por_slice[idx_slice] == 0:
-            idx_slice = ct_arr.shape[0] // 2
+        # -- Scatter (fila superior) --
+        ax_s = axes[0, i]
+        all_v = np.concatenate([real, pred])
+        vmin, vmax = all_v.min(), all_v.max()
+        margin = (vmax - vmin) * 0.15
+        lims = [max(0, vmin - margin), vmax + margin]
+        xs = np.linspace(lims[0], lims[1], 200)
 
-        ct_slice = ct_arr[idx_slice, :, :]
-        seg_slice = seg_arr[idx_slice, :, :]
+        ax_s.fill_between(xs, xs * 0.85, xs * 1.15,
+                          alpha=0.12, color="#27ae60")
+        ax_s.plot(xs, xs, "--", color="#888", linewidth=1.5, alpha=0.7)
 
-        # Col 0: CT original
-        ax0 = axes[row, 0]
-        ax0.imshow(ct_slice, cmap="gray", vmin=-160, vmax=240)
-        ax0.set_title(f"{pac_id} - CT (slice {idx_slice})",
-                      fontsize=10, fontweight="bold", color="#222")
-        ax0.axis("off")
+        colores_pts = ["#27ae60" if e < 15 else "#f39c12" if e < 30
+                       else "#e74c3c" for e in errs]
+        ax_s.scatter(real, pred, c=colores_pts, s=80, edgecolors="white",
+                     linewidth=1, zorder=3)
 
-        # Col 1: CT + máscara overlay
-        ax1 = axes[row, 1]
-        ax1.imshow(ct_slice, cmap="gray", vmin=-160, vmax=240)
-        ax1.imshow(seg_slice, cmap="Reds", alpha=0.5, interpolation="none")
-        ax1.set_title(f"{pac_id} - CT + Máscara",
-                      fontsize=10, fontweight="bold", color="#222")
-        ax1.axis("off")
+        # Etiquetas
+        for _, row in sub.iterrows():
+            pac = row["Paciente_ID"].replace("case_", "")
+            ax_s.annotate(pac, (row["Real"], row["Predicho"]),
+                          fontsize=7.5, fontweight="bold",
+                          xytext=(4, 4), textcoords="offset points",
+                          color="#555")
 
-        # Anotación con predicciones y errores
-        sub = df_verif[df_verif["Paciente_ID"] == pac_id]
-        partes = []
-        max_err = 0.0
-        for _, r in sub.iterrows():
-            nombre_corto = r["Target"].replace("Volumen Tumoral", "Vol") \
-                                       .replace("Diámetro Eje Corto", "Corto") \
-                                       .replace("Diámetro Eje Largo", "Largo")
-            partes.append(f"{nombre_corto}: {r['Real']:.0f}→{r['Predicho']:.0f} "
-                          f"{r['Unidad']} (err {r['Error %']:.0f}%)")
-            max_err = max(max_err, r["Error %"])
+        ax_s.set_xlim(lims)
+        ax_s.set_ylim(lims)
+        ax_s.set_aspect("equal")
+        ax_s.set_xlabel(f"Real ({u})", fontsize=9)
+        ax_s.set_ylabel(f"Prediccion ({u})", fontsize=9)
+        ax_s.set_title(f"{_NOMBRES_CORTOS.get(t['nombre'], t['nombre'])}"
+                       f"  ({modelo})", fontsize=11, pad=8)
 
-        texto = "  |  ".join(partes)
-        color_txt = "#2D7F3F" if max_err < 15 else ("#D89D3D" if max_err < 30 else "#A63C37")
+        # -- Tabla (fila inferior) --
+        ax_t = axes[1, i]
+        ax_t.axis("off")
+        tabla_data = []
+        colores_celda = []
+        for _, row in sub.iterrows():
+            pac = row["Paciente_ID"].replace("case_", "")
+            err_v = row["Error %"]
+            tabla_data.append([
+                pac,
+                f"{row['Real']:.1f}",
+                f"{row['Predicho']:.1f}",
+                f"{err_v:.0f}%",
+            ])
+            if err_v < 15:
+                c = "#d5f5e3"
+            elif err_v < 30:
+                c = "#fdebd0"
+            else:
+                c = "#fadbd8"
+            colores_celda.append([c] * 4)
 
-        fig.text(0.5, 1.0 - (row + 0.97) / N,
-                 texto, ha="center", fontsize=8.5, color=color_txt, fontweight="bold")
+        if tabla_data:
+            tabla = ax_t.table(
+                cellText=tabla_data,
+                colLabels=["Paciente", "Real", "Predicho", "Error"],
+                cellColours=colores_celda,
+                colColours=["#d6eaf8"] * 4,
+                loc="center", cellLoc="center",
+            )
+            tabla.auto_set_font_size(False)
+            tabla.set_fontsize(8.5)
+            tabla.scale(1, 1.4)
 
-    fig.suptitle("Verificación Casos de Prueba — CT + Máscara + Predicciones",
-                 fontsize=13, fontweight="bold", y=0.995, color="#222")
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
-    plt.subplots_adjust(hspace=0.25)
+    fig.suptitle("Rendimiento en Casos Nunca Vistos por el Modelo",
+                 fontsize=14, fontweight="bold", y=0.98)
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    _guardar(fig, "entrenamiento_08_casos_prueba.png")
 
 
+# ===========================================================================
+#  Main
+# ===========================================================================
 if __name__ == "__main__":
     df_pred, _, info_modelos = entrenar_y_evaluar()
+    generar_graficas(df_pred, info_modelos)
     df_verif = predecir_casos_prueba(info_modelos)
-    generar_graficas(df_verif, info_modelos)
-    visualizar_casos_prueba(df_verif)
-    plt.show()
+    generar_grafica_casos_prueba(df_verif, info_modelos)
