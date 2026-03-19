@@ -19,6 +19,11 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
     extractor.enableFeatureClassByName('firstorder')  # Media, Mediana, Asimetría (HU)
     extractor.enableFeatureClassByName('glcm')  # Textura (Homogeneidad, Contraste)
 
+    # Habilitar las nuevas familias de texturas avanzadas
+    extractor.enableFeatureClassByName('glrlm')
+    extractor.enableFeatureClassByName('glszm')
+    extractor.enableFeatureClassByName('gldm')
+
     lista_resultados = []
     pacientes = [p for p in os.listdir(carpeta_origen) if os.path.isdir(os.path.join(carpeta_origen, p))]
 
@@ -70,13 +75,7 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
 # EJECUCIÓN
 # ==========================================
 if __name__ == "__main__":
-    # Raíz del proyecto (Lymph-Node/)
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-    # Carpeta con los NIfTI resampleados a 1×1×1 mm (entrada para PyRadiomics)
-    carpeta_preprocesada = os.path.join(base_dir, "Dataset_Preprocesado")
-
-    # CSV de salida con las 57 features radiómicas por paciente
-    csv_salida = os.path.join(base_dir, "db", "ganglios_radiomica.csv")
+    carpeta_preprocesada = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_Preprocesado"
+    csv_salida = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\nueva_ganglios_radiomica.csv"
 
     extraer_radiomica(carpeta_preprocesada, csv_salida)
