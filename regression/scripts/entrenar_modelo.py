@@ -36,12 +36,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Wedge
 
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import (
     RandomForestRegressor, GradientBoostingRegressor, StackingRegressor,
 )
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.feature_selection import SelectFromModel
 from sklearn.pipeline import Pipeline
 from sklearn.base import clone
 from sklearn.metrics import (
@@ -51,13 +52,14 @@ from sklearn.metrics import (
 )
 from sklearn.feature_selection import mutual_info_regression
 
+from optimizacion import detectar_overfitting, seleccionar_features_rfecv
+
 try:
     from xgboost import XGBRegressor
 except ImportError:
     raise ImportError("XGBoost requerido: pip install xgboost")
 
 sys.path.insert(0, os.path.dirname(__file__))
-from optimizacion import detectar_overfitting
 
 warnings.filterwarnings("ignore")
 
@@ -127,6 +129,7 @@ def _crear_stacking_pipeline():
     Retorna (Pipeline, nombre_modelo) con StackingRegressor.
     Base estimators: XGBoost + Random Forest + Gradient Boosting.
     Meta-learner: Ridge(alpha=10).
+    Filtro previo: LASSO para eliminar colinealidad.
     """
     estimators = [
         ("xgb", XGBRegressor(
@@ -145,21 +148,30 @@ def _crear_stacking_pipeline():
     ]
     pipe = Pipeline([
         ("scaler", StandardScaler()),
+        # --- NUEVO: Filtro LASSO ---
+        # alpha=0.01 es un buen punto de partida para que no elimine demasiadas
+        ("lasso_filter", SelectFromModel(Lasso(alpha=0.01, random_state=42, max_iter=10000))), 
         ("model", StackingRegressor(
             estimators=estimators,
             final_estimator=Ridge(alpha=10.0),
             cv=5,
-            n_jobs=-1,
+            n_jobs=None, # Probar None en lugar de -1 si la compu se congela o tarda mucho
         )),
     ])
-    return pipe, "Stacking (XGB+RF+GB)"
+    return pipe, "Stacking (LASSO + XGB+RF+GB)"
 
 
 def _extraer_importances_stacking(pipe, feature_names):
     """Importances ponderadas: base estimators x coef Ridge."""
+    
+    # 1. Identificar qué variables sobrevivieron al filtro LASSO
+    lasso_step = pipe.named_steps["lasso_filter"]
+    surviving_features = np.array(feature_names)[lasso_step.get_support()]
+
+    # 2. Extraer los coeficientes del Stacking solo para las variables sobrevivientes
     stacking = pipe.named_steps["model"]
     coefs = stacking.final_estimator_.coef_
-    importances = np.zeros(len(feature_names))
+    importances = np.zeros(len(surviving_features))
 
     for est, coef in zip(stacking.estimators_, coefs):
         if hasattr(est, "feature_importances_"):
@@ -169,7 +181,7 @@ def _extraer_importances_stacking(pipe, feature_names):
     if total > 0:
         importances /= total
 
-    return dict(zip(feature_names, importances))
+    return dict(zip(surviving_features, importances))
 
 
 # ===========================================================================
@@ -263,43 +275,46 @@ def crear_features_derivadas(X):
 # ===========================================================================
 #  Feature selection (por target)
 # ===========================================================================
-def seleccionar_features(X, y_target):
+def seleccionar_features(X, y_target, usar_rfecv=True):
     """
-    Selecciona features para UN target especifico:
-      1. |corr| > CORR_UMBRAL con el target (relaciones lineales)
-      2. Mutual information > percentil 20 (relaciones no lineales)
-      3. Union de ambos criterios
-      4. Elimina redundantes con inter-corr > INTER_CORR_UMBRAL
+    Selecciona features en tres pasos:
+      1. Filtro grueso (Pearson + MI) para descartar ruido total.
+      2. Poda de Colinealidad (INTER_CORR_UMBRAL) para eliminar variables gemelas.
+      3. RFECV para encontrar el subset óptimo.
     """
+    # --- PASO 1: FILTRO GRUESO (Ruido) ---
     corrs = X.corrwith(pd.Series(y_target, index=X.index)).abs().fillna(0)
-
-    # Criterio 1: correlacion lineal
     cols_corr = set(corrs[corrs > CORR_UMBRAL].index)
 
-    # Criterio 2: mutual information (captura no-linealidades)
     mi = mutual_info_regression(X, y_target, random_state=42, n_neighbors=5)
     mi_series = pd.Series(mi, index=X.columns)
     mi_umbral = np.percentile(mi_series.values, 20)
     cols_mi = set(mi_series[mi_series > mi_umbral].index)
 
-    # Union de ambos criterios
     cols_ok = list(cols_corr | cols_mi)
     if not cols_ok:
-        return list(X.columns)
+        cols_ok = list(X.columns)
+        
+    X_filt = X[cols_ok].copy()
 
-    X_filt = X[cols_ok]
+    # --- PASO 2: PODA DE COLINEALIDAD (El paso perdido) ---
+    # Calculamos la matriz de correlación de las características sobrevivientes
     corr_matrix = X_filt.corr().abs()
-    upper = corr_matrix.where(
-        np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    to_drop = set()
-    for col in upper.columns:
-        for red in upper.index[upper[col] > INTER_CORR_UMBRAL]:
-            if corrs[red] < corrs[col]:
-                to_drop.add(red)
-            else:
-                to_drop.add(col)
+    # Tomamos solo el triángulo superior de la matriz para no borrar ambas variables
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    # Encontramos las columnas con correlación mayor al 95%
+    to_drop = [column for column in upper.columns if any(upper[column] > INTER_CORR_UMBRAL)]
+    X_filt = X_filt.drop(columns=to_drop)
+    
+    cols_ok = list(X_filt.columns)
 
-    return [c for c in cols_ok if c not in to_drop]
+    # --- PASO 3: RFECV (EL QUIRÓFANO) ---
+    if usar_rfecv and len(cols_ok) > 5:
+        resultado_rfecv = seleccionar_features_rfecv(X_filt, y_target, cv=3, min_features=5)
+        cols_finales = resultado_rfecv["columnas_seleccionadas"]
+        return cols_finales
+    else:
+        return cols_ok
 
 
 # ===========================================================================
@@ -401,36 +416,72 @@ def entrenar_y_evaluar():
 
         pipe_tmpl, nombre_modelo = _crear_stacking_pipeline()
 
-        # Feature selection especifica para este target
-        cols_sel = seleccionar_features(X_all, y_orig)
-        X = X_all[cols_sel]
-        n_feat = len(cols_sel)
-
-        print(f"\n  {t['nombre']} ({u}) | {nombre_modelo} | {n_feat} features")
+        print(f"\n  {t['nombre']} ({u}) | {nombre_modelo}")
         print(f"    Rango: [{y_orig.min():.1f}, {y_orig.max():.1f}]  Media: {y_orig.mean():.1f}")
 
         # ---------------------------------------------------------------
-        #  KFold CV (out-of-fold predictions)
+        #  KFold CV (out-of-fold predictions) SIN DATA LEAKAGE
         # ---------------------------------------------------------------
         all_y_pred_kf = np.zeros(N)
         all_y_count_kf = np.zeros(N)
         kf_train_maes = []
         kf_test_maes = []
+        features_seleccionadas_por_fold = [] # Para rastrear cuántas selecciona
 
         for rep in range(N_REPEATS):
             kf = KFold(n_splits=N_SPLITS, shuffle=True, random_state=42 + rep)
-            for train_idx, test_idx in kf.split(X):
-                X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
-                y_tr = y_train_space[train_idx]
+            # Fíjate que ahora dividimos X_all, no la X filtrada
+            for train_idx, test_idx in kf.split(X_all): 
+                X_tr_completo, X_te_completo = X_all.iloc[train_idx], X_all.iloc[test_idx]
+                y_tr_space = y_train_space[train_idx]
+                #y_tr_orig = y_orig[train_idx]
                 y_te_orig = y_orig[test_idx]
 
+                # 1. SELECCIÓN ESTRICTA: Solo vemos los datos de entrenamiento
+                cols_sel_fold = seleccionar_features(X_tr_completo, y_tr_space)
+                features_seleccionadas_por_fold.append(len(cols_sel_fold))
+
+                # 2. FILTRADO: Aplicamos las columnas ganadoras al train y al test
+                X_tr = X_tr_completo[cols_sel_fold]
+                X_te = X_te_completo[cols_sel_fold]
+
+                # 3. ENTRENAMIENTO Y AFINACIÓN: Buscamos los mejores parámetros para el ensamble
                 fold_pipe = clone(pipe_tmpl)
-                fold_pipe.fit(X_tr, y_tr)
+                
+                # Definimos la red de hiperparámetros a explorar
+                param_grid = {
+                    "lasso_filter__estimator__alpha": [0.001, 0.01, 0.1], # Decidir cuánta colinealidad limpiar
+                    "model__final_estimator__alpha": [0.1, 1.0, 10.0, 50.0], # Ajuste del juez (Ridge)
+                    "model__rf__max_depth": [3, 5, 7],                       # Ajuste de Random Forest
+                    "model__xgb__learning_rate": [0.01, 0.05, 0.1],          # Ajuste de XGBoost
+                    "model__xgb__max_depth": [3, 5],
+                    "model__gb__learning_rate": [0.01, 0.05, 0.1]            # Ajuste de Gradient Boost
+                }
+                
+                # Usamos RandomizedSearchCV para buscar rápido (solo prueba 5 combinaciones al azar)
+                # cv=2 es suficiente aquí porque ya estamos dentro de un K-Fold externo
+                search = RandomizedSearchCV(
+                    fold_pipe, 
+                    param_distributions=param_grid,
+                    n_iter=5, 
+                    cv=2, 
+                    scoring="neg_mean_absolute_error",
+                    random_state=42,
+                    n_jobs=-1
+                )
+                
+                # Entrenamos la búsqueda
+                search.fit(X_tr, y_tr_space)
+                
+                # Nos quedamos con el mejor pipeline encontrado
+                fold_pipe = search.best_estimator_
 
-                pred_tr = np.expm1(fold_pipe.predict(X_tr))
-                pred_te = np.expm1(fold_pipe.predict(X_te))
+                # 4. PREDICCIÓN CON LÍMITE FÍSICO
+                # Evitamos que la inversa del logaritmo genere volúmenes negativos
+                pred_tr = np.maximum(0, np.expm1(fold_pipe.predict(X_tr)))
+                pred_te = np.maximum(0, np.expm1(fold_pipe.predict(X_te)))
 
-                kf_train_maes.append(mean_absolute_error(np.expm1(y_tr), pred_tr))
+                kf_train_maes.append(mean_absolute_error(np.expm1(y_tr_space), pred_tr))
                 kf_test_maes.append(mean_absolute_error(y_te_orig, pred_te))
 
                 all_y_pred_kf[test_idx] += pred_te
@@ -443,35 +494,59 @@ def entrenar_y_evaluar():
         kf_test_mae = np.mean(kf_test_maes)
         kf_gap = ((kf_test_mae - kf_train_mae) / kf_test_mae * 100
                    ) if kf_test_mae != 0 else 0
+                   
+        avg_features = np.mean(features_seleccionadas_por_fold)
 
         print(f"    KFold  R2={metricas_kf['R2']:.4f}  MAE={metricas_kf['MAE']:.1f}  "
-              f"Gap={kf_gap:.1f}%")
+              f"Gap={kf_gap:.1f}%  (Promedio de features: {avg_features:.0f})")
 
         # ---------------------------------------------------------------
-        #  Modelo final (todos los datos)
+        #  Modelo final (todos los datos) - SOLO PARA PRODUCCIÓN
         # ---------------------------------------------------------------
-        pipe_final = clone(pipe_tmpl)
-        pipe_final.fit(X, y_train_space)
+        # Aquí sí usamos todo X_all porque el modelo final va al dashboard
+        cols_sel_final = seleccionar_features(X_all, y_train_space)
+        X_final = X_all[cols_sel_final]
+        
+        # ENTRENAMIENTO Y AFINACIÓN DEL MODELO DE PRODUCCIÓN
+        pipe_base_final = clone(pipe_tmpl)
+        
+        search_final = RandomizedSearchCV(
+            pipe_base_final, 
+            param_distributions=param_grid,
+            n_iter=10, # Usamos 10 iteraciones aquí porque es el modelo definitivo
+            cv=3,      # CV de 3 para mayor robustez
+            scoring="neg_mean_absolute_error",
+            random_state=42,
+            n_jobs=-1
+        )
+        search_final.fit(X_final, y_train_space)
+        pipe_final = search_final.best_estimator_
+        
+        print(f"    Mejores parámetros finales: {search_final.best_params_}")
 
-        imp_dict = _extraer_importances_stacking(pipe_final, list(X.columns))
+        imp_dict = _extraer_importances_stacking(pipe_final, list(X_final.columns))
         top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
 
-        ovf = detectar_overfitting(pipe_final, X, y_train_space,
-                                   n_splits=N_SPLITS, umbral=OVERFITTING_UMBRAL)
+        ovf = {
+            "Train_MAE": round(kf_train_mae, 4),
+            "Test_MAE": round(kf_test_mae, 4),
+            "Gap_%": round(kf_gap, 2),
+            "Diagnostico": "OVERFITTING" if kf_gap > OVERFITTING_UMBRAL else ("UNDERFITTING" if kf_gap < -10 else "OK")
+        }
 
         informacion_modelos[t["nombre"]] = {
             "nombre_modelo": nombre_modelo,
             "slug": slug,
             "features": [f for f, _ in top_features],
             "importances": {f: v for f, v in top_features},
-            "X": X, "y": y_orig,
+            "X": X_final, "y": y_orig,
             "y_pred_kf": y_pred_kf,
             "metricas_kf": metricas_kf,
             "mejor_pipe": pipe_final,
             "overfitting": ovf,
             "unidad": u,
             "use_log": True,
-            "cols_selected": list(X.columns),
+            "cols_selected": cols_sel_final,
             "kf_gap": round(kf_gap, 2),
         }
 
@@ -496,15 +571,7 @@ def entrenar_y_evaluar():
                 "Error": round(err_abs, 2),
                 "Error %": round(err_pct, 2),
             })
-
-        # Resumen compacto
-        errores = [abs(y_orig[i] - y_pred_kf[i]) / max(abs(y_orig[i]), 1e-9) * 100
-                   for i in range(N)]
-        n15 = sum(1 for e in errores if e < 15)
-        print(f"    Errores: P50={np.median(errores):.1f}%  "
-              f"P90={np.percentile(errores, 90):.1f}%  "
-              f"<15%: {n15}/{N} ({n15/N*100:.0f}%)")
-
+            
     # CSVs
     df_pred = pd.DataFrame(predicciones_totales)
     df_pred.to_csv(os.path.join(CARPETA_METRICAS, "predicciones_kfold.csv"),
@@ -951,11 +1018,20 @@ def predecir_casos_prueba(informacion_modelos):
         y_train = info["y"]
         cols_sel = info.get("cols_selected")
 
-        X_pred = X_prueba[cols_sel] if cols_sel else X_prueba
+        if cols_sel:
+            # Garantiza que X_pred tenga exactamente las columnas que espera el modelo
+            X_pred = X_prueba.reindex(columns=cols_sel, fill_value=0)
+        else:
+            X_pred = X_prueba
 
         y_real = df_prueba[t["origen"]].values
+        
+        # Aplicamos el límite a las predicciones finales
         y_pred_raw = pipe.predict(X_pred)
-        y_pred = np.expm1(y_pred_raw) if info.get("use_log") else y_pred_raw
+        if info.get("use_log"):
+            y_pred = np.maximum(0, np.expm1(y_pred_raw))
+        else:
+            y_pred = np.maximum(0, y_pred_raw)
 
         metricas = calcular_metricas(y_real, y_pred)
         print(f"    {nombre}: R2={metricas['R2']:.4f}  "

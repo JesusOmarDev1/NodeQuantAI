@@ -1,13 +1,13 @@
 """
-optimizacion.py — Utilidades de optimización para regresión Ridge y Stacking
+optimizacion.py — Utilidades de optimización para regresión Ridge
 ================================================================
 Evaluación de varianza con KFold y LOO, detección de overfitting,
-y selección avanzada de características con RFECV.
+y análisis de estabilidad del modelo.
 """
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import cross_val_score, KFold, LeaveOneOut
+import pandas as pd
 from sklearn.feature_selection import RFECV
 from sklearn.ensemble import RandomForestRegressor
 
@@ -116,27 +116,27 @@ def detectar_overfitting(pipe, X, y, n_splits=9, umbral=15.0):
         "Diagnostico": dx,
     }
 
-
-# Selección de Características Avanzada (Wrapper Method)
-def seleccionar_features_rfecv(X, y, cv=5, min_features=5):
+# =====================================================================
+#  Selección de Características Avanzada (Wrapper Method)
+# =====================================================================
+def seleccionar_features_rfecv(X, y, cv=3, min_features=5):
     """
     Utiliza RFECV con un RandomForestRegressor para encontrar el subconjunto
     óptimo de características que minimiza el error absoluto medio (MAE).
     
     Parámetros:
-    - X: DataFrame con las features radiómicas.
+    - X: DataFrame con las features (después del filtro grueso).
     - y: Array/Series con el target (ej. Volumen Tumoral).
-    - cv: Número de particiones para la validación cruzada.
+    - cv: Número de particiones para la validación cruzada interna.
     - min_features: Número mínimo de columnas a conservar.
     
     Retorna un diccionario con las columnas seleccionadas y el modelo entrenado.
     """
-    print("\n[RFECV] Iniciando eliminación recursiva de características...")
-    print(f"        Analizando {X.shape[1]} features iniciales. Esto puede tomar un momento.")
+    print(f"        [RFECV] Evaluando {X.shape[1]} features para encontrar el subset óptimo...")
 
-    # 1. Definir el "Juez" (El estimador base)
-    # Usamos Random Forest porque maneja bien colinealidad y no linealidad
-    estimador_base = RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1)
+    # 1. Definir el "Cirujano" (El estimador base)
+    # Usamos Random Forest porque maneja muy bien las relaciones no lineales
+    estimador_base = RandomForestRegressor(n_estimators=50, max_depth=5, random_state=42, n_jobs=None) # Probar None en lugar de -1 por si la compu se congela o tarda mucho
 
     # 2. Configurar el esquema de validación cruzada
     kf = KFold(n_splits=cv, shuffle=True, random_state=42)
@@ -144,9 +144,9 @@ def seleccionar_features_rfecv(X, y, cv=5, min_features=5):
     # 3. Configurar el RFECV
     selector = RFECV(
         estimator=estimador_base,
-        step=1,                          # Elimina la peor característica 1 a 1
-        cv=kf,                           # Evalúa el impacto usando K-Fold
-        scoring='neg_mean_absolute_error', # Nuestro objetivo es minimizar el MAE
+        step=1,                            # Elimina la peor característica 1 a 1
+        cv=kf,                             # Evalúa el impacto usando K-Fold
+        scoring='neg_mean_absolute_error', # Objetivo: minimizar el MAE
         min_features_to_select=min_features,
         n_jobs=-1
     )
@@ -160,11 +160,10 @@ def seleccionar_features_rfecv(X, y, cv=5, min_features=5):
     else:
         features_optimas = [i for i, val in enumerate(selector.support_) if val]
 
-    print(f"[RFECV] ¡Completado! Número óptimo de características: {selector.n_features_}")
+    print(f"        [RFECV] ¡Completado! Número óptimo de características: {selector.n_features_}")
     
     return {
         "selector_model": selector,
         "n_features": selector.n_features_,
         "columnas_seleccionadas": features_optimas,
-        "ranking_completo": selector.ranking_
     }
