@@ -82,7 +82,7 @@ OVERFITTING_UMBRAL = 15.0
 CORR_UMBRAL = 0.03
 INTER_CORR_UMBRAL = 0.95
 
-COLS_CLINICAS = ["body_part_examined", "patient_sex", "primary_condition"]
+COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
 
 TARGETS = [
     {"nombre": "Volumen Tumoral",    "col": "target_regresion",
@@ -343,11 +343,21 @@ def preparar_datos(df_raw):
     ids = df_raw["Paciente_ID"].values
     targets = {t["col"]: df[t["col"]].values for t in TARGETS}
 
+    # Desglose por familia radiómica
+    familias = {
+        "firstorder": len([c for c in X.columns if c.startswith("firstorder_")]),
+        "glcm": len([c for c in X.columns if c.startswith("glcm_")]),
+        "glrlm": len([c for c in X.columns if c.startswith("glrlm_")]),
+        "glszm": len([c for c in X.columns if c.startswith("glszm_")]),
+        "gldm": len([c for c in X.columns if c.startswith("gldm_")]),
+    }
+
     info = {
         "n_raw": n_raw,
         "n_muestras": n_dedup,
         "n_features": X.shape[1],
         "shape_eliminadas": len(shape_cols),
+        "familias": familias,
     }
     return X, targets, ids, info
 
@@ -397,9 +407,13 @@ def entrenar_y_evaluar():
 
     N = info["n_muestras"]
 
+    fam = info.get("familias", {})
+    fam_str = " + ".join(f"{v} {k}" for k, v in fam.items() if v > 0)
+
     print(f"\nMODELADO PREDICTIVO")
     print(f"  {info['n_raw']} filas -> {N} unicas")
-    print(f"  {info['n_features']} features base + {n_derivadas} derivadas = {X_all.shape[1]} total")
+    print(f"  {info['n_features']} features base ({fam_str})")
+    print(f"  + {n_derivadas} derivadas = {X_all.shape[1]} total")
     print(f"  shape eliminadas: {info['shape_eliminadas']}")
     print(f"  Validacion: {N_SPLITS}-Fold CV x{N_REPEATS}")
 
@@ -467,7 +481,7 @@ def entrenar_y_evaluar():
                     cv=2, 
                     scoring="neg_mean_absolute_error",
                     random_state=42,
-                    n_jobs=-1
+                    n_jobs=None
                 )
                 
                 # Entrenamos la búsqueda
@@ -517,7 +531,7 @@ def entrenar_y_evaluar():
             cv=3,      # CV de 3 para mayor robustez
             scoring="neg_mean_absolute_error",
             random_state=42,
-            n_jobs=-1
+            n_jobs=None
         )
         search_final.fit(X_final, y_train_space)
         pipe_final = search_final.best_estimator_
@@ -952,10 +966,19 @@ def generar_graficas(df_pred, informacion_modelos):
         imp_series = pd.Series(imp_dict).sort_values()
         top10 = imp_series.tail(10)
 
-        colores_feat = ["#3498db" if f.startswith("firstorder_")
-                        else "#e67e22" if f.startswith("glcm_")
-                        else "#9b59b6" for f in top10.index]
-        labels = [f.replace("firstorder_", "fo_").replace("glcm_", "gl_")
+        def _color_familia(f):
+            if f.startswith("firstorder_"): return "#3498db"
+            if f.startswith("glcm_"): return "#e67e22"
+            if f.startswith("glrlm_"): return "#2ecc71"
+            if f.startswith("glszm_"): return "#e74c3c"
+            if f.startswith("gldm_"): return "#9b59b6"
+            return "#95a5a6"
+        colores_feat = [_color_familia(f) for f in top10.index]
+        labels = [f.replace("firstorder_", "fo_")
+                   .replace("glcm_", "gl_")
+                   .replace("glrlm_", "rl_")
+                   .replace("glszm_", "sz_")
+                   .replace("gldm_", "dm_")
                   for f in top10.index]
 
         bars = ax.barh(range(len(top10)), top10.values, color=colores_feat,
@@ -976,8 +999,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig7.suptitle("Caracteristicas mas Importantes para la Prediccion",
                   fontsize=14, fontweight="bold", y=1.01)
     fig7.text(0.5, -0.02,
-              "Azul: First Order  |  Naranja: GLCM  |  "
-              "Morado: Features derivadas  |  Ponderado por Ridge",
+              "Azul: FirstOrder  |  Naranja: GLCM  |  Verde: GLRLM  |  "
+              "Rojo: GLSZM  |  Morado: GLDM  |  Gris: Derivadas  |  Ponderado por Ridge",
               ha="center", fontsize=8, color="#888")
     fig7.tight_layout()
     _guardar(fig7, "entrenamiento_07_feature_importance.png")

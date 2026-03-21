@@ -63,7 +63,7 @@ from xgboost import XGBRegressor
 w.filterwarnings("ignore")
 
 # -- Rutas --
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RUTA_CSV = os.path.join(base_dir, "db", "ganglios_master.csv")
 CARPETA_METRICAS = os.path.join(base_dir, "regression", "metrics")
 os.makedirs(CARPETA_METRICAS, exist_ok=True)
@@ -90,7 +90,7 @@ TARGETS = [
 COLS_TARGET = [t["col"] for t in TARGETS]
 
 # -- Columnas clínicas (solo para gráficas, NO entran al pipeline ML) --
-COLS_CLINICAS = ["body_part_examined", "patient_sex", "primary_condition"]
+COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
 
 
 # ==============================================================
@@ -100,13 +100,21 @@ COLS_CLINICAS = ["body_part_examined", "patient_sex", "primary_condition"]
 def preparar_datos_regresion(df):
     """
     Crea targets de regresión desde shape_* y elimina features de forma
-    para prevenir data leakage (columnas_regresion.txt).
+    para prevenir data leakage.
 
     Transformaciones:
       1. target_regresion  = shape_VoxelVolume      (mm³)
       2. target_eje_corto  = shape_MinorAxisLength   (mm)
       3. target_eje_largo  = shape_MajorAxisLength   (mm)
-      4. X = firstorder (19) + glcm (24) = 42 features
+      4. X = 102 features radiómicos seleccionados automáticamente:
+         - firstorder (18): estadísticas de intensidad
+         - glcm (24): texturas Gray Level Co-occurrence
+         - glrlm (16): patrones de runs (homogeneidad/complejidad)
+         - glszm (16): patrones de zonas (estructuras locales)
+         - gldm (14): dependencia de niveles de gris
+      
+      Feature selection pipeline (4-pasos) elige subset óptimo por target:
+      Varianza → Correlación → Inter-correlación → LassoCV
 
     Returns
     -------
@@ -129,9 +137,10 @@ def preparar_datos_regresion(df):
     shape_cols = [c for c in df_clean.columns if c.startswith("shape_")]
     df_clean = df_clean.drop(columns=shape_cols)
 
-    # Contar features finales
+    # Contar features finales - TODAS las familias radiómicas
     feature_cols = [c for c in df_clean.columns
-                    if c.startswith(("firstorder_", "glcm_"))]
+                    if c.startswith(("firstorder_", "glcm_", "glrlm_", 
+                                      "glszm_", "gldm_"))]
 
     info = {
         "n_muestras":       len(df_clean),
@@ -157,13 +166,16 @@ def seleccionar_features(X, y, nombre_target):
 
     Parámetros
     ----------
-    X : DataFrame con features candidatas (42 firstorder + glcm)
+    X : DataFrame con features candidatas (hasta 102 radiómicos: firstorder, glcm, glrlm, glszm, gldm)
     y : array con valores del target
     nombre_target : str para identificar en consola
 
+    Pipeline robusto: cada paso preserva información relevante mientras elimina ruido.
+    El subset final es específico y óptimo para cada target.
+
     Retorna
     -------
-    cols_final : lista de nombres de columnas seleccionadas
+    cols_final : lista de nombres de columnas seleccionadas (óptimas para target)
     """
     n_original = X.shape[1]
 
@@ -210,9 +222,27 @@ def seleccionar_features(X, y, nombre_target):
     if len(cols_final) < 3:
         cols_final = cols_inter
 
+    # Analizar composición de features finales por familia
+    familias_final = {
+        "firstorder": len([c for c in cols_final if "firstorder" in c]),
+        "glcm": len([c for c in cols_final if "glcm" in c]),
+        "glrlm": len([c for c in cols_final if "glrlm" in c]),
+        "glszm": len([c for c in cols_final if "glszm" in c]),
+        "gldm": len([c for c in cols_final if "gldm" in c]),
+    }
+    familias_entrada = {
+        "firstorder": len([c for c in X.columns if "firstorder" in c]),
+        "glcm": len([c for c in X.columns if "glcm" in c]),
+        "glrlm": len([c for c in X.columns if "glrlm" in c]),
+        "glszm": len([c for c in X.columns if "glszm" in c]),
+        "gldm": len([c for c in X.columns if "gldm" in c]),
+    }
+
     print(f"    Features: {n_original} → {len(cols_var)} (var) → "
           f"{len(cols_corr)} (corr) → {len(cols_inter)} (inter) → "
           f"{len(cols_final)} (lasso) para {nombre_target}")
+    print(f"    Entrada: {dict(sorted(familias_entrada.items(), key=lambda x: -x[1]))} → "
+          f"Salida: {dict(sorted(familias_final.items(), key=lambda x: -x[1]))}")
 
     return cols_final
 
@@ -639,7 +669,7 @@ def ejecutar_evaluacion():
     print(f"\n  PREPARACIÓN:")
     print(f"  [OK] Targets creados: {', '.join(prep_info['targets_creados'])}")
     print(f"  [OK] shape_* eliminadas: {prep_info['shape_eliminadas']} columnas")
-    print(f"  [OK] Features iniciales: {prep_info['n_features']} (firstorder + glcm)")
+    print(f"  [OK] Features iniciales: {prep_info['n_features']} (firstorder + glcm + glrlm + glszm + gldm)")
 
     # -- Separar X (features) de targets y metadatos --
     cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET + COLS_CLINICAS
