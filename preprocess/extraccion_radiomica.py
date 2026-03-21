@@ -75,7 +75,8 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
 # EJECUCIÓN
 # ==========================================
 if __name__ == "__main__":
-    carpeta_preprocesada = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\Dataset_Preprocesado"
-    csv_salida = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\Proyecto\Local\nueva_ganglios_radiomica.csv"
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    carpeta_preprocesada = os.path.join(base_dir, "Dataset_Preprocesado")
+    csv_salida = os.path.join(base_dir, "db", "ganglios_radiomica.csv")
 
     extraer_radiomica(carpeta_preprocesada, csv_salida)
