@@ -1,0 +1,14 @@
+{
+    "target": "Volumen Tumoral",
+    "unidad": "mm\u00b3",
+    "use_log": true,
+    "n_features_esperadas": 6,
+    "features_entrada": [
+        "glrlm_LongRunEmphasis",
+        "gldm_DependenceNonUniformityNormalized",
+        "gldm_DependenceNonUniformity",
+        "glrlm_RunLengthNonUniformity",
+        "glszm_LargeAreaHighGrayLevelEmphasis",
+        "gldm_DependenceVariance"
+    ]
+}

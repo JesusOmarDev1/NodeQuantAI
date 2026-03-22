@@ -51,27 +51,27 @@ from sklearn.metrics import (
     explained_variance_score, mean_absolute_percentage_error,
 )
 from sklearn.feature_selection import mutual_info_regression
+from xgboost import XGBRegressor
 
-from optimizacion import detectar_overfitting, seleccionar_features_rfecv
-
-try:
-    from xgboost import XGBRegressor
-except ImportError:
-    raise ImportError("XGBoost requerido: pip install xgboost")
-
-sys.path.insert(0, os.path.dirname(__file__))
+from regression.scripts.optimizacion_regression import detectar_overfitting, seleccionar_features_rfecv
 
 warnings.filterwarnings("ignore")
+
+# Generar joblib
+import json
+import joblib
 
 # ---------------------------------------------------------------------------
 #  Rutas
 # ---------------------------------------------------------------------------
+
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RUTA_CSV = os.path.join(base_dir, "db", "ganglios_master.csv")
 RUTA_PRUEBA = os.path.join(base_dir, "db", "casos_prueba.csv")
 CARPETA_METRICAS = os.path.join(base_dir, "regression", "metrics")
 CARPETA_NIFIT = os.path.join(base_dir, "Dataset_NIFIT")
 os.makedirs(CARPETA_METRICAS, exist_ok=True)
+
 
 # ---------------------------------------------------------------------------
 #  Configuracion
@@ -466,9 +466,9 @@ def entrenar_y_evaluar():
                 param_grid = {
                     "lasso_filter__estimator__alpha": [0.001, 0.01, 0.1], # Decidir cuánta colinealidad limpiar
                     "model__final_estimator__alpha": [0.1, 1.0, 10.0, 50.0], # Ajuste del juez (Ridge)
-                    "model__rf__max_depth": [3, 5, 7],                       # Ajuste de Random Forest
+                    "model__rf__max_depth": [2,3,4], #[3, 5, 7]              # Ajuste de Random Forest
                     "model__xgb__learning_rate": [0.01, 0.05, 0.1],          # Ajuste de XGBoost
-                    "model__xgb__max_depth": [3, 5],
+                    "model__xgb__max_depth": [2,3], #[3, 5]
                     "model__gb__learning_rate": [0.01, 0.05, 0.1]            # Ajuste de Gradient Boost
                 }
                 
@@ -1186,6 +1186,46 @@ def generar_grafica_casos_prueba(df_verif, informacion_modelos):
 
 
 # ===========================================================================
+#  Exportación a Producción (Joblib)
+# ===========================================================================
+def exportar_modelos_produccion(informacion_modelos):
+    """
+    Guarda los pipelines definitivos en formato .joblib y genera un archivo .json
+    con los metadatos necesarios para predecir nuevos pacientes (features exactas, log_transform).
+    """
+    carpeta_produccion = os.path.join(base_dir, "regression", "joblib")
+    os.makedirs(carpeta_produccion, exist_ok=True)
+
+    print(f"\n  EXPORTANDO MODELOS A PRODUCCIÓN ({carpeta_produccion}):")
+
+    for target_nombre, info in informacion_modelos.items():
+        slug = info["slug"]
+        modelo_final = info["mejor_pipe"]
+        features_requeridas = info["cols_selected"]  # Las columnas que sobrevivieron al RFECV
+
+        # 1. Guardar el modelo compilado (Pipeline completo)
+        ruta_joblib = os.path.join(carpeta_produccion, f"modelo_{slug}.joblib")
+        joblib.dump(modelo_final, ruta_joblib)
+
+        # 2. Guardar el "Manual de Instrucciones" (Metadatos)
+        metadata = {
+            "target": target_nombre,
+            "unidad": info["unidad"],
+            "use_log": info["use_log"],
+            "n_features_esperadas": len(features_requeridas),
+            "features_entrada": features_requeridas
+        }
+
+        ruta_json = os.path.join(carpeta_produccion, f"metadata_{slug}.json")
+        with open(ruta_json, 'w') as f:
+            json.dump(metadata, f, indent=4)
+
+        print(f"    [OK] {target_nombre}: {len(features_requeridas)} features requeridas.")
+        print(f"         -> {ruta_joblib}")
+        print(f"         -> {ruta_json}")
+
+
+# ===========================================================================
 #  Main
 # ===========================================================================
 if __name__ == "__main__":
@@ -1193,3 +1233,4 @@ if __name__ == "__main__":
     generar_graficas(df_pred, info_modelos)
     df_verif = predecir_casos_prueba(info_modelos)
     generar_grafica_casos_prueba(df_verif, info_modelos)
+    exportar_modelos_produccion(info_modelos)

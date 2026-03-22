@@ -1,5 +1,5 @@
 """
-optimizacion.py — Utilidades de optimización para regresión Ridge
+optimizacion_regression.py — Utilidades de optimización para regresión Ridge
 ================================================================
 Evaluación de varianza con KFold y LOO, detección de overfitting,
 y análisis de estabilidad del modelo.

@@ -1,0 +1,18 @@
+{
+    "target": "riesgo",
+    "unidad": "Categoria",
+    "use_log": false,
+    "n_features_esperadas": 10,
+    "features_entrada": [
+        "glszm_ZoneEntropy",
+        "glszm_SizeZoneNonUniformity",
+        "glszm_LargeAreaEmphasis",
+        "gldm_GrayLevelNonUniformity",
+        "glszm_LargeAreaHighGrayLevelEmphasis",
+        "firstorder_TotalEnergy",
+        "firstorder_10Percentile",
+        "glrlm_GrayLevelNonUniformity",
+        "glrlm_RunLengthNonUniformity",
+        "glszm_GrayLevelNonUniformity"
+    ]
+}
