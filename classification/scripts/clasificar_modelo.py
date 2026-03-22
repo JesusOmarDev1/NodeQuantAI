@@ -58,7 +58,7 @@ CORR_UMBRAL = 0.03
 INTER_CORR_UMBRAL = 0.95
 
 COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
-NOMBRES_CLASES = ["Sin riesgo", "Bajo riesgo", "Notorio", "Crítico"]
+NOMBRES_CLASES = ["Bajo", "Moderado", "Medio-Alto", "Crítico"]
 
 # Estilo global matplotlib
 plt.rcParams.update({

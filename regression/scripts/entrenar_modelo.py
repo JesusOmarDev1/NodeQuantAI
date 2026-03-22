@@ -386,7 +386,7 @@ def categorizar_nivel(valor, y_total):
         return "Moderado"
     if valor <= q3:
         return "Medio-Alto"
-    return "Alto"
+    return "Crítico"
 
 
 # ===========================================================================
