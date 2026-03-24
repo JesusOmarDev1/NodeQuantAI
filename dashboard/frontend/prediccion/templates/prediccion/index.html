@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NodeQuant AI</title>
+    <link rel="stylesheet" href="{% static 'prediccion/css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'prediccion/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'prediccion/css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'prediccion/css/form.css' %}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{% static 'prediccion/css/onboarding.css' %}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{% static 'prediccion/css/loading.css' %}" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="{% static 'prediccion/css/form.css' %}">
+        <link rel="stylesheet" href="{% static 'prediccion/css/onboarding.css' %}">
+        <link rel="stylesheet" href="{% static 'prediccion/css/loading.css' %}">
+    </noscript>
+</head>
+<body class="app-body">
+
+<!-- ONBOARDING -->
+<div class="onboarding-overlay" id="onboardingOverlay">
+    <div class="onboarding-backdrop" id="onboardingBackdrop"></div>
+    <div class="onboarding-card" id="onboardingCard">
+        <div class="onboarding-bar"></div>
+        <div class="onboarding-body">
+            <div class="ob-step active" data-step="0">
+                <div class="ob-icon"><span class="ob-icon-cross" aria-hidden="true"></span></div>
+                <span class="ob-badge">Bienvenido</span>
+                <h2 class="ob-title">NodeQuant<span class="ob-title-ai">AI</span></h2>
+                <p class="ob-desc">
+                    Plataforma de análisis radiómico cuantitativo asistido por inteligencia artificial.<br><br>
+                    En menos de un minuto podrás cargar un estudio NIfTI y obtener métricas radiómicas automáticas.
+                    Te mostramos el proceso en <strong>3 pasos sencillos</strong>.
+                </p>
+            </div>
+            <div class="ob-step" data-step="1">
+                <div class="ob-icon ob-icon--file" aria-hidden="true"></div>
+                <span class="ob-badge">Paso 1 de 3</span>
+                <h2 class="ob-title">Carga la imagen NIfTI</h2>
+                <p class="ob-desc">
+                    Selecciona o arrastra tu archivo de imagen médica en el primer campo.
+                    Formatos aceptados: <strong>.nii</strong> y <strong>.nii.gz</strong>.
+                </p>
+                <div class="ob-file-preview">
+                    <div class="ob-fp-row">
+                        <span class="ob-fp-num">01</span>
+                        <div class="ob-fp-info">
+                            <div class="ob-fp-label">Imagen NIfTI</div>
+                            <div class="ob-fp-ext">image.nii / image.nii.gz</div>
+                        </div>
+                        <span class="ob-fp-arrow" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ob-step" data-step="2">
+                <div class="ob-icon ob-icon--mask" aria-hidden="true"></div>
+                <span class="ob-badge">Paso 2 de 3</span>
+                <h2 class="ob-title">Carga la máscara de segmentación</h2>
+                <p class="ob-desc">
+                    Agrega el archivo de segmentación que delimita la región de interés.
+                    Debe corresponder al mismo espacio volumétrico que la imagen.
+                </p>
+                <div class="ob-file-preview">
+                    <div class="ob-fp-row">
+                        <span class="ob-fp-num">02</span>
+                        <div class="ob-fp-info">
+                            <div class="ob-fp-label">Máscara de segmentación</div>
+                            <div class="ob-fp-ext">mask.nii / mask.nii.gz</div>
+                        </div>
+                        <span class="ob-fp-arrow" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ob-step" data-step="3">
+                <div class="ob-icon ob-icon--chart" aria-hidden="true"></div>
+                <span class="ob-badge">Paso 3 de 3</span>
+                <h2 class="ob-title">Inicia el análisis</h2>
+                <p class="ob-desc">
+                    Con los dos archivos cargados, presiona <strong>Iniciar análisis</strong>.
+                    El procesamiento tarda entre 15 y 60 segundos según el tamaño del volumen.
+                </p>
+                <div class="ob-btn-preview" aria-hidden="true">
+                    <span class="ob-btn-preview-text">Iniciar análisis</span>
+                    <span class="ob-btn-preview-arrow"></span>
+                </div>
+            </div>
+        </div>
+        <div class="ob-dots" aria-hidden="true">
+            <span class="ob-dot active" data-d="0"></span>
+            <span class="ob-dot" data-d="1"></span>
+            <span class="ob-dot" data-d="2"></span>
+            <span class="ob-dot" data-d="3"></span>
+        </div>
+        <div class="ob-footer">
+            <button class="ob-btn-skip" id="obSkip" type="button">Omitir y no mostrar de nuevo</button>
+            <button class="ob-btn-next" id="obNext" type="button">
+                <span class="ob-btn-next-text">Siguiente</span>
+                <span class="ob-btn-next-arrow" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loader">
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+    </div>
+    <p class="loading-text">Procesando estudio radiómico...</p>
+    <div class="loading-subtext">Análisis cuantitativo en curso</div>
+    <div class="loading-progress">
+        <div class="loading-progress-bar"></div>
+    </div>
+</div>
+
+<!-- APP -->
+<div class="app-layout">
+    <nav class="app-nav">
+        <div class="nav-brand">
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span class="nav-logo">NodeQuant<span>AI</span></span>
+        </div>
+        <span class="nav-tag">Plataforma de análisis radiómico asistido</span>
+    </nav>
+
+    <div class="app-main">
+        {% include 'prediccion/_sidebar.html' with page='index' %}
+
+        <main class="app-content">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title">Nuevo análisis</h2>
+                    <p class="content-subtitle">Carga los archivos NIfTI para iniciar el análisis radiómico</p>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="mainForm" class="upload-form" novalidate>
+                {% csrf_token %}
+                <fieldset class="form-section">
+                    <legend>Archivos de estudio</legend>
+                    <div class="upload-field">
+                        <label for="imagen" class="field-label">
+                            <span class="field-number">01</span>
+                            Imagen NIfTI
+                        </label>
+                        <div class="file-drop-area" id="wrap-imagen" tabindex="0">
+                            <input type="file" name="imagen" id="imagen" accept=".gz,.nii" required class="file-input">
+                            <span class="file-status" aria-hidden="true"></span>
+                            <div class="file-placeholder">
+                                <span class="file-hint">Arrastre o seleccione el archivo</span>
+                                <span class="file-name" id="label-imagen">image.nii.gz</span>
+                            </div>
+                            <span class="file-badge">.nii / .nii.gz</span>
+                        </div>
+                    </div>
+                    <div class="upload-field">
+                        <label for="mascara" class="field-label">
+                            <span class="field-number">02</span>
+                            Máscara de segmentación
+                        </label>
+                        <div class="file-drop-area" id="wrap-mascara" tabindex="0">
+                            <input type="file" name="mascara" id="mascara" accept=".gz,.nii" required class="file-input">
+                            <span class="file-status" aria-hidden="true"></span>
+                            <div class="file-placeholder">
+                                <span class="file-hint">Arrastre o seleccione el archivo</span>
+                                <span class="file-name" id="label-mascara">mask.nii.gz</span>
+                            </div>
+                            <span class="file-badge">.nii / .nii.gz</span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="btn-primary" formaction="/predecir/" id="submitBtn">
+                    <span class="btn-text">Iniciar análisis</span>
+                    <span class="btn-arrow" aria-hidden="true"></span>
+                </button>
+
+                <p class="form-note">Los archivos se procesan localmente. Cumplimiento HIPAA/GDPR.</p>
+            </form>
+        </main>
+    </div>
+</div>
+
+<script src="{% static 'prediccion/js/history.js' %}" defer></script>
+<script src="{% static 'prediccion/js/sidebar.js' %}" defer></script>
+<script src="{% static 'prediccion/js/onboarding.js' %}" defer></script>
+<script src="{% static 'prediccion/js/form.js' %}" defer></script>
+</body>
+</html>

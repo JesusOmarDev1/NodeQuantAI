@@ -1,0 +1,40 @@
+{% load static %}
+<aside class="app-sidebar" id="appSidebar">
+
+    <div class="sidebar-section-label">Análisis</div>
+
+    <a href="/" class="sidebar-item {% if page == 'index' %}active{% endif %}">
+        <span class="sidebar-icon sidebar-icon--upload" aria-hidden="true"></span>
+        Nuevo estudio
+    </a>
+
+    <div class="sidebar-section-label" style="margin-top: 8px;">Sesión actual</div>
+
+    <div class="sidebar-item {% if page == 'resultado' %}active{% endif %} {% if page != 'resultado' %}sidebar-item--locked{% endif %}"
+         id="sidebarCurrentReport">
+        <span class="sidebar-icon sidebar-icon--report" aria-hidden="true"></span>
+        Reporte actual
+        {% if page != 'resultado' %}
+            <span class="sidebar-lock" aria-hidden="true"></span>
+        {% endif %}
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">
+        Historial
+        <button class="sidebar-clear-btn" id="sidebarClearBtn" type="button" title="Limpiar historial">✕</button>
+    </div>
+
+    <div id="sidebarHistory" class="sidebar-history">
+        <div class="sidebar-empty" id="sidebarEmpty">Sin estudios previos</div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <button type="button" class="sidebar-item" id="tutorialReset">
+        <span class="sidebar-icon sidebar-icon--guide" aria-hidden="true"></span>
+        Ver guía de uso
+    </button>
+
+</aside>

@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 # --- AJUSTE DE RUTAS ---
-ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ruta_raiz not in sys.path:
     sys.path.insert(0, ruta_raiz)
 
@@ -64,7 +64,7 @@ class MotorInferenciaNodeQuant:
         """
         Llama al entorno de Python 3.9 mediante un subproceso.
         """
-        python_39_exe = r"C:/Users/korev/anaconda3/envs/sic_9/python.exe"
+        python_39_exe = r"C:\Users\dario\anaconda3\envs\py39\python.exe"
         # Usamos ruta relativa al dashboard para el script extractor
         script_extractor = os.path.join(os.path.dirname(__file__), "extractor_py39.py")
 
@@ -138,8 +138,8 @@ if __name__ == "__main__":
     motor = MotorInferenciaNodeQuant(RUTA_REG, RUTA_CLF)
 
     # Rutas de prueba
-    img_test = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\Local\Dataset_Preprocesado\case_0093\image.nii.gz"
-    mask_test = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\Local\Dataset_Preprocesado\case_0093\mask.nii.gz"
+    img_test = os.path.join(ruta_raiz, "Dataset_Preprocesado", "case_0093", "image.nii.gz")
+    mask_test = os.path.join(ruta_raiz, "Dataset_Preprocesado", "case_0093", "mask.nii.gz")
 
     try:
         print("\nAnalizando nuevo paciente...")
