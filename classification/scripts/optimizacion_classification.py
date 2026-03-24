@@ -5,6 +5,7 @@ Evaluación de métricas con StratifiedKFold, detección de overfitting,
 y selección de características avanzada (RFECV) optimizada para F1-Score.
 """
 
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import cross_val_score, StratifiedKFold, LeaveOneOut
