@@ -57,7 +57,7 @@ Dataset_NIFIT/
 Dataset_Entrenamiento/
 Dataset_Validacion/
 Dataset_Test/
-Dataset_Preprocesado/
+Dataset_Preprocesado/**
 **/nifti/
 **/*.nii
 **/*.nii.gz
@@ -135,7 +135,6 @@ secrets.yaml
 Code/
 Mediastinal_Data_Sample/
 Dataset_NIFIT/
-Dataset_Preprocesado/
 Local/
 
 # Archivos 
@@ -143,3 +142,32 @@ Mediastinal-Lymph-Node-SEG-DA-RAD-nbia-digest.xlsx
 Mediastinal-Lymph-Node-SEG-VER1-CLINICAL-1.csv
 
 AGENTS.md
+
+# Dataset_Preprocesado: ignorar todo, permitir solo casos seleccionados
+Dataset_Preprocesado/**
+!Dataset_Preprocesado/
+
+!Dataset_Preprocesado/case_0854/
+!Dataset_Preprocesado/case_0854/**
+!Dataset_Preprocesado/case_0854/**/*.nii
+!Dataset_Preprocesado/case_0854/**/*.nii.gz
+
+!Dataset_Preprocesado/case_0864/
+!Dataset_Preprocesado/case_0864/**
+!Dataset_Preprocesado/case_0864/**/*.nii
+!Dataset_Preprocesado/case_0864/**/*.nii.gz
+
+!Dataset_Preprocesado/case_0165/
+!Dataset_Preprocesado/case_0165/**
+!Dataset_Preprocesado/case_0165/**/*.nii
+!Dataset_Preprocesado/case_0165/**/*.nii.gz
+
+!Dataset_Preprocesado/case_0303/
+!Dataset_Preprocesado/case_0303/**
+!Dataset_Preprocesado/case_0303/**/*.nii
+!Dataset_Preprocesado/case_0303/**/*.nii.gz
+
+!Dataset_Preprocesado/case_0545/
+!Dataset_Preprocesado/case_0545/**
+!Dataset_Preprocesado/case_0545/**/*.nii
+!Dataset_Preprocesado/case_0545/**/*.nii.gz

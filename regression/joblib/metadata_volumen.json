@@ -4,11 +4,11 @@
     "use_log": true,
     "n_features_esperadas": 6,
     "features_entrada": [
-        "glrlm_LongRunEmphasis",
-        "gldm_DependenceNonUniformityNormalized",
-        "gldm_DependenceNonUniformity",
         "glrlm_RunLengthNonUniformity",
-        "glszm_LargeAreaHighGrayLevelEmphasis",
-        "gldm_DependenceVariance"
+        "glcm_Imc2",
+        "glrlm_GrayLevelNonUniformity",
+        "glrlm_RunEntropy",
+        "gldm_GrayLevelNonUniformity",
+        "glcm_Imc1"
     ]
 }
