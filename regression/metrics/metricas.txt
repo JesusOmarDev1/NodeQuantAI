@@ -1,0 +1,14 @@
+=================================================================
+   PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS XGB, RF, GB
+=================================================================
+Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen Tumoral        Stacking (LASSO + XGB+RF+GB)     554.9    1159.4   52.1%  OVERFITTING
+  Diametro Eje Corto     Stacking (LASSO + XGB+RF+GB)       3.2       6.9   53.0%  OVERFITTING
+  Diametro Eje Largo     Stacking (LASSO + XGB+RF+GB)      14.8      21.2   30.3%  OVERFITTING
+
+  Tiempo: 1740.4s | CSVs en regression/metrics/
+
+  =================================================================
+   PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS XGB, RF, GB, KNN, MLP
+=================================================================

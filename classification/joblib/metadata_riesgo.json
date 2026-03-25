@@ -2,17 +2,24 @@
     "target": "riesgo",
     "unidad": "Categoria",
     "use_log": false,
-    "n_features_esperadas": 10,
+    "n_features_esperadas": 17,
     "features_entrada": [
-        "glszm_ZoneEntropy",
-        "glszm_SizeZoneNonUniformity",
+        "glszm_LowGrayLevelZoneEmphasis",
+        "firstorder_Energy",
+        "gldm_DependenceNonUniformity",
         "glszm_LargeAreaEmphasis",
-        "gldm_GrayLevelNonUniformity",
-        "glszm_LargeAreaHighGrayLevelEmphasis",
-        "firstorder_TotalEnergy",
-        "firstorder_10Percentile",
-        "glrlm_GrayLevelNonUniformity",
+        "log_Energy",
         "glrlm_RunLengthNonUniformity",
-        "glszm_GrayLevelNonUniformity"
+        "glszm_SizeZoneNonUniformity",
+        "glrlm_GrayLevelNonUniformity",
+        "glszm_LargeAreaHighGrayLevelEmphasis",
+        "glszm_GrayLevelNonUniformity",
+        "glrlm_GrayLevelNonUniformityNormalized",
+        "firstorder_Range",
+        "ratio_Mean_Variance",
+        "glszm_LargeAreaLowGrayLevelEmphasis",
+        "glszm_SmallAreaLowGrayLevelEmphasis",
+        "gldm_GrayLevelNonUniformity",
+        "glszm_ZoneEntropy"
     ]
 }

@@ -1,0 +1,65 @@
+=================================================================
+   PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold) XGB, RF, GB
+=================================================================
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7480  (Aciertos totales)
+  • Precisión Ponderada       : 0.7471  (Fiabilidad cuando detecta algo)
+  • Sensibilidad (Recall)     : 0.7480  (Capacidad de no dejar ir positivos)
+  • Especificidad Macro       : 0.9160  (Capacidad de descartar sanos)
+  • Valor Predictivo Neg. NPV : 0.9161  (Seguridad de un diagnóstico negativo)
+  • F1-Score Ponderado        : 0.7475  (Balance Precisión/Sensibilidad)
+
+ [Métricas de Probabilidad y Robustez Estadistica]
+  • ROC-AUC (OVR)             : 0.9262  (Calidad probabilística)
+  • Coeficiente Matthews (MCC): 0.6641  (Correlación global de aciertos)
+  • Log Loss (Cross-Entropy)  : 0.6200  (Incertidumbre en las probabilidades)
+
+ [Métricas de Gravedad Ordinal]
+  • Índice Kappa Cuadrático   : 0.8793  (Concordancia penalizando errores graves)
+  • MAE Categórico (Escalones): 0.2677  (Desviación promedio en niveles de riesgo)
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9113
+  • Test F1-Score             : 0.7475
+  • Train Accuracy            : 0.9109
+  • Test Accuracy             : 0.7480
+  • Gap de Sobreajuste (F1)   : 18.0%
+=================================================================
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.84      0.86      0.85       127
+    Moderado       0.67      0.67      0.67       127
+  Medio-Alto       0.66      0.65      0.66       127
+     Crítico       0.80      0.81      0.81       127
+
+    accuracy                           0.75       508
+   macro avg       0.75      0.75      0.75       508
+weighted avg       0.75      0.75      0.75       508
+
+==================================================
+ VERIFICACIÓN EN CASOS DE PRUEBA (5 pacientes)
+==================================================
+  • Exactitud (Accuracy) : 0.6000
+  • F1-Score Ponderado   : 0.6000
+
+  [Detalle del Veredicto por Paciente]
+   - case_0854: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
+   - case_0864: Real = Medio-Alto | Predicho = Moderado   -> ❌ FALLO
+   - case_0165: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
+   - case_0303: Real = Crítico    | Predicho = Crítico    -> ✅ ACIERTO
+   - case_0545: Real = Moderado   | Predicho = Medio-Alto -> ❌ FALLO
+
+
+
+
+
+
+
+
+
+
+=====================================================================
+PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold) XGB, RF, GB, KNN, MLP
+=====================================================================
