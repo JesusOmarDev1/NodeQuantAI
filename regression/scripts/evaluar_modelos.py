@@ -744,29 +744,61 @@ def ejecutar_evaluacion():
                          for r in resultados]
         df_res = pd.DataFrame(clean_results).sort_values("MAE")
 
-        print(f"\n  {'Modelo':<18} {'R2':>7} {'MAE':>10} {'Train':>8} "
-              f"{'Gap%':>7} {'MAPE':>7}  Dx")
-        print("  " + "=" * 70)
+        # -- Reporte detallado por modelo (formato bloque) --
+        print(f"\n  {'='*72}")
+        print(f"  REPORTE DETALLADO — {t['nombre']} ({u})")
+        print(f"  {'='*72}")
+        pos = 0
         for _, row in df_res.iterrows():
             if pd.notna(row["MAE"]):
+                pos += 1
                 ovf_dx = next(
                     (o for o in overfitting_info if o["Modelo"] == row["Modelo"]),
                     {"Diagnostico": "?"})
                 sym = _recomendacion_color(ovf_dx["Diagnostico"])
-                print(f"  {row['Modelo']:<18} {row['R2']:>7.3f} "
-                      f"{row['MAE']:>8.1f}{u:>2} {row['Train_MAE']:>7.1f} "
-                      f"{row['Gap_%']:>6.1f}% {row['MAPE %']:>6.1f}%  "
-                      f"{sym} {ovf_dx['Diagnostico']}")
+                print(f"\n  #{pos} {row['Modelo']}  {sym} {ovf_dx['Diagnostico']}")
+                print(f"  {'─'*50}")
+                print(f"  │ R²={row['R2']:.4f}   Pearson={row['Pearson_r']:.4f}   "
+                      f"MAPE={row['MAPE %']:.1f}%   EVS={row['EVS']:.4f}")
+                print(f"  │ MAE={row['MAE']:.2f}   RMSE={row['RMSE']:.2f}   "
+                      f"MedAE={row['MedAE']:.2f}   MaxErr={row['MaxErr']:.2f}")
+                print(f"  │ MSE={row['MSE']:.2f}   Train_MAE={row['Train_MAE']:.2f}   "
+                      f"Gap={row['Gap_%']:.1f}%")
+                if row.get("Best_Params"):
+                    print(f"  │ Params: {row['Best_Params']}")
 
-        # Mejor modelo
+        # Mejor modelo + justificación
         validos = [r for r in resultados if not np.isnan(r["MAE"])]
         if validos:
-            mejor = min(validos, key=lambda r: r["MAE"])
-            print(f"\n  [OK] Mejor: {mejor['Modelo']} | "
-                  f"MAE={mejor['MAE']:.1f} {u} | R2={mejor['R2']:.3f} | "
-                  f"MAPE={mejor['MAPE %']:.1f}%")
-            if mejor.get("Best_Params"):
-                print(f"    Params: {mejor['Best_Params']}")
+            ranking = sorted(validos, key=lambda r: r["MAE"])
+            mejor = ranking[0]
+            print(f"\n  {'─'*72}")
+            print(f"  MEJOR MODELO: {mejor['Modelo']}")
+            print(f"  {'─'*72}")
+            print(f"  R²={mejor['R2']:.4f}  MAPE={mejor['MAPE %']:.1f}%  "
+                  f"MAE={mejor['MAE']:.2f} {u}  RMSE={mejor['RMSE']:.2f}  "
+                  f"Gap={mejor['Gap_%']:.1f}%")
+
+            # Justificación vs segundo y tercero
+            if len(ranking) >= 2:
+                seg = ranking[1]
+                print(f"\n  ¿POR QUÉ ESTE MODELO?")
+                r2_diff = mejor["R2"] - seg["R2"]
+                mape_diff = seg["MAPE %"] - mejor["MAPE %"]
+                mae_diff = seg["MAE"] - mejor["MAE"]
+                print(f"  vs #{2} {seg['Modelo']}:")
+                print(f"    R² {'+' if r2_diff>=0 else ''}{r2_diff:.4f}  |  "
+                      f"MAPE {'+' if mape_diff>=0 else ''}{mape_diff:.1f}pp  |  "
+                      f"MAE {'+' if mae_diff>=0 else ''}{mae_diff:.2f} {u}")
+            if len(ranking) >= 3:
+                ter = ranking[2]
+                r2_diff = mejor["R2"] - ter["R2"]
+                mape_diff = ter["MAPE %"] - mejor["MAPE %"]
+                mae_diff = ter["MAE"] - mejor["MAE"]
+                print(f"  vs #{3} {ter['Modelo']}:")
+                print(f"    R² {'+' if r2_diff>=0 else ''}{r2_diff:.4f}  |  "
+                      f"MAPE {'+' if mape_diff>=0 else ''}{mape_diff:.1f}pp  |  "
+                      f"MAE {'+' if mae_diff>=0 else ''}{mae_diff:.2f} {u}")
 
         # Modelos con overfitting
         ovf_modelos = [o for o in overfitting_info
@@ -799,9 +831,44 @@ def ejecutar_evaluacion():
     csv_path = os.path.join(CARPETA_METRICAS, "comparativa_general.csv")
     df_all.to_csv(csv_path, index=False)
 
-    t_total = time.time() - t_inicio
+    # -- Ranking multi-target --
     print(f"\n{'=' * 80}")
-    print(f"  Tiempo total: {t_total:.1f}s ({t_total/60:.1f} min)")
+    print(f"  RANKING MULTI-TARGET")
+    print(f"{'=' * 80}")
+    print(f"  {'Target':<22} {'Mejor Modelo':<18} {'R²':>7} {'MAPE%':>7} {'RMSE':>9} {'MAE':>9} {'Gap%':>7}")
+    print(f"  {'─'*80}")
+    for slug in ["volumen", "eje_corto", "eje_largo"]:
+        if slug not in todos:
+            continue
+        data = todos[slug]
+        cfg = data["cfg"]
+        validos = [r for r in data["resultados"] if not np.isnan(r.get("MAE", np.nan))]
+        if validos:
+            mejor = min(validos, key=lambda r: r["MAE"])
+            print(f"  {cfg['nombre']:<22} {mejor['Modelo']:<18} "
+                  f"{mejor['R2']:>7.4f} {mejor['MAPE %']:>6.1f}% "
+                  f"{mejor['RMSE']:>9.2f} {mejor['MAE']:>9.2f} "
+                  f"{mejor['Gap_%']:>6.1f}%")
+
+    # Modelo más consistente
+    conteo_ganador = {}
+    for slug in ["volumen", "eje_corto", "eje_largo"]:
+        if slug not in todos:
+            continue
+        validos = [r for r in todos[slug]["resultados"] if not np.isnan(r.get("MAE", np.nan))]
+        if validos:
+            mejor = min(validos, key=lambda r: r["MAE"])
+            nombre = mejor["Modelo"]
+            conteo_ganador[nombre] = conteo_ganador.get(nombre, 0) + 1
+    if conteo_ganador:
+        mas_consistente = max(conteo_ganador, key=conteo_ganador.get)
+        n_wins = conteo_ganador[mas_consistente]
+        print(f"\n  Modelo más consistente: {mas_consistente} (mejor en {n_wins}/3 targets)")
+
+    t_total = time.time() - t_inicio
+    mins = int(t_total // 60)
+    segs = t_total % 60
+    print(f"\n  Tiempo total: {mins}m {segs:.0f}s")
     print(f"  Resultados: metrics/comparativa_general.csv")
     print(f"{'=' * 80}")
 

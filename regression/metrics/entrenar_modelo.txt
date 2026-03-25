@@ -1,0 +1,179 @@
+MODELADO PREDICTIVO
+  508 filas -> 508 unicas
+  88 features base (18 firstorder + 24 glcm + 16 glrlm + 16 glszm + 14 gldm)
+  + 25 derivadas = 113 total
+  shape eliminadas: 14
+  Validacion: 10-Fold CV x1
+
+  Volumen Tumoral (mm³) | Stacking (LASSO + XGB+RF+GB)
+    Rango: [376.0, 225877.0]  Media: 19170.6
+        [RFECV] Evaluando 59 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 58 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 15
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 6
+
+MODELADO PREDICTIVO
+  508 filas -> 508 unicas
+  88 features base (18 firstorder + 24 glcm + 16 glrlm + 16 glszm + 14 gldm)
+  + 25 derivadas = 113 total
+  shape eliminadas: 14
+  Validacion: 10-Fold CV x1
+
+  Volumen Tumoral (mm³) | Stacking (LASSO + XGB+RF+GB)
+    Rango: [376.0, 225877.0]  Media: 19170.6
+        [RFECV] Evaluando 59 features para encontrar el subset óptimo...
+  Volumen Tumoral (mm³) | Stacking (LASSO + XGB+RF+GB)
+    Rango: [376.0, 225877.0]  Media: 19170.6
+        [RFECV] Evaluando 59 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 58 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 15
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 6
+        [RFECV] Evaluando 64 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 6
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 7
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 5
+    KFold (features: 6)
+      R²=0.9678   MAPE=5.6%   RMSE=5162.3   EVS=0.9679
+      MAE=1377.1   MedAE=339.2   MaxErr=85760.4   MSE=26649154.3
+      Gap=60.4%  Dx: OVERFITTING
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 6
+    Mejores parámetros finales: {'model__xgb__max_depth': 2, 'model__xgb__learning_rate': 0.01, 'model__rf__max_depth': 2, 'model__gb__learning_rate': 0.05, 'model__final_estimator__alpha': 1.0, 'lasso_filter__estimator__alpha': 0.001}
+
+  Diametro Eje Corto (mm) | Stacking (LASSO + XGB+RF+GB)
+    Rango: [7.0, 115.2]  Media: 36.0
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 39
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 34
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 17
+        [RFECV] Evaluando 64 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 19
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 9
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 26
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 27
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 11
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 8
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 17
+    KFold (features: 21)
+      R²=0.7864   MAPE=16.9%   RMSE=11.3   EVS=0.7896
+      MAE=6.9   MedAE=3.2   MaxErr=81.8   MSE=128.8
+      Gap=50.8%  Dx: OVERFITTING
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 23
+    Mejores parámetros finales: {'model__xgb__max_depth': 2, 'model__xgb__learning_rate': 0.1, 'model__rf__max_depth': 2, 'model__gb__learning_rate': 0.01, 'model__final_estimator__alpha': 0.1, 'lasso_filter__estimator__alpha': 0.01}
+
+  Diametro Eje Largo (mm) | Stacking (LASSO + XGB+RF+GB)
+    Rango: [10.4, 240.6]  Media: 71.1
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 16
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 9
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+        [RFECV] Evaluando 64 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 6
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 6
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 9
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 7
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 8
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 17
+    KFold (features: 10)
+      R²=0.5331   MAPE=30.5%   RMSE=33.5   EVS=0.5471
+      MAE=21.3   MedAE=11.2   MaxErr=152.9   MSE=1120.0
+      Gap=33.0%  Dx: OVERFITTING
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 9
+    Mejores parámetros finales: {'model__xgb__max_depth': 2, 'model__xgb__learning_rate': 0.01, 'model__rf__max_depth': 2, 'model__gb__learning_rate': 0.05, 'model__final_estimator__alpha': 1.0, 'lasso_filter__estimator__alpha': 0.001}
+
+  ================================================================================
+  RESUMEN DE RENDIMIENTO
+  ================================================================================
+  Target                      R²   MAPE%      RMSE       MAE  TrainMAE    Gap%  Dx
+  ────────────────────────────────────────────────────────────────────────────────
+  Volumen Tumoral         0.9678    5.6%    5162.3    1377.1     545.2   60.4%  OVERFITTING
+  Diametro Eje Corto      0.7864   16.9%      11.3       6.9       3.4   50.8%  OVERFITTING
+  Diametro Eje Largo      0.5331   30.5%      33.5      21.3      14.3   33.0%  OVERFITTING
+  ────────────────────────────────────────────────────────────────────────────────
+  MAPE PROMEDIO                    17.7%
+
+  DETALLE ADICIONAL:
+  Target                     MedAE    MaxErr          MSE     EVS
+  ──────────────────────────────────────────────────────────────
+  Volumen Tumoral            339.2   85760.4   26649154.3  0.9679
+  Diametro Eje Corto           3.2      81.8        128.8  0.7896
+  Diametro Eje Largo          11.2     152.9       1120.0  0.5471
+
+  DIAGNÓSTICO OVERFITTING:
+  Gap% = (TestMAE - TrainMAE) / TestMAE × 100
+  Gap alto (>15.0%) = modelo memoriza entrenamiento
+  Gap bajo/negativo = modelo generaliza bien
+
+  Tiempo: 25m 6s | CSVs en regression/metrics/
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+
+    Volumen Tumoral (mm³)
+      R²=0.9956   MAPE=7.6%   RMSE=816.9   EVS=0.9956
+      MAE=632.4   MedAE=340.1   MaxErr=1518.0   MSE=667315.9
+
+    Diametro Eje Corto (mm)
+      R²=-0.0885   MAPE=26.8%   RMSE=13.5   EVS=0.0521
+      MAE=9.2   MedAE=3.3   MaxErr=28.6   MSE=182.8
+
+    Diametro Eje Largo (mm)
+      R²=0.8338   MAPE=19.2%   RMSE=12.4   EVS=0.8363
+      MAE=11.0   MedAE=13.1   MaxErr=17.7   MSE=153.6
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib):
+    [OK] Volumen Tumoral: 6 features requeridas.
+         -> C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib\metadata_volumen.json
+    [OK] Diametro Eje Corto: 23 features requeridas.
+         -> C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib\modelo_eje_corto.joblib
+         -> C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib\metadata_eje_corto.json
+    [OK] Diametro Eje Largo: 9 features requeridas.
+         -> C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib\modelo_eje_largo.joblib
+         -> C:\Users\omar\OneDrive\Escritorio\Lymph-Node\regression\joblib\metadata_eje_largo.json

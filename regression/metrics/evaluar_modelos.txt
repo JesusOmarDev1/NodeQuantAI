@@ -1,0 +1,394 @@
+================================================================================
+  VALIDACIÓN DE DATOS DE ENTRADA
+================================================================================
+  [OK] CSV cargado: 508 filas x 107 columnas
+  [OK] shape: 14 | firstorder: 18 | glcm: 24
+
+  PREPARACIÓN:
+  [OK] Targets creados: target_regresion, target_eje_corto, target_eje_largo
+  [OK] shape_* eliminadas: 14 columnas
+  [OK] Features iniciales: 88 (firstorder + glcm + glrlm + glszm + gldm)
+
+================================================================================
+  EVALUACIÓN DE MODELOS DE REGRESIÓN
+================================================================================
+  Dataset: 508 muestras x 88 features iniciales
+  Validación: 5-Fold CV x 2 repeticiones
+  Tuning interno: 3-Fold CV
+  Umbral overfitting: Gap% > 15.0%
+  Feature selection: corr>0.05 + inter<0.95 + LassoCV
+
+
+--------------------------------------------------------------------------------
+> Volumen Tumoral (mm3)
+    Features: 88 → 88 (var) → 81 (corr) → 44 (inter) → 32 (lasso) para Volumen Tumoral
+    Entrada: {'glcm': 24, 'firstorder': 18, 'glrlm': 16, 'glszm': 16, 'gldm': 14} → Salida: {'glszm': 8, 'glcm': 7, 'gldm': 7, 'glrlm': 6, 'firstorder': 4}
+  Rango: 376.00 - 225877.00 mm3 | Media: 19170.57 mm3 | Mejor feature: gldm_DependenceNonUniformity (r=0.984)
+  [LOG] Log-transform activado para Volumen Tumoral
+
+
+  ========================================================================
+  REPORTE DETALLADO — Volumen Tumoral (mm3)
+  ========================================================================
+
+  #1 Random Forest  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.8724   Pearson=0.9404   MAPE=14.2%   EVS=0.8735
+  │ MAE=3148.53   RMSE=10283.64   MedAE=811.88   MaxErr=115996.38
+  │ MSE=105753255.13   Train_MAE=2875.07   Gap=9.9%
+  │ Params: max_depth=3, min_samples_leaf=8, n_estimators=100
+
+  #2 Polinomica  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.7176   Pearson=0.8516   MAPE=11.2%   EVS=0.7181
+  │ MAE=3262.91   RMSE=15295.44   MedAE=583.07   MaxErr=215566.66
+  │ MSE=233950494.87   Train_MAE=717.21   Gap=79.2%
+  │ Params: alpha=10.0, degree=2
+
+  #3 XGBoost  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7468   Pearson=0.8975   MAPE=12.6%   EVS=0.7532
+  │ MAE=3464.74   RMSE=14483.56   MedAE=649.19   MaxErr=156825.58
+  │ MSE=209773509.10   Train_MAE=3198.98   Gap=11.2%
+  │ Params: learning_rate=0.2, max_depth=1, min_child_weight=20, n_estimators=50, reg_alpha=5, reg_lambda=10
+
+  #4 Arbol Decision  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.8494   Pearson=0.9241   MAPE=18.0%   EVS=0.8501
+  │ MAE=3824.89   RMSE=11170.41   MedAE=1086.96   MaxErr=123001.05
+  │ MSE=124777986.68   Train_MAE=3905.54   Gap=5.8%
+  │ Params: max_depth=3, min_samples_leaf=16
+
+  #5 Gradient Boost  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7244   Pearson=0.8868   MAPE=15.2%   EVS=0.7324
+  │ MAE=3967.16   RMSE=15109.96   MedAE=828.83   MaxErr=159791.62
+  │ MSE=228310747.91   Train_MAE=3855.07   Gap=9.2%
+  │ Params: learning_rate=0.2, max_depth=1, min_samples_leaf=32, min_samples_split=15, n_estimators=25
+
+  #6 KNN  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.7480   Pearson=0.9539   MAPE=36.8%   EVS=0.7764
+  │ MAE=6038.80   RMSE=14448.61   MedAE=1977.26   MaxErr=121009.87
+  │ MSE=208762279.47   Train_MAE=0.00   Gap=100.0%
+  │ Params: n_neighbors=15, p=1, weights=distance
+
+  #7 Lasso  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=-1.2148   Pearson=0.7901   MAPE=18.1%   EVS=-1.2050
+  │ MAE=6508.29   RMSE=42836.20   MedAE=1000.44   MaxErr=641869.08
+  │ MSE=1834940406.76   Train_MAE=4414.69   Gap=32.3%
+  │ Params: alpha=0.01
+
+  #8 Reg. Multiple  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=-3.1092   Pearson=0.6424   MAPE=17.4%   EVS=-3.0936
+  │ MAE=6929.51   RMSE=58347.49   MedAE=927.01   MaxErr=1234608.62
+  │ MSE=3404429317.40   Train_MAE=3504.90   Gap=49.6%
+
+  #9 Ridge  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=-3.1407   Pearson=0.6437   MAPE=17.4%   EVS=-3.1250
+  │ MAE=6972.68   RMSE=58570.60   MedAE=918.21   MaxErr=1238526.74
+  │ MSE=3430515482.24   Train_MAE=3576.75   Gap=49.0%
+  │ Params: alpha=1.0
+
+  #10 ElasticNet  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=-3.3611   Pearson=0.6744   MAPE=17.9%   EVS=-3.3427
+  │ MAE=7377.30   RMSE=60109.45   MedAE=962.34   MaxErr=1193378.33
+  │ MSE=3613145510.05   Train_MAE=4080.03   Gap=44.9%
+  │ Params: alpha=0.01, l1_ratio=0.2
+
+  #11 SVR  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=-4.9387   Pearson=0.6596   MAPE=17.2%   EVS=-4.9020
+  │ MAE=8417.39   RMSE=70143.81   MedAE=836.45   MaxErr=1349038.23
+  │ MSE=4920153942.69   Train_MAE=5991.77   Gap=29.1%
+  │ Params: C=1, epsilon=0.1, kernel=linear
+
+  #12 Reg. Simple  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=-82941.0537   Pearson=0.3288   MAPE=260.6%   EVS=-82759.2497
+  │ MAE=399696.19   RMSE=8289542.52   MedAE=3844.41   MaxErr=186608002.99
+  │ MSE=68716515220851.60   Train_MAE=81615.50   Gap=79.5%
+
+  ────────────────────────────────────────────────────────────────────────
+  MEJOR MODELO: Random Forest
+  ────────────────────────────────────────────────────────────────────────
+  R²=0.8724  MAPE=14.2%  MAE=3148.53 mm3  RMSE=10283.64  Gap=9.9%
+
+  ¿POR QUÉ ESTE MODELO?
+  vs #2 Polinomica:
+    R² +0.1548  |  MAPE -3.0pp  |  MAE +114.38 mm3
+  vs #3 XGBoost:
+    R² +0.1256  |  MAPE -1.5pp  |  MAE +316.21 mm3
+
+  [!] Modelos con overfitting (8):
+    • Reg. Simple        Gap= 79.5% -> Aumentar regularización o reducir complejidad
+    • Reg. Multiple      Gap= 49.6% -> Reducir features (feature selection) o regularizar
+    • Polinomica         Gap= 79.2% -> Usar degree=2 o aplicar regularización (Ridge)
+    • Ridge              Gap= 49.0% -> Aumentar regularización o reducir complejidad
+    • Lasso              Gap= 32.3% -> Aumentar regularización o reducir complejidad
+    • ElasticNet         Gap= 44.9% -> Aumentar regularización o reducir complejidad
+    • KNN                Gap=100.0% -> Aumentar n_neighbors
+    • SVR                Gap= 29.1% -> Aumentar regularización o reducir complejidad
+
+
+--------------------------------------------------------------------------------
+> Diámetro Eje Corto (mm)
+    Features: 88 → 88 (var) → 87 (corr) → 46 (inter) → 23 (lasso) para Diámetro Eje Corto
+    Entrada: {'glcm': 24, 'firstorder': 18, 'glrlm': 16, 'glszm': 16, 'gldm': 14} → Salida: {'glszm': 8, 'gldm': 5, 'glcm': 4, 'firstorder': 3, 'glrlm': 3}
+  Rango: 7.05 - 115.17 mm | Media: 35.98 mm | Mejor feature: glszm_ZoneEntropy (r=0.744)
+
+
+  ========================================================================
+  REPORTE DETALLADO — Diámetro Eje Corto (mm)
+  ========================================================================
+
+  #1 XGBoost  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.7625   Pearson=0.8742   MAPE=22.3%   EVS=0.7625
+  │ MAE=7.80   RMSE=11.96   MedAE=4.49   MaxErr=78.43
+  │ MSE=143.15   Train_MAE=6.72   Gap=15.7%
+  │ Params: learning_rate=0.3, max_depth=1, min_child_weight=10, n_estimators=50, reg_alpha=5, reg_lambda=10
+
+  #2 SVR  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7411   Pearson=0.8648   MAPE=22.3%   EVS=0.7456
+  │ MAE=7.91   RMSE=12.49   MedAE=5.04   MaxErr=80.42
+  │ MSE=156.04   Train_MAE=7.37   Gap=7.2%
+  │ Params: C=1, epsilon=1.0, kernel=linear
+
+  #3 Polinomica  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.7569   Pearson=0.8701   MAPE=24.4%   EVS=0.7569
+  │ MAE=7.98   RMSE=12.10   MedAE=5.04   MaxErr=80.16
+  │ MSE=146.52   Train_MAE=6.27   Gap=22.3%
+  │ Params: alpha=100.0, degree=2
+
+  #4 Ridge  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7737   Pearson=0.8799   MAPE=26.8%   EVS=0.7738
+  │ MAE=8.00   RMSE=11.68   MedAE=5.89   MaxErr=75.52
+  │ MSE=136.36   Train_MAE=7.45   Gap=7.2%
+  │ Params: alpha=1.0
+
+  #5 ElasticNet  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7735   Pearson=0.8796   MAPE=26.6%   EVS=0.7735
+  │ MAE=8.01   RMSE=11.68   MedAE=5.73   MaxErr=75.78
+  │ MSE=136.52   Train_MAE=7.47   Gap=7.1%
+  │ Params: alpha=0.01, l1_ratio=0.2
+
+  #6 Reg. Multiple  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7737   Pearson=0.8799   MAPE=27.0%   EVS=0.7737
+  │ MAE=8.03   RMSE=11.68   MedAE=5.76   MaxErr=75.13
+  │ MSE=136.40   Train_MAE=7.45   Gap=7.5%
+
+  #7 Lasso  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7727   Pearson=0.8791   MAPE=26.8%   EVS=0.7727
+  │ MAE=8.04   RMSE=11.70   MedAE=5.74   MaxErr=76.36
+  │ MSE=136.99   Train_MAE=7.51   Gap=7.0%
+  │ Params: alpha=0.1
+
+  #8 Random Forest  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.7222   Pearson=0.8509   MAPE=22.6%   EVS=0.7222
+  │ MAE=8.20   RMSE=12.94   MedAE=4.59   MaxErr=84.75
+  │ MSE=167.46   Train_MAE=6.85   Gap=17.0%
+  │ Params: max_depth=3, min_samples_leaf=8, n_estimators=100
+
+  #9 Gradient Boost  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.7264   Pearson=0.8527   MAPE=24.6%   EVS=0.7265
+  │ MAE=8.50   RMSE=12.84   MedAE=4.98   MaxErr=81.61
+  │ MSE=164.89   Train_MAE=7.59   Gap=12.1%
+  │ Params: learning_rate=0.3, max_depth=1, min_samples_leaf=32, min_samples_split=15, n_estimators=25
+
+  #10 KNN  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.7100   Pearson=0.8476   MAPE=26.0%   EVS=0.7100
+  │ MAE=8.86   RMSE=13.22   MedAE=5.39   MaxErr=83.20
+  │ MSE=174.81   Train_MAE=0.00   Gap=100.0%
+  │ Params: n_neighbors=15, p=1, weights=distance
+
+  #11 Arbol Decision  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.6590   Pearson=0.8131   MAPE=26.4%   EVS=0.6590
+  │ MAE=9.28   RMSE=14.34   MedAE=5.35   MaxErr=84.18
+  │ MSE=205.51   Train_MAE=8.20   Gap=17.3%
+  │ Params: max_depth=3, min_samples_leaf=16
+
+  #12 Reg. Simple  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5497   Pearson=0.7415   MAPE=42.7%   EVS=0.5497
+  │ MAE=12.39   RMSE=16.47   MedAE=9.69   MaxErr=73.55
+  │ MSE=271.38   Train_MAE=12.32   Gap=0.6%
+
+  ────────────────────────────────────────────────────────────────────────
+  MEJOR MODELO: XGBoost
+  ────────────────────────────────────────────────────────────────────────
+  R²=0.7625  MAPE=22.3%  MAE=7.80 mm  RMSE=11.96  Gap=15.7%
+
+  ¿POR QUÉ ESTE MODELO?
+  vs #2 SVR:
+    R² +0.0214  |  MAPE +0.0pp  |  MAE +0.11 mm
+  vs #3 Polinomica:
+    R² +0.0056  |  MAPE +2.1pp  |  MAE +0.18 mm
+
+  [!] Modelos con overfitting (5):
+    • Polinomica         Gap= 22.3% -> Usar degree=2 o aplicar regularización (Ridge)
+    • KNN                Gap=100.0% -> Aumentar n_neighbors
+    • Arbol Decision     Gap= 17.3% -> Reducir max_depth o aumentar min_samples_leaf
+    • Random Forest      Gap= 17.0% -> Reducir max_depth o aumentar min_samples_leaf
+    • XGBoost            Gap= 15.7% -> Reducir max_depth / n_estimators o subir learning_rate
+
+
+--------------------------------------------------------------------------------
+> Diámetro Eje Largo (mm)
+    Features: 88 → 88 (var) → 80 (corr) → 44 (inter) → 28 (lasso) para Diámetro Eje Largo
+    Entrada: {'glcm': 24, 'firstorder': 18, 'glrlm': 16, 'glszm': 16, 'gldm': 14} → Salida: {'glrlm': 7, 'glszm': 7, 'glcm': 6, 'firstorder': 5, 'gldm': 3}
+  Rango: 10.39 - 240.56 mm | Media: 71.14 mm | Mejor feature: glszm_ZoneEntropy (r=0.662)
+
+
+  ========================================================================
+  REPORTE DETALLADO — Diámetro Eje Largo (mm)
+  ========================================================================
+
+  #1 SVR  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.4874   Pearson=0.7231   MAPE=31.4%   EVS=0.5219
+  │ MAE=21.87   RMSE=35.07   MedAE=12.61   MaxErr=217.12
+  │ MSE=1229.63   Train_MAE=20.37   Gap=7.4%
+  │ Params: C=1, epsilon=1.0, kernel=linear
+
+  #2 Reg. Multiple  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5612   Pearson=0.7515   MAPE=41.0%   EVS=0.5612
+  │ MAE=22.74   RMSE=32.45   MedAE=16.28   MaxErr=157.48
+  │ MSE=1052.70   Train_MAE=20.83   Gap=8.9%
+
+  #3 Lasso  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5611   Pearson=0.7506   MAPE=41.2%   EVS=0.5611
+  │ MAE=22.84   RMSE=32.45   MedAE=16.55   MaxErr=157.14
+  │ MSE=1052.82   Train_MAE=20.94   Gap=8.8%
+  │ Params: alpha=0.1
+
+  #4 Ridge  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5630   Pearson=0.7513   MAPE=41.6%   EVS=0.5630
+  │ MAE=22.94   RMSE=32.38   MedAE=16.50   MaxErr=156.75
+  │ MSE=1048.35   Train_MAE=21.01   Gap=9.0%
+  │ Params: alpha=1.0
+
+  #5 ElasticNet  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5617   Pearson=0.7502   MAPE=41.7%   EVS=0.5617
+  │ MAE=22.97   RMSE=32.43   MedAE=16.50   MaxErr=159.52
+  │ MSE=1051.41   Train_MAE=21.11   Gap=8.7%
+  │ Params: alpha=0.01, l1_ratio=0.8
+
+  #6 XGBoost  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5569   Pearson=0.7466   MAPE=40.8%   EVS=0.5569
+  │ MAE=23.15   RMSE=32.60   MedAE=15.81   MaxErr=141.57
+  │ MSE=1062.92   Train_MAE=20.19   Gap=13.6%
+  │ Params: learning_rate=0.3, max_depth=1, min_child_weight=10, n_estimators=50, reg_alpha=5, reg_lambda=10     
+
+  #7 Gradient Boost  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5329   Pearson=0.7311   MAPE=43.4%   EVS=0.5329
+  │ MAE=24.05   RMSE=33.47   MedAE=16.65   MaxErr=147.39
+  │ MSE=1120.46   Train_MAE=21.98   Gap=9.6%
+  │ Params: learning_rate=0.3, max_depth=1, min_samples_leaf=32, min_samples_split=15, n_estimators=25
+
+  #8 Random Forest  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.5151   Pearson=0.7179   MAPE=43.6%   EVS=0.5151
+  │ MAE=24.26   RMSE=34.11   MedAE=17.15   MaxErr=148.29
+  │ MSE=1163.29   Train_MAE=21.06   Gap=13.5%
+  │ Params: max_depth=3, min_samples_leaf=8, n_estimators=50
+
+  #9 Arbol Decision  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.4776   Pearson=0.6915   MAPE=44.4%   EVS=0.4776
+  │ MAE=25.01   RMSE=35.40   MedAE=16.42   MaxErr=147.61
+  │ MSE=1253.19   Train_MAE=23.01   Gap=11.2%
+  │ Params: max_depth=3, min_samples_leaf=16
+
+  #10 Polinomica  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.4856   Pearson=0.6993   MAPE=48.9%   EVS=0.4856
+  │ MAE=25.55   RMSE=35.13   MedAE=19.04   MaxErr=136.85
+  │ MSE=1233.92   Train_MAE=19.10   Gap=25.9%
+  │ Params: alpha=100.0, degree=2
+
+  #11 KNN  [!] OVERFITTING
+  ──────────────────────────────────────────────────
+  │ R²=0.4650   Pearson=0.6853   MAPE=50.0%   EVS=0.4654
+  │ MAE=25.82   RMSE=35.82   MedAE=19.21   MaxErr=147.82
+  │ MSE=1283.39   Train_MAE=0.00   Gap=100.0%
+  │ Params: n_neighbors=20, p=1, weights=distance
+
+  #12 Reg. Simple  [OK] OK
+  ──────────────────────────────────────────────────
+  │ R²=0.4349   Pearson=0.6595   MAPE=57.0%   EVS=0.4349
+  │ MAE=27.69   RMSE=36.82   MedAE=21.88   MaxErr=136.73
+  │ MSE=1355.60   Train_MAE=27.58   Gap=0.4%
+
+  ────────────────────────────────────────────────────────────────────────
+  MEJOR MODELO: SVR
+  ────────────────────────────────────────────────────────────────────────
+  R²=0.4874  MAPE=31.4%  MAE=21.87 mm  RMSE=35.07  Gap=7.4%
+
+  ¿POR QUÉ ESTE MODELO?
+  vs #2 Reg. Multiple:
+    R² -0.0738  |  MAPE +9.6pp  |  MAE +0.87 mm
+  vs #3 Lasso:
+    R² -0.0737  |  MAPE +9.9pp  |  MAE +0.97 mm
+
+  [!] Modelos con overfitting (2):
+    • Polinomica         Gap= 25.9% -> Usar degree=2 o aplicar regularización (Ridge)
+    • KNN                Gap=100.0% -> Aumentar n_neighbors
+
+
+================================================================================
+  RANKING MULTI-TARGET
+================================================================================
+  Target                 Mejor Modelo            R²   MAPE%      RMSE       MAE    Gap%
+  ────────────────────────────────────────────────────────────────────────────────
+  Volumen Tumoral        Random Forest       0.8724   14.2%  10283.64   3148.53    9.9%
+  Diámetro Eje Corto     XGBoost             0.7625   22.3%     11.96      7.80   15.7%
+  Diámetro Eje Largo     SVR                 0.4874   31.4%     35.07     21.87    7.4%
+
+  Modelo más consistente: Random Forest (mejor en 1/3 targets)
+
+  Tiempo total: 3m 17s
+  Resultados: metrics/comparativa_general.csv
+================================================================================
+
+GLOSARIO DE MÉTRICAS:
+--------------------------------------------------------------------------------
+  R²         -> Varianza explicada: 1=perfecto, >0=bueno, <=0=malo
+  Pearson_r  -> Correlación lineal Pearson: 1=perfecto, 0=sin relación
+  MAE        -> Error absoluto medio (mismas unidades que el target)
+  RMSE       -> Raíz del error cuadrático medio (penaliza outliers)
+  MAPE       -> Error porcentual medio (%)
+  Gap%       -> (Test-Train)/Testx100: >15.0%=overfitting
+  Train_MAE  -> MAE sobre datos de entrenamiento
+  MedAE      -> Error absoluto mediano (robusto a outliers)
+  MaxErr     -> Error máximo (peor caso)
+  EVS        -> Explained Variance Score (similar a R²)
+
+DIAGNÓSTICOS DE OVERFITTING:
+--------------------------------------------------------------------------------
+  [OK] OK           -> Gap% <= 15.0% y >= -10%
+  [!] OVERFITTING  -> Gap% > 15.0% (modelo memoriza train)
+  [v] UNDERFITTING -> Gap% < -10% (modelo muy simple)
+
+
+  [OK] 6 gráficas guardadas en metrics/grafica_1..6.png

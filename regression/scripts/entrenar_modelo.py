@@ -515,8 +515,13 @@ def entrenar_y_evaluar():
                    
         avg_features = np.mean(features_seleccionadas_por_fold)
 
-        print(f"    KFold  R2={metricas_kf['R2']:.4f}  MAE={metricas_kf['MAE']:.1f}  "
-              f"Gap={kf_gap:.1f}%  (Promedio de features: {avg_features:.0f})")
+        dx_kf = "OVERFITTING" if kf_gap > OVERFITTING_UMBRAL else ("UNDERFITTING" if kf_gap < -10 else "OK")
+        print(f"    KFold (features: {avg_features:.0f})")
+        print(f"      R²={metricas_kf['R2']:.4f}   MAPE={metricas_kf['MAPE %']:.1f}%   "
+              f"RMSE={metricas_kf['RMSE']:.1f}   EVS={metricas_kf['EVS']:.4f}")
+        print(f"      MAE={metricas_kf['MAE']:.1f}   MedAE={metricas_kf['MedAE']:.1f}   "
+              f"MaxErr={metricas_kf['MaxErr']:.1f}   MSE={metricas_kf['MSE']:.1f}")
+        print(f"      Gap={kf_gap:.1f}%  Dx: {dx_kf}")
 
         # ---------------------------------------------------------------
         #  Modelo final (todos los datos) - SOLO PARA PRODUCCIÓN
@@ -598,18 +603,45 @@ def entrenar_y_evaluar():
     df_res.to_csv(os.path.join(CARPETA_METRICAS, "metricas_modelos_finales.csv"),
                   index=False)
 
-    # Overfitting
-    print(f"\n  {'Target':<22} {'Modelo':<22} {'TrainMAE':>9} {'TestMAE':>9} {'Gap%':>7}")
-    print(f"  {'-'*71}")
+    # Resumen con todas las métricas
+    print(f"\n  {'='*80}")
+    print(f"  RESUMEN DE RENDIMIENTO")
+    print(f"  {'='*80}")
+    print(f"  {'Target':<22} {'R²':>7} {'MAPE%':>7} {'RMSE':>9} {'MAE':>9} {'TrainMAE':>9} {'Gap%':>7}  Dx")
+    print(f"  {'─'*80}")
+    mapes = []
     for t in TARGETS:
         im = informacion_modelos[t["nombre"]]
+        mk = im["metricas_kf"]
         ovf = im["overfitting"]
-        print(f"  {t['nombre']:<22} {im['nombre_modelo']:<22} "
-              f"{ovf['Train_MAE']:>9.1f} {ovf['Test_MAE']:>9.1f} "
-              f"{ovf['Gap_%']:>6.1f}%  {ovf['Diagnostico']}")
+        mapes.append(mk["MAPE %"])
+        print(f"  {t['nombre']:<22} {mk['R2']:>7.4f} {mk['MAPE %']:>6.1f}% "
+              f"{mk['RMSE']:>9.1f} {mk['MAE']:>9.1f} "
+              f"{ovf['Train_MAE']:>9.1f} {ovf['Gap_%']:>6.1f}%  {ovf['Diagnostico']}")
+
+    mape_promedio = np.mean(mapes)
+    print(f"  {'─'*80}")
+    print(f"  {'MAPE PROMEDIO':<22} {'':>7} {mape_promedio:>6.1f}%")
+
+    # Detalle adicional por target
+    print(f"\n  DETALLE ADICIONAL:")
+    print(f"  {'Target':<22} {'MedAE':>9} {'MaxErr':>9} {'MSE':>12} {'EVS':>7}")
+    print(f"  {'─'*62}")
+    for t in TARGETS:
+        mk = informacion_modelos[t["nombre"]]["metricas_kf"]
+        print(f"  {t['nombre']:<22} {mk['MedAE']:>9.1f} {mk['MaxErr']:>9.1f} "
+              f"{mk['MSE']:>12.1f} {mk['EVS']:>7.4f}")
+
+    # Diagnóstico de overfitting
+    print(f"\n  DIAGNÓSTICO OVERFITTING:")
+    print(f"  Gap% = (TestMAE - TrainMAE) / TestMAE × 100")
+    print(f"  Gap alto (>{OVERFITTING_UMBRAL}%) = modelo memoriza entrenamiento")
+    print(f"  Gap bajo/negativo = modelo generaliza bien")
 
     t_total = time.time() - t_inicio
-    print(f"\n  Tiempo: {t_total:.1f}s | CSVs en regression/metrics/")
+    mins = int(t_total // 60)
+    segs = t_total % 60
+    print(f"\n  Tiempo: {mins}m {segs:.0f}s | CSVs en regression/metrics/")
 
     return df_pred, resultados_globales, informacion_modelos
 
@@ -1061,9 +1093,11 @@ def predecir_casos_prueba(informacion_modelos):
             y_pred = np.maximum(0, y_pred_raw)
 
         metricas = calcular_metricas(y_real, y_pred)
-        print(f"    {nombre}: R2={metricas['R2']:.4f}  "
-              f"MAE={metricas['MAE']:.1f} {u}  "
-              f"MAPE={metricas['MAPE %']:.1f}%")
+        print(f"\n    {nombre} ({u})")
+        print(f"      R²={metricas['R2']:.4f}   MAPE={metricas['MAPE %']:.1f}%   "
+              f"RMSE={metricas['RMSE']:.1f}   EVS={metricas['EVS']:.4f}")
+        print(f"      MAE={metricas['MAE']:.1f}   MedAE={metricas['MedAE']:.1f}   "
+              f"MaxErr={metricas['MaxErr']:.1f}   MSE={metricas['MSE']:.1f}")
 
         for i in range(len(df_prueba)):
             pac = df_prueba["Paciente_ID"].iloc[i]

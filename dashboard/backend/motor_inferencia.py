@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import subprocess
 import sys
+from typing import List, Tuple
 
 # --- AJUSTE DE RUTAS ---
 ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
@@ -24,8 +25,10 @@ class MotorInferenciaNodeQuant:
         self.ruta_clf = ruta_clf
         self.modelos_regresion = {}
         self.modelo_clasificacion = None
+        self.python_radiomics_exe = self._resolver_python_radiomics()
 
         print("Cargando cerebro de NodeQuant AI...")
+        print(f"  [OK] Intérprete radiomics seleccionado: {self.python_radiomics_exe}")
 
         # 1. Cargar los 3 modelos de regresión
         targets = ["volumen", "eje_corto", "eje_largo"]
@@ -60,22 +63,148 @@ class MotorInferenciaNodeQuant:
         else:
             print(f"  [ALERTA] Faltan archivos para clasificación en {self.ruta_clf}")
 
-    def extraer_radiomica(self, ruta_imagen, ruta_mascara):
-        """
-        Llama al entorno de Python 3.9 mediante un subproceso.
-        """
-        python_39_exe = r"C:\Users\dario\anaconda3\envs\py39\python.exe"
-        # Usamos ruta relativa al dashboard para el script extractor
-        script_extractor = os.path.join(os.path.dirname(__file__), "extractor_py39.py")
+    def _probar_radiomics_en_interprete(self, ruta_python: str) -> Tuple[bool, str]:
+        """Verifica que un intérprete pueda importar radiomics."""
+        if not ruta_python or not os.path.exists(ruta_python):
+            return False, "No existe"
 
-        proceso = subprocess.run(
-            [python_39_exe, script_extractor, ruta_imagen, ruta_mascara],
+        prueba = subprocess.run(
+            [ruta_python, "-c", "import radiomics"],
             capture_output=True,
             text=True
         )
 
+        if prueba.returncode == 0:
+            return True, "OK"
+
+        detalle = (prueba.stderr or prueba.stdout or "Import fallido").strip()
+        return False, detalle
+
+    def _resolver_python_radiomics(self) -> str:
+        """
+        Resuelve el intérprete con fallback para equipos con venv o Anaconda.
+
+        Prioridad:
+        1) Variable de entorno NODEQUANT_PYTHON_RADIOMICS
+        2) venv9 del repositorio
+        3) Python del entorno Conda activo
+        4) Rutas comunes de Anaconda/Miniconda
+        5) Intérprete actual (sys.executable)
+        """
+        candidatos: List[str] = []
+
+        # 1) Override explícito por variable de entorno (evita interferir entre equipos)
+        exe_env = os.environ.get("NODEQUANT_PYTHON_RADIOMICS", "").strip()
+        if exe_env:
+            candidatos.append(exe_env)
+
+        # 2) venv9 local del repositorio
+        candidatos.append(os.path.join(ruta_raiz, "venv9", "Scripts", "python.exe"))
+
+        # 3) Entorno Conda activo
+        conda_prefix = os.environ.get("CONDA_PREFIX", "").strip()
+        if conda_prefix:
+            candidatos.append(os.path.join(conda_prefix, "python.exe"))
+
+        # 4) Rutas comunes de Anaconda/Miniconda por usuario actual
+        user_home = os.path.expanduser("~")
+        bases_conda = ["anaconda3", "miniconda3"]
+        envs_conda = ["py39", "venv9", "nodequant", "radiomics", "base"]
+        for base in bases_conda:
+            candidatos.append(os.path.join(user_home, base, "python.exe"))
+            for env_name in envs_conda:
+                candidatos.append(os.path.join(user_home, base, "envs", env_name, "python.exe"))
+
+        # 5) Intérprete actual como último recurso
+        candidatos.append(sys.executable)
+
+        # Mantener orden y eliminar duplicados
+        candidatos_unicos: List[str] = []
+        vistos = set()
+        for c in candidatos:
+            c_norm = os.path.normpath(c)
+            if c_norm not in vistos:
+                vistos.add(c_norm)
+                candidatos_unicos.append(c_norm)
+
+        errores = []
+        for candidato in candidatos_unicos:
+            ok, detalle = self._probar_radiomics_en_interprete(candidato)
+            if ok:
+                return candidato
+            errores.append(f"- {candidato}: {detalle}")
+
+        raise RuntimeError(
+            "No se encontró un intérprete válido para PyRadiomics. "
+            "Configura NODEQUANT_PYTHON_RADIOMICS con la ruta de python.exe.\n"
+            + "\n".join(errores)
+        )
+
+    def generar_visualizacion(self, ruta_imagen, ruta_mascara):
+        """
+        Genera imágenes CT (original + overlay) mediante un subproceso con Python 3.9.
+        Retorna dict con imágenes base64 y metadata, o None si falla.
+        """
+        script_viz = os.path.join(os.path.dirname(__file__), "visualizador_nifti.py")
+
+        if not os.path.exists(script_viz):
+            print("  [WARN] visualizador_nifti.py no encontrado, omitiendo visualización.")
+            return None
+
+        try:
+            proceso = subprocess.run(
+                [self.python_radiomics_exe, script_viz, ruta_imagen, ruta_mascara],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                cwd=os.path.dirname(__file__)
+            )
+
+            if proceso.returncode != 0:
+                print(f"  [WARN] Visualización falló: {proceso.stderr[:200]}")
+                return None
+
+            resultado = json.loads(proceso.stdout)
+            if "error" in resultado:
+                print(f"  [WARN] Visualización error: {resultado['error']}")
+                return None
+
+            return resultado
+
+        except subprocess.TimeoutExpired:
+            print("  [WARN] Visualización excedió timeout de 60s.")
+            return None
+        except Exception as e:
+            print(f"  [WARN] Visualización excepción: {e}")
+            return None
+
+    def extraer_radiomica(self, ruta_imagen, ruta_mascara):
+        """
+        Llama al extractor de PyRadiomics mediante un subproceso.
+        """
+        script_extractor = os.path.join(os.path.dirname(__file__), "extractor_py39.py")
+
+        if not os.path.exists(script_extractor):
+            raise FileNotFoundError(f"No existe el script extractor: {script_extractor}")
+        if not os.path.exists(ruta_imagen):
+            raise FileNotFoundError(f"No existe la imagen de entrada: {ruta_imagen}")
+        if not os.path.exists(ruta_mascara):
+            raise FileNotFoundError(f"No existe la máscara de entrada: {ruta_mascara}")
+
+        proceso = subprocess.run(
+            [self.python_radiomics_exe, script_extractor, ruta_imagen, ruta_mascara],
+            capture_output=True,
+            text=True,
+            cwd=os.path.dirname(__file__)
+        )
+
         if proceso.returncode != 0:
-            raise Exception(f"Fallo en el puente 3.9.\n[STDERR]: {proceso.stderr}\n[STDOUT]: {proceso.stdout}")
+            raise Exception(
+                "Fallo en el extractor de radiomics.\n"
+                f"[Python]: {self.python_radiomics_exe}\n"
+                f"[STDERR]: {proceso.stderr}\n"
+                f"[STDOUT]: {proceso.stdout}"
+            )
 
         try:
             resultado_json = json.loads(proceso.stdout)
@@ -83,7 +212,7 @@ class MotorInferenciaNodeQuant:
             raise Exception(f"Salida no válida de PyRadiomics: {proceso.stdout}")
 
         if "error" in resultado_json:
-            raise Exception(f"Error interno en PyRadiomics (3.9): {resultado_json['error']}")
+            raise Exception(f"Error interno en PyRadiomics: {resultado_json['error']}")
 
         return pd.DataFrame([resultado_json])
 

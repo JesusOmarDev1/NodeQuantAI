@@ -2,24 +2,16 @@
     "target": "Diametro Eje Largo",
     "unidad": "mm",
     "use_log": true,
-    "n_features_esperadas": 17,
+    "n_features_esperadas": 9,
     "features_entrada": [
         "glszm_SizeZoneNonUniformity",
-        "inter_Energy_JointEnergy",
-        "firstorder_RootMeanSquared",
-        "glrlm_RunLengthNonUniformity",
-        "cv_intensidad",
-        "glszm_GrayLevelNonUniformity",
-        "glszm_LargeAreaLowGrayLevelEmphasis",
+        "glszm_LargeAreaEmphasis",
         "glcm_Idn",
-        "gldm_SmallDependenceEmphasis",
-        "glszm_LargeAreaHighGrayLevelEmphasis",
-        "gldm_LargeDependenceEmphasis",
-        "glszm_ZoneEntropy",
         "glrlm_GrayLevelNonUniformity",
-        "glszm_ZoneVariance",
-        "gldm_GrayLevelNonUniformity",
-        "glcm_Correlation",
-        "glcm_Imc1"
+        "firstorder_Mean",
+        "glszm_ZoneEntropy",
+        "glrlm_RunLengthNonUniformity",
+        "glszm_GrayLevelNonUniformity",
+        "glszm_LargeAreaLowGrayLevelEmphasis"
     ]
 }

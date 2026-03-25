@@ -1,16 +1,16 @@
 Paciente_ID,Target,Unidad,Real,Predicho,Error,Error %,Nivel_Real,Nivel_Predicho
-case_0854,Volumen Tumoral,mm³,2139.0,2417.25,278.25,13.01,Bajo,Bajo
-case_0864,Volumen Tumoral,mm³,7761.0,8615.17,854.17,11.01,Moderado,Moderado
-case_0165,Volumen Tumoral,mm³,4206.0,4275.83,69.83,1.66,Bajo,Bajo
-case_0303,Volumen Tumoral,mm³,35640.0,35654.17,14.17,0.04,Crítico,Crítico
-case_0545,Volumen Tumoral,mm³,18326.0,16807.47,1518.53,8.29,Medio-Alto,Medio-Alto
-case_0854,Diametro Eje Corto,mm,14.45,17.15,2.7,18.72,Bajo,Bajo
-case_0864,Diametro Eje Corto,mm,31.31,24.63,6.68,21.32,Medio-Alto,Moderado
-case_0165,Diametro Eje Corto,mm,17.29,20.82,3.53,20.42,Bajo,Moderado
-case_0303,Diametro Eje Corto,mm,50.82,67.36,16.54,32.55,Crítico,Crítico
-case_0545,Diametro Eje Corto,mm,24.86,23.86,1.0,4.03,Moderado,Moderado
-case_0854,Diametro Eje Largo,mm,21.99,21.42,0.57,2.58,Bajo,Bajo
-case_0864,Diametro Eje Largo,mm,67.48,44.26,23.23,34.42,Medio-Alto,Moderado
-case_0165,Diametro Eje Largo,mm,34.76,36.15,1.39,3.99,Moderado,Moderado
-case_0303,Diametro Eje Largo,mm,109.67,120.78,11.11,10.13,Crítico,Crítico
-case_0545,Diametro Eje Largo,mm,53.09,38.62,14.47,27.25,Moderado,Moderado
+case_0854,Volumen Tumoral,mm³,2139.0,2465.58,326.58,15.27,Bajo,Bajo
+case_0864,Volumen Tumoral,mm³,7761.0,8657.25,896.25,11.55,Moderado,Moderado
+case_0165,Volumen Tumoral,mm³,4206.0,4287.13,81.13,1.93,Bajo,Bajo
+case_0303,Volumen Tumoral,mm³,35640.0,35980.13,340.13,0.95,Crítico,Crítico
+case_0545,Volumen Tumoral,mm³,18326.0,16807.98,1518.02,8.28,Medio-Alto,Medio-Alto
+case_0854,Diametro Eje Corto,mm,14.45,17.74,3.3,22.83,Bajo,Bajo
+case_0864,Diametro Eje Corto,mm,31.31,23.09,8.21,26.24,Medio-Alto,Moderado
+case_0165,Diametro Eje Corto,mm,17.29,20.47,3.18,18.42,Bajo,Moderado
+case_0303,Diametro Eje Corto,mm,50.82,79.44,28.61,56.31,Crítico,Crítico
+case_0545,Diametro Eje Corto,mm,24.86,22.27,2.59,10.41,Moderado,Moderado
+case_0854,Diametro Eje Largo,mm,21.99,22.88,0.89,4.04,Bajo,Bajo
+case_0864,Diametro Eje Largo,mm,67.48,49.79,17.7,26.22,Medio-Alto,Moderado
+case_0165,Diametro Eje Largo,mm,34.76,44.5,9.74,28.02,Moderado,Moderado
+case_0303,Diametro Eje Largo,mm,109.67,122.79,13.12,11.96,Crítico,Crítico
+case_0545,Diametro Eje Largo,mm,53.09,39.42,13.67,25.75,Moderado,Moderado

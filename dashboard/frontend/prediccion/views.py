@@ -39,6 +39,34 @@ def predecir(request):
                         f.write(chunk)
 
                 reporte = motor.predecir_paciente(ruta_img, ruta_mask)
+                viz = motor.generar_visualizacion(ruta_img, ruta_mask)
 
-            return render(request, 'prediccion/resultado.html', {'reporte': reporte})
+            return render(request, 'prediccion/resultado.html', {
+                'reporte': reporte,
+                'viz': viz,
+            })
     return render(request, 'prediccion/index.html', {'form': PredicionForm()})
+
+
+def resultado(request):
+    """Vista GET para reconstruir un reporte desde el historial del sidebar."""
+    reporte = {
+        'volumen': {
+            'valor': request.GET.get('volumen_valor', '—'),
+            'unidad': request.GET.get('volumen_unidad', 'mm³'),
+        },
+        'eje_corto': {
+            'valor': request.GET.get('eje_corto_valor', '—'),
+            'unidad': request.GET.get('eje_corto_unidad', 'mm'),
+        },
+        'eje_largo': {
+            'valor': request.GET.get('eje_largo_valor', '—'),
+            'unidad': request.GET.get('eje_largo_unidad', 'mm'),
+        },
+        'riesgo': request.GET.get('riesgo', 'Desconocido'),
+    }
+    return render(request, 'prediccion/resultado.html', {
+        'reporte': reporte,
+        'viz': None,
+        'from_cache': True,
+    })
