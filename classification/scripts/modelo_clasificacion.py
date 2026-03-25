@@ -35,10 +35,20 @@ from sklearn.metrics import (
     mean_absolute_error, matthews_corrcoef, log_loss,
     roc_curve, auc, precision_recall_curve, average_precision_score
 )
+
 from xgboost import XGBClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import log_loss, matthews_corrcoef
 
-from classification.scripts.optimizar_classification import seleccionar_features_rfecv
+from sklearn.tree import plot_tree
 
+#from classification.scripts.optimizar_classification import seleccionar_features_rfecv
+from optimizar_classification import seleccionar_features_rfecv
 warnings.filterwarnings("ignore")
 
 # ---------------------------------------------------------------------------
@@ -87,6 +97,8 @@ def _crear_stacking_pipeline():
         ("gb", GradientBoostingClassifier(
             n_estimators=200, max_depth=3, learning_rate=0.05,
             random_state=42)),
+        #("knn", KNeighborsClassifier(n_neighbors=5, weights='distance')),
+        #("mlp", MLPClassifier(hidden_layer_sizes=(50,), max_iter=500, random_state=42))
     ]
     pipe = Pipeline([
         ("scaler", StandardScaler()),
@@ -368,7 +380,12 @@ def entrenar_y_evaluar():
         json.dump(metadata, f, indent=4)
 
     print(f"  [OK] modelo_riesgo.joblib guardado ({len(cols_sel_final)} features)")
-    predecir_casos_prueba(pipe_final, cols_sel_final)
+
+    # Generamos el gráfico del árbol
+    generar_grafico_arbol(pipe_final, cols_sel_final)
+
+    # Evaluamos pasando el f1 del train para que calcule el Overfitting Holdout
+    predecir_casos_prueba(pipe_final, cols_sel_final, train_f1_mean)
 
 
 
@@ -457,43 +474,271 @@ def generar_grafica_overfitting(train_f1s, test_f1s):
     plt.savefig(os.path.join(CARPETA_METRICAS, "analisis_overfitting.png"), dpi=150)
     plt.close()
 
-def predecir_casos_prueba(modelo, cols_sel):
+
+def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
     if not os.path.exists(RUTA_PRUEBA):
         print(f"\n[!] Archivo de casos de prueba no encontrado en: {RUTA_PRUEBA}")
         return
 
     df_prueba = pd.read_csv(RUTA_PRUEBA)
-    print(f"\n" + "="*50)
-    print(f" VERIFICACIÓN EN CASOS DE PRUEBA ({len(df_prueba)} pacientes)")
-    print(f"==================================================")
+    print(f"\n" + "=" * 70)
+    print(f" VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA ({len(df_prueba)} pacientes)")
+    print(f"======================================================================")
 
     y_real = df_prueba["target_riesgo"].values
     ids = df_prueba["Paciente_ID"].values
 
     # 1. Limpieza anti-data leakage
     shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
-    cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto", "target_eje_largo"] + shape_cols + COLS_CLINICAS
+    cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto",
+                 "target_eje_largo"] + shape_cols + COLS_CLINICAS
     X_prueba = df_prueba.drop(columns=[c for c in cols_drop if c in df_prueba.columns])
 
-    # 2. Magia matemática (Derivadas) y Filtro de Columnas exactas
+    # 2. Magia matemática (Derivadas) y Filtro
     X_prueba = crear_features_derivadas(X_prueba)
     X_pred = X_prueba.reindex(columns=cols_sel, fill_value=0)
 
-    # 3. Predicción
+    # 3. Predicciones y Probabilidades
     y_pred = modelo.predict(X_pred)
+    y_proba = modelo.predict_proba(X_pred)
 
+    # 4. Métricas Holdout
     acc = accuracy_score(y_real, y_pred)
     f1 = f1_score(y_real, y_pred, average='weighted')
+    mae = mean_absolute_error(y_real, y_pred)
+    logloss = log_loss(y_real, y_proba, labels=[0, 1, 2, 3])
 
+    print(f"  [Métricas de Rendimiento Global Holdout]")
     print(f"  • Exactitud (Accuracy) : {acc:.4f}")
-    print(f"  • F1-Score Ponderado   : {f1:.4f}\n")
+    print(f"  • F1-Score Ponderado   : {f1:.4f}")
+    print(f"  • Log Loss (Certeza)   : {logloss:.4f} (Más cerca a 0 es mejor)")
+    print(f"  • Error Medio Global   : {mae:.2f} escalones de riesgo en promedio")
 
-    print("  [Detalle del Veredicto por Paciente]")
-    for pac, real, pred in zip(ids, y_real, y_pred):
+    if train_f1 is not None:
+        gap_holdout = ((train_f1 - f1) / train_f1) * 100
+        print(f"  • Overfitting Holdout  : {gap_holdout:.1f}% (Caída respecto al Train)")
+
+    print("\n  [Análisis Forense por Paciente (Probabilidades y Error)]")
+    for i, (pac, real, pred) in enumerate(zip(ids, y_real, y_pred)):
         r_nom = NOMBRES_CLASES[int(real)]
         p_nom = NOMBRES_CLASES[int(pred)]
-        marca = "✅ ACIERTO" if real == pred else "❌ FALLO"
-        print(f"   - {pac}: Real = {r_nom:<10} | Predicho = {p_nom:<10} -> {marca}")
+        marca = "ACIERTO" if real == pred else "FALLO"
+        error_local = abs(real - pred)
+
+        # Formatear las probabilidades
+        p = y_proba[i] * 100
+        str_probs = f"Bajo:{p[0]:.0f}% | Mod:{p[1]:.0f}% | M-A:{p[2]:.0f}% | Cri:{p[3]:.0f}%"
+
+        print(f"   {pac} -> {marca} | Real: {r_nom:<10} | Pred: {p_nom:<10}")
+        print(f"        ↳ Error: {error_local} escalón(es) | {str_probs}")
+
+
+def generar_grafico_arbol(modelo, cols_sel):
+    """Extrae y grafica un árbol de decisión del Random Forest dentro del Stacking"""
+    plt.figure(figsize=(22, 12))
+
+    try:
+        # Navegamos por el pipeline: Pipeline -> Stacking -> Random Forest -> Árbol 0
+        stacking_clf = modelo.named_steps['model']
+        rf_clf = stacking_clf.estimators_[1]  # El índice 1 es el Random Forest
+        arbol_ejemplo = rf_clf.estimators_[0]  # Sacamos el primer árbol del bosque
+
+        plot_tree(arbol_ejemplo,
+                  feature_names=cols_sel,
+                  class_names=NOMBRES_CLASES,
+                  filled=True,
+                  rounded=True,
+                  max_depth=3,  # Limitamos a 3 niveles para que sea legible
+                  fontsize=10)
+
+        plt.title("Lógica de Decisión Radiómica (Muestra de 1 Árbol del Ensamble)", fontweight="bold", fontsize=16)
+        plt.tight_layout()
+        plt.savefig(os.path.join(CARPETA_METRICAS, "arbol_decision.png"), dpi=200)
+        plt.close()
+    except Exception as e:
+        print(f"  [ALERTA] No se pudo generar el gráfico de árbol: {e}")
+
+
+def comparar_modelos_individuales():
+    print("\n" + "=" * 70)
+    print(" INICIANDO TORNEO DE MODELOS INDIVIDUALES (BASELINES)")
+    print("=" * 70)
+
+    # 1. Preparar datos una sola vez para que la competencia sea justa
+    df_raw = pd.read_csv(RUTA_CSV)
+    X_all, y_orig, ids = preparar_datos(df_raw)
+    X_all = crear_features_derivadas(X_all)
+
+    print("Seleccionando las mejores características (RFECV) para el torneo...")
+    cols_sel = seleccionar_features(X_all, y_orig, usar_rfecv=True)
+    X_filt = X_all[cols_sel]
+
+    # Preparar Casos de Prueba (Holdout)
+    if os.path.exists(RUTA_PRUEBA):
+        df_prueba = pd.read_csv(RUTA_PRUEBA)
+        y_real_holdout = df_prueba["target_riesgo"].values
+        ids_holdout = df_prueba["Paciente_ID"].values
+        shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
+        cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto",
+                     "target_eje_largo"] + shape_cols + COLS_CLINICAS
+        X_prueba = df_prueba.drop(columns=[c for c in cols_drop if c in df_prueba.columns])
+        X_prueba = crear_features_derivadas(X_prueba).reindex(columns=cols_sel, fill_value=0)
+    else:
+        df_prueba = None
+
+    # 2. Definir los contendientes
+    modelos = {
+        "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=7, class_weight='balanced',
+                                                random_state=42),
+        "Decision Tree": DecisionTreeClassifier(max_depth=7, class_weight='balanced', random_state=42),
+        "SVM (SVC)": SVC(kernel='rbf', probability=True, class_weight='balanced', random_state=42),
+        "Reg. Logística": LogisticRegression(max_iter=2000, class_weight='balanced', solver='saga', random_state=42),
+        "XGBoost": XGBClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, random_state=42,
+                                 eval_metric='mlogloss'),
+        "Gradient Boost": GradientBoostingClassifier(n_estimators=200, max_depth=3, learning_rate=0.05,
+                                                     random_state=42),
+        "KNN": KNeighborsClassifier(n_neighbors=5, weights='distance'),
+        "Naive Bayes": GaussianNB()
+    }
+
+    diccionario_roc = {}
+    diccionario_mae = {}
+
+    # 3. Entrenar y Evaluar cada modelo
+    for nombre, modelo in modelos.items():
+        print(f"\n\n{'*' * 50}")
+        print(f" EVALUANDO: {nombre}")
+        print(f"{'*' * 50}")
+
+        skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=42)
+
+        all_y_true, all_y_pred, all_y_proba = [], [], []
+        train_f1s, test_f1s, train_accs = [], [], []
+
+        for train_idx, test_idx in skf.split(X_filt, y_orig):
+            X_tr, X_te = X_filt.iloc[train_idx], X_filt.iloc[test_idx]
+            y_tr, y_te = y_orig[train_idx], y_orig[test_idx]
+
+            # Escalar datos (vital para SVM, KNN, RegLog)
+            scaler = StandardScaler()
+            X_tr_sc = scaler.fit_transform(X_tr)
+            X_te_sc = scaler.transform(X_te)
+
+            clon = clone(modelo)
+            clon.fit(X_tr_sc, y_tr)
+
+            pred_tr = clon.predict(X_tr_sc)
+            pred_te = clon.predict(X_te_sc)
+            proba_te = clon.predict_proba(X_te_sc)
+
+            all_y_true.extend(y_te)
+            all_y_pred.extend(pred_te)
+            all_y_proba.extend(proba_te)
+
+            train_f1s.append(f1_score(y_tr, pred_tr, average='weighted'))
+            test_f1s.append(f1_score(y_te, pred_te, average='weighted'))
+            train_accs.append(accuracy_score(y_tr, pred_tr))
+
+        # Métricas Globales K-Fold
+        acc = accuracy_score(all_y_true, all_y_pred)
+        prec = precision_score(all_y_true, all_y_pred, average='weighted')
+        rec = recall_score(all_y_true, all_y_pred, average='weighted')
+        f1 = f1_score(all_y_true, all_y_pred, average='weighted')
+        mae = mean_absolute_error(all_y_true, all_y_pred)
+
+        cm = confusion_matrix(all_y_true, all_y_pred)
+        FN = cm.sum(axis=1) - np.diag(cm)
+        TN = cm.sum() - (cm.sum(axis=0) - np.diag(cm) + FN + np.diag(cm))
+        npv = np.mean(TN / (TN + FN))
+
+        t_f1 = np.mean(train_f1s)
+        t_acc = np.mean(train_accs)
+        gap = ((t_f1 - f1) / t_f1) * 100
+
+        # Guardar para gráficas combinadas
+        diccionario_mae[nombre] = mae
+        y_bin = label_binarize(all_y_true, classes=[0, 1, 2, 3])
+        all_y_proba = np.array(all_y_proba)
+        # ROC micro-average (ideal para comparar múltiples modelos multiclase de un vistazo)
+        fpr, tpr, _ = roc_curve(y_bin.ravel(), all_y_proba.ravel())
+        diccionario_roc[nombre] = (fpr, tpr, auc(fpr, tpr))
+
+        print(f" [Métricas de Clasificación Médica]")
+        print(f"  • Exactitud (Accuracy)      : {acc:.4f}")
+        print(f"  • Precisión Ponderada       : {prec:.4f}")
+        print(f"  • Sensibilidad (Recall)     : {rec:.4f}")
+        print(f"  • Valor Predictivo Neg. NPV : {npv:.4f}")
+        print(f"  • F1-Score Ponderado        : {f1:.4f}")
+        print(f"  • MAE Categórico (Escalones): {mae:.4f}")
+        print(f"\n [Diagnóstico de Aprendizaje y Sobreajuste]")
+        print(f"  • Train F1-Score            : {t_f1:.4f}")
+        print(f"  • Test F1-Score             : {f1:.4f}")
+        print(f"  • Train Accuracy            : {t_acc:.4f}")
+        print(f"  • Test Accuracy             : {acc:.4f}")
+        print(f"  • Gap de Sobreajuste (F1)   : {gap:.1f}%")
+
+        print("\nREPORTE DETALLADO POR CATEGORÍA:")
+        print(classification_report(all_y_true, all_y_pred, target_names=NOMBRES_CLASES))
+
+        # Evaluación Holdout (Casos de prueba)
+        if df_prueba is not None:
+            # Entrenar con todo el dataset para la prueba final
+            scaler_final = StandardScaler()
+            X_filt_sc = scaler_final.fit_transform(X_filt)
+            X_prueba_sc = scaler_final.transform(X_prueba)
+
+            modelo_final = clone(modelo)
+            modelo_final.fit(X_filt_sc, y_orig)
+
+            y_pred_h = modelo_final.predict(X_prueba_sc)
+            y_proba_h = modelo_final.predict_proba(X_prueba_sc)
+
+            acc_h = accuracy_score(y_real_holdout, y_pred_h)
+            f1_h = f1_score(y_real_holdout, y_pred_h, average='weighted')
+            mae_h = mean_absolute_error(y_real_holdout, y_pred_h)
+
+            print(f"\n [VERIFICACIÓN EN CASOS DE PRUEBA]")
+            print(f"  • Exactitud: {acc_h:.4f} | F1: {f1_h:.4f} | MAE Promedio: {mae_h:.2f} escalones")
+            for i, (pac, real, pred) in enumerate(zip(ids_holdout, y_real_holdout, y_pred_h)):
+                marca = "CORRECTO" if real == pred else "INCORRECTO"
+                err = abs(real - pred)
+                p = y_proba_h[i] * 100
+                print(
+                    f"   {marca} {pac}: Real={NOMBRES_CLASES[int(real)]:<10} | Pred={NOMBRES_CLASES[int(pred)]:<10} | Err: {err} | Probs: B:{p[0]:.0f}% M:{p[1]:.0f}% MA:{p[2]:.0f}% C:{p[3]:.0f}%")
+
+    # 4. Generar Gráficas Combinadas
+    # Gráfica ROC Combinada
+    plt.figure(figsize=(10, 8))
+    for nombre, (fpr, tpr, roc_auc) in diccionario_roc.items():
+        plt.plot(fpr, tpr, lw=2, label=f'{nombre} (AUC = {roc_auc:.3f})')
+    plt.plot([0, 1], [0, 1], 'k--', lw=1.5, alpha=0.5)
+    plt.xlabel('Tasa de Falsos Positivos (FPR)')
+    plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
+    plt.title('Comparativa ROC-AUC (Micro-Average) de Todos los Modelos', fontweight="bold")
+    plt.legend(loc="lower right")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_roc_combinado.png"), dpi=200)
+    plt.close()
+
+    # Gráfica MAE Combinada
+    plt.figure(figsize=(10, 6))
+    nombres_ordenados = sorted(diccionario_mae, key=diccionario_mae.get)
+    maes_ordenados = [diccionario_mae[n] for n in nombres_ordenados]
+
+    barras = plt.barh(nombres_ordenados, maes_ordenados, color='#3498db', edgecolor='white')
+    for barra, valor in zip(barras, maes_ordenados):
+        plt.text(valor + 0.005, barra.get_y() + barra.get_height() / 2, f'{valor:.3f}', va='center')
+    plt.xlabel('Error Medio Absoluto (MAE) en Escalones de Riesgo')
+    plt.title('Comparativa de Error de Gravedad', fontweight="bold")
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_mae_combinado.png"), dpi=200)
+    plt.close()
+
+    print(f"\n[!] Torneo finalizado. Gráficas combinadas guardadas en {CARPETA_METRICAS}")
+
+
 
 if __name__ == "__main__":
     entrenar_y_evaluar()
+    #comparar_modelos_individuales()

@@ -8,7 +8,7 @@ import sys
 from typing import List, Tuple
 
 # --- AJUSTE DE RUTAS ---
-ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ruta_raiz not in sys.path:
     sys.path.insert(0, ruta_raiz)
 
@@ -99,7 +99,7 @@ class MotorInferenciaNodeQuant:
             candidatos.append(exe_env)
 
         # 2) venv9 local del repositorio
-        candidatos.append(os.path.join(ruta_raiz, "venv9", "Scripts", "python.exe"))
+        candidatos.append(os.path.join(ruta_raiz, "sic_9", "Scripts", "python.exe"))
 
         # 3) Entorno Conda activo
         conda_prefix = os.environ.get("CONDA_PREFIX", "").strip()
@@ -109,7 +109,7 @@ class MotorInferenciaNodeQuant:
         # 4) Rutas comunes de Anaconda/Miniconda por usuario actual
         user_home = os.path.expanduser("~")
         bases_conda = ["anaconda3", "miniconda3"]
-        envs_conda = ["py39", "venv9", "nodequant", "radiomics", "base"]
+        envs_conda = ["sic_9", "py39", "venv9", "nodequant", "radiomics", "base"]
         for base in bases_conda:
             candidatos.append(os.path.join(user_home, base, "python.exe"))
             for env_name in envs_conda:

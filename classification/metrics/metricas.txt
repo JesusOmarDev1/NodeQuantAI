@@ -67,11 +67,11 @@ EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovat
   • F1-Score Ponderado   : 0.6000
 
   [Detalle del Veredicto por Paciente]
-   - case_0854: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
-   - case_0864: Real = Medio-Alto | Predicho = Moderado   -> ❌ FALLO
-   - case_0165: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
-   - case_0303: Real = Crítico    | Predicho = Crítico    -> ✅ ACIERTO
-   - case_0545: Real = Moderado   | Predicho = Medio-Alto -> ❌ FALLO
+   - case_0854: Real = Bajo       | Predicho = Bajo       -> ACIERTO
+   - case_0864: Real = Medio-Alto | Predicho = Moderado   -> FALLO
+   - case_0165: Real = Bajo       | Predicho = Bajo       -> ACIERTO
+   - case_0303: Real = Crítico    | Predicho = Crítico    -> ACIERTO
+   - case_0545: Real = Moderado   | Predicho = Medio-Alto -> FALLO
 
 
 
@@ -86,74 +86,418 @@ EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovat
 =====================================================================
 PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold) XGB, RF, GB, KNN, MLP
 =====================================================================
-C:\Users\korev\anaconda3\envs\sic\python.exe "C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\scripts\modelo_clasificacion.py"
-
 MODELADO PREDICTIVO (CLASIFICACIÓN MULTICLASE)
   Dataset: 508 pacientes | 96 features iniciales
         [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 15
-        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 14
+        [RFECV] ¡Completado! Número óptimo de características: 42
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 10
         [RFECV] Evaluando 61 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 12
+        [RFECV] ¡Completado! Número óptimo de características: 14
         [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 33
+        [RFECV] ¡Completado! Número óptimo de características: 24
         [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 41
+        [RFECV] ¡Completado! Número óptimo de características: 15
 
 =================================================================
        PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)
 =================================================================
  [Métricas de Clasificación Médica]
-  • Exactitud (Accuracy)      : 0.7480  (Aciertos totales)
-  • Precisión Ponderada       : 0.7486  (Fiabilidad cuando detecta algo)
-  • Sensibilidad (Recall)     : 0.7480  (Capacidad de no dejar ir positivos)
-  • Especificidad Macro       : 0.9160  (Capacidad de descartar sanos)
-  • Valor Predictivo Neg. NPV : 0.9160  (Seguridad de un diagnóstico negativo)
-  • F1-Score Ponderado        : 0.7482  (Balance Precisión/Sensibilidad)
+  • Exactitud (Accuracy)      : 0.7224  (Aciertos totales)
+  • Precisión Ponderada       : 0.7245  (Fiabilidad cuando detecta algo)
+  • Sensibilidad (Recall)     : 0.7224  (Capacidad de no dejar ir positivos)
+  • Especificidad Macro       : 0.9075  (Capacidad de descartar sanos)
+  • Valor Predictivo Neg. NPV : 0.9073  (Seguridad de un diagnóstico negativo)
+  • F1-Score Ponderado        : 0.7232  (Balance Precisión/Sensibilidad)
 
  [Métricas de Probabilidad y Robustez Estadistica]
-  • ROC-AUC (OVR)             : 0.9242  (Calidad probabilística)
-  • Coeficiente Matthews (MCC): 0.6641  (Correlación global de aciertos)
-  • Log Loss (Cross-Entropy)  : 0.6276  (Incertidumbre en las probabilidades)
+  • ROC-AUC (OVR)             : 0.9272  (Calidad probabilística)
+  • Coeficiente Matthews (MCC): 0.6301  (Correlación global de aciertos)
+  • Log Loss (Cross-Entropy)  : 0.6407  (Incertidumbre en las probabilidades)
 
  [Métricas de Gravedad Ordinal]
-  • Índice Kappa Cuadrático   : 0.8734  (Concordancia penalizando errores graves)
-  • MAE Categórico (Escalones): 0.2717  (Desviación promedio en niveles de riesgo)
+  • Índice Kappa Cuadrático   : 0.8559  (Concordancia penalizando errores graves)
+  • MAE Categórico (Escalones): 0.3012  (Desviación promedio en niveles de riesgo)
 
  [Diagnóstico de Aprendizaje y Sobreajuste]
-  • Train F1-Score            : 0.9587
-  • Test F1-Score             : 0.7482
-  • Train Accuracy            : 0.9587
-  • Test Accuracy             : 0.7480
-  • Gap de Sobreajuste (F1)   : 21.9%
+  • Train F1-Score            : 0.9539
+  • Test F1-Score             : 0.7232
+  • Train Accuracy            : 0.9537
+  • Test Accuracy             : 0.7224
+  • Gap de Sobreajuste (F1)   : 24.2%
 =================================================================
 
 REPORTE DETALLADO POR CATEGORÍA:
               precision    recall  f1-score   support
 
-        Bajo       0.87      0.87      0.87       127
-    Moderado       0.69      0.71      0.70       127
-  Medio-Alto       0.65      0.65      0.65       127
-     Crítico       0.78      0.76      0.77       127
+        Bajo       0.83      0.83      0.83       127
+    Moderado       0.64      0.67      0.65       127
+  Medio-Alto       0.64      0.65      0.64       127
+     Crítico       0.79      0.75      0.77       127
 
-    accuracy                           0.75       508
-   macro avg       0.75      0.75      0.75       508
-weighted avg       0.75      0.75      0.75       508
+    accuracy                           0.72       508
+   macro avg       0.72      0.72      0.72       508
+weighted avg       0.72      0.72      0.72       508
 
         [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 38
+        [RFECV] ¡Completado! Número óptimo de características: 13
 
-==================================================
- VERIFICACIÓN EN CASOS DE PRUEBA (5 pacientes)
-==================================================
+EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\joblib):
+  [OK] modelo_riesgo.joblib guardado (13 features)
+
+======================================================================
+ VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA (5 pacientes)
+======================================================================
+  [Métricas de Rendimiento Global Holdout]
   • Exactitud (Accuracy) : 0.6000
   • F1-Score Ponderado   : 0.6000
+  • Log Loss (Certeza)   : 0.8222 (Más cerca a 0 es mejor)
+  • Error Medio Global   : 0.40 escalones de riesgo en promedio
+  • Overfitting Holdout  : 37.1% (Caída respecto al Train)
 
-  [Detalle del Veredicto por Paciente]
-   - case_0854: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
-   - case_0864: Real = Medio-Alto | Predicho = Moderado   -> ❌ FALLO
-   - case_0165: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
-   - case_0303: Real = Crítico    | Predicho = Crítico    -> ✅ ACIERTO
-   - case_0545: Real = Moderado   | Predicho = Medio-Alto -> ❌ FALLO
+  [Análisis Forense por Paciente (Probabilidades y Error)]
+   case_0854 -> ACIERTO | Real: Bajo       | Pred: Bajo
+        ↳ Error: 0 escalón(es) | Bajo:90% | Mod:7% | M-A:2% | Cri:1%
+   case_0864 -> FALLO | Real: Medio-Alto | Pred: Moderado
+        ↳ Error: 1 escalón(es) | Bajo:8% | Mod:64% | M-A:23% | Cri:5%
+   case_0165 -> ACIERTO | Real: Bajo       | Pred: Bajo
+        ↳ Error: 0 escalón(es) | Bajo:57% | Mod:31% | M-A:8% | Cri:4%
+   case_0303 -> ACIERTO | Real: Crítico    | Pred: Crítico
+        ↳ Error: 0 escalón(es) | Bajo:1% | Mod:2% | M-A:9% | Cri:87%
+   case_0545 -> FALLO | Real: Moderado   | Pred: Medio-Alto
+        ↳ Error: 1 escalón(es) | Bajo:3% | Mod:16% | M-A:73% | Cri:9%
 
+
+
+
+
+
+
+
+
+======================================================================
+ INICIANDO TORNEO DE MODELOS INDIVIDUALES (BASELINES)
+======================================================================
+Seleccionando las mejores características (RFECV) para el torneo...
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 13
+
+
+**************************************************
+ EVALUANDO: Random Forest
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7618
+  • Precisión Ponderada       : 0.7634
+  • Sensibilidad (Recall)     : 0.7618
+  • Valor Predictivo Neg. NPV : 0.9207
+  • F1-Score Ponderado        : 0.7620
+  • MAE Categórico (Escalones): 0.2598
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9585
+  • Test F1-Score             : 0.7620
+  • Train Accuracy            : 0.9582
+  • Test Accuracy             : 0.7618
+  • Gap de Sobreajuste (F1)   : 20.5%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.84      0.87      0.86       127
+    Moderado       0.68      0.72      0.70       127
+  Medio-Alto       0.69      0.68      0.69       127
+     Crítico       0.84      0.77      0.80       127
+
+    accuracy                           0.76       508
+   macro avg       0.76      0.76      0.76       508
+weighted avg       0.76      0.76      0.76       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.6000 | F1: 0.6000 | MAE Promedio: 0.40 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:95% M:5% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:10% M:70% MA:17% C:3%
+   case_0165: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:52% M:28% MA:18% C:2%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:5% C:95%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:3% M:32% MA:63% C:2%
+
+
+**************************************************
+ EVALUANDO: Decision Tree
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.6988
+  • Precisión Ponderada       : 0.7003
+  • Sensibilidad (Recall)     : 0.6988
+  • Valor Predictivo Neg. NPV : 0.8997
+  • F1-Score Ponderado        : 0.6989
+  • MAE Categórico (Escalones): 0.3484
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9275
+  • Test F1-Score             : 0.6989
+  • Train Accuracy            : 0.9272
+  • Test Accuracy             : 0.6988
+  • Gap de Sobreajuste (F1)   : 24.6%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.83      0.80      0.82       127
+    Moderado       0.62      0.57      0.59       127
+  Medio-Alto       0.61      0.68      0.64       127
+     Crítico       0.74      0.75      0.75       127
+
+    accuracy                           0.70       508
+   macro avg       0.70      0.70      0.70       508
+weighted avg       0.70      0.70      0.70       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.4000 | F1: 0.4667 | MAE Promedio: 0.80 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:100% M:0% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:2% M:93% MA:5% C:0%
+   case_0165: Real=Bajo       | Pred=Medio-Alto | Err: 2 | Probs: B:0% M:0% MA:100% C:0%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:0% C:100%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:25% MA:75% C:0%
+
+
+**************************************************
+ EVALUANDO: SVM (SVC)
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7559
+  • Precisión Ponderada       : 0.7586
+  • Sensibilidad (Recall)     : 0.7559
+  • Valor Predictivo Neg. NPV : 0.9186
+  • F1-Score Ponderado        : 0.7565
+  • MAE Categórico (Escalones): 0.2657
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.7882
+  • Test F1-Score             : 0.7565
+  • Train Accuracy            : 0.7874
+  • Test Accuracy             : 0.7559
+  • Gap de Sobreajuste (F1)   : 4.0%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.85      0.83      0.84       127
+    Moderado       0.67      0.75      0.71       127
+  Medio-Alto       0.69      0.66      0.68       127
+     Crítico       0.81      0.78      0.80       127
+
+    accuracy                           0.76       508
+   macro avg       0.76      0.76      0.76       508
+weighted avg       0.76      0.76      0.76       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.4000 | F1: 0.4667 | MAE Promedio: 0.60 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:92% M:7% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:3% M:65% MA:30% C:3%
+   case_0165: Real=Bajo       | Pred=Moderado   | Err: 1 | Probs: B:42% M:51% MA:6% C:1%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:8% C:92%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:3% M:20% MA:72% C:5%
+
+
+**************************************************
+ EVALUANDO: Reg. Logística
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7382
+  • Precisión Ponderada       : 0.7375
+  • Sensibilidad (Recall)     : 0.7382
+  • Valor Predictivo Neg. NPV : 0.9129
+  • F1-Score Ponderado        : 0.7376
+  • MAE Categórico (Escalones): 0.2894
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.7812
+  • Test F1-Score             : 0.7376
+  • Train Accuracy            : 0.7810
+  • Test Accuracy             : 0.7382
+  • Gap de Sobreajuste (F1)   : 5.6%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.84      0.87      0.85       127
+    Moderado       0.67      0.70      0.69       127
+  Medio-Alto       0.66      0.63      0.64       127
+     Crítico       0.78      0.76      0.77       127
+
+    accuracy                           0.74       508
+   macro avg       0.74      0.74      0.74       508
+weighted avg       0.74      0.74      0.74       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.4000 | F1: 0.4667 | MAE Promedio: 0.60 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:88% M:12% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:3% M:60% MA:35% C:2%
+   case_0165: Real=Bajo       | Pred=Moderado   | Err: 1 | Probs: B:32% M:60% MA:7% C:0%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:11% C:89%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:12% MA:88% C:0%
+
+
+**************************************************
+ EVALUANDO: XGBoost
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7441
+  • Precisión Ponderada       : 0.7432
+  • Sensibilidad (Recall)     : 0.7441
+  • Valor Predictivo Neg. NPV : 0.9148
+  • F1-Score Ponderado        : 0.7436
+  • MAE Categórico (Escalones): 0.2776
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9906
+  • Test F1-Score             : 0.7436
+  • Train Accuracy            : 0.9906
+  • Test Accuracy             : 0.7441
+  • Gap de Sobreajuste (F1)   : 24.9%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.84      0.85      0.85       127
+    Moderado       0.67      0.65      0.66       127
+  Medio-Alto       0.66      0.66      0.66       127
+     Crítico       0.80      0.81      0.80       127
+
+    accuracy                           0.74       508
+   macro avg       0.74      0.74      0.74       508
+weighted avg       0.74      0.74      0.74       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.6000 | F1: 0.6000 | MAE Promedio: 0.40 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:97% M:3% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:3% M:90% MA:6% C:1%
+   case_0165: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:53% M:13% MA:33% C:1%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:1% C:99%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:7% M:6% MA:87% C:0%
+
+
+**************************************************
+ EVALUANDO: Gradient Boost
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7323
+  • Precisión Ponderada       : 0.7318
+  • Sensibilidad (Recall)     : 0.7323
+  • Valor Predictivo Neg. NPV : 0.9108
+  • F1-Score Ponderado        : 0.7320
+  • MAE Categórico (Escalones): 0.2913
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 1.0000
+  • Test F1-Score             : 0.7320
+  • Train Accuracy            : 1.0000
+  • Test Accuracy             : 0.7323
+  • Gap de Sobreajuste (F1)   : 26.8%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.84      0.84      0.84       127
+    Moderado       0.67      0.65      0.66       127
+  Medio-Alto       0.65      0.65      0.65       127
+     Crítico       0.77      0.78      0.78       127
+
+    accuracy                           0.73       508
+   macro avg       0.73      0.73      0.73       508
+weighted avg       0.73      0.73      0.73       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.6000 | F1: 0.6000 | MAE Promedio: 0.40 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:98% M:2% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:1% M:97% MA:2% C:0%
+   case_0165: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:77% M:2% MA:20% C:1%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:1% C:99%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:2% M:11% MA:87% C:0%
+
+
+**************************************************
+ EVALUANDO: KNN
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.6909
+  • Precisión Ponderada       : 0.6862
+  • Sensibilidad (Recall)     : 0.6909
+  • Valor Predictivo Neg. NPV : 0.8977
+  • F1-Score Ponderado        : 0.6879
+  • MAE Categórico (Escalones): 0.3465
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 1.0000
+  • Test F1-Score             : 0.6879
+  • Train Accuracy            : 1.0000
+  • Test Accuracy             : 0.6909
+  • Gap de Sobreajuste (F1)   : 31.2%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.77      0.83      0.80       127
+    Moderado       0.57      0.54      0.56       127
+  Medio-Alto       0.64      0.59      0.61       127
+     Crítico       0.77      0.80      0.78       127
+
+    accuracy                           0.69       508
+   macro avg       0.69      0.69      0.69       508
+weighted avg       0.69      0.69      0.69       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.6000 | F1: 0.6000 | MAE Promedio: 0.40 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:100% M:0% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:17% M:42% MA:41% C:0%
+   case_0165: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:59% M:41% MA:0% C:0%
+   case_0303: Real=Crítico    | Pred=Crítico    | Err: 0 | Probs: B:0% M:0% MA:0% C:100%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:18% MA:82% C:0%
+
+
+**************************************************
+ EVALUANDO: Naive Bayes
+**************************************************
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.6870
+  • Precisión Ponderada       : 0.7097
+  • Sensibilidad (Recall)     : 0.6870
+  • Valor Predictivo Neg. NPV : 0.8986
+  • F1-Score Ponderado        : 0.6813
+  • MAE Categórico (Escalones): 0.3622
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.6827
+  • Test F1-Score             : 0.6813
+  • Train Accuracy            : 0.6900
+  • Test Accuracy             : 0.6870
+  • Gap de Sobreajuste (F1)   : 0.2%
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.79      0.92      0.85       127
+    Moderado       0.59      0.74      0.66       127
+  Medio-Alto       0.59      0.60      0.59       127
+     Crítico       0.87      0.49      0.63       127
+
+    accuracy                           0.69       508
+   macro avg       0.71      0.69      0.68       508
+weighted avg       0.71      0.69      0.68       508
+
+
+ [VERIFICACIÓN EN CASOS DE PRUEBA]
+  • Exactitud: 0.4000 | F1: 0.4000 | MAE Promedio: 0.60 escalones
+   case_0854: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:100% M:0% MA:0% C:0%
+   case_0864: Real=Medio-Alto | Pred=Moderado   | Err: 1 | Probs: B:0% M:100% MA:0% C:0%
+   case_0165: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:85% M:15% MA:0% C:0%
+   case_0303: Real=Crítico    | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:0% MA:82% C:18%
+   case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:0% MA:100% C:0%
