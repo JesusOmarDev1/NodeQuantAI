@@ -1,0 +1,159 @@
+=================================================================
+   PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold) XGB, RF, GB
+=================================================================
+MODELADO PREDICTIVO (CLASIFICACIÓN MULTICLASE)
+  Dataset: 508 pacientes | 96 features iniciales
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 25
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 14
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 29
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 11
+
+=================================================================
+       PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)
+=================================================================
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7539  (Aciertos totales)
+  • Precisión Ponderada       : 0.7562  (Fiabilidad cuando detecta algo)
+  • Sensibilidad (Recall)     : 0.7539  (Capacidad de no dejar ir positivos)
+  • Especificidad Macro       : 0.9180  (Capacidad de descartar sanos)
+  • Valor Predictivo Neg. NPV : 0.9178  (Seguridad de un diagnóstico negativo)
+  • F1-Score Ponderado        : 0.7548  (Balance Precisión/Sensibilidad)
+
+ [Métricas de Probabilidad y Robustez Estadistica]
+  • ROC-AUC (OVR)             : 0.9280  (Calidad probabilística)
+  • Coeficiente Matthews (MCC): 0.6721  (Correlación global de aciertos)
+  • Log Loss (Cross-Entropy)  : 0.6158  (Incertidumbre en las probabilidades)
+
+ [Métricas de Gravedad Ordinal]
+  • Índice Kappa Cuadrático   : 0.8792  (Concordancia penalizando errores graves)
+  • MAE Categórico (Escalones): 0.2638  (Desviación promedio en niveles de riesgo)
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9215
+  • Test F1-Score             : 0.7548
+  • Train Accuracy            : 0.9213
+  • Test Accuracy             : 0.7539
+  • Gap de Sobreajuste (F1)   : 18.1%
+=================================================================
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.86      0.85      0.85       127
+    Moderado       0.65      0.70      0.68       127
+  Medio-Alto       0.69      0.67      0.68       127
+     Crítico       0.83      0.80      0.81       127
+
+    accuracy                           0.75       508
+   macro avg       0.76      0.75      0.75       508
+weighted avg       0.76      0.75      0.75       508
+
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 10
+
+EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\joblib):
+  [OK] modelo_riesgo.joblib guardado (10 features)
+
+==================================================
+ VERIFICACIÓN EN CASOS DE PRUEBA (5 pacientes)
+==================================================
+  • Exactitud (Accuracy) : 0.6000
+  • F1-Score Ponderado   : 0.6000
+
+  [Detalle del Veredicto por Paciente]
+   - case_0854: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
+   - case_0864: Real = Medio-Alto | Predicho = Moderado   -> ❌ FALLO
+   - case_0165: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
+   - case_0303: Real = Crítico    | Predicho = Crítico    -> ✅ ACIERTO
+   - case_0545: Real = Moderado   | Predicho = Medio-Alto -> ❌ FALLO
+
+
+
+
+
+
+
+
+
+
+
+=====================================================================
+PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold) XGB, RF, GB, KNN, MLP
+=====================================================================
+C:\Users\korev\anaconda3\envs\sic\python.exe "C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\scripts\modelo_clasificacion.py"
+
+MODELADO PREDICTIVO (CLASIFICACIÓN MULTICLASE)
+  Dataset: 508 pacientes | 96 features iniciales
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 15
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 14
+        [RFECV] Evaluando 61 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 33
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 41
+
+=================================================================
+       PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)
+=================================================================
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.7480  (Aciertos totales)
+  • Precisión Ponderada       : 0.7486  (Fiabilidad cuando detecta algo)
+  • Sensibilidad (Recall)     : 0.7480  (Capacidad de no dejar ir positivos)
+  • Especificidad Macro       : 0.9160  (Capacidad de descartar sanos)
+  • Valor Predictivo Neg. NPV : 0.9160  (Seguridad de un diagnóstico negativo)
+  • F1-Score Ponderado        : 0.7482  (Balance Precisión/Sensibilidad)
+
+ [Métricas de Probabilidad y Robustez Estadistica]
+  • ROC-AUC (OVR)             : 0.9242  (Calidad probabilística)
+  • Coeficiente Matthews (MCC): 0.6641  (Correlación global de aciertos)
+  • Log Loss (Cross-Entropy)  : 0.6276  (Incertidumbre en las probabilidades)
+
+ [Métricas de Gravedad Ordinal]
+  • Índice Kappa Cuadrático   : 0.8734  (Concordancia penalizando errores graves)
+  • MAE Categórico (Escalones): 0.2717  (Desviación promedio en niveles de riesgo)
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9587
+  • Test F1-Score             : 0.7482
+  • Train Accuracy            : 0.9587
+  • Test Accuracy             : 0.7480
+  • Gap de Sobreajuste (F1)   : 21.9%
+=================================================================
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.87      0.87      0.87       127
+    Moderado       0.69      0.71      0.70       127
+  Medio-Alto       0.65      0.65      0.65       127
+     Crítico       0.78      0.76      0.77       127
+
+    accuracy                           0.75       508
+   macro avg       0.75      0.75      0.75       508
+weighted avg       0.75      0.75      0.75       508
+
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 38
+
+==================================================
+ VERIFICACIÓN EN CASOS DE PRUEBA (5 pacientes)
+==================================================
+  • Exactitud (Accuracy) : 0.6000
+  • F1-Score Ponderado   : 0.6000
+
+  [Detalle del Veredicto por Paciente]
+   - case_0854: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
+   - case_0864: Real = Medio-Alto | Predicho = Moderado   -> ❌ FALLO
+   - case_0165: Real = Bajo       | Predicho = Bajo       -> ✅ ACIERTO
+   - case_0303: Real = Crítico    | Predicho = Crítico    -> ✅ ACIERTO
+   - case_0545: Real = Moderado   | Predicho = Medio-Alto -> ❌ FALLO
+

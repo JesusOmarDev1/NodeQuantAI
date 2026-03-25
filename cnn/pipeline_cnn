@@ -1,6 +1,0 @@
-PIPELINE CNN
-
-Ejecutar en Python 3.11
-. dataset_medico	- Carga los NIfTIs reales y recorta los parches 3D
-. modelo_unet3d		- Estructura de la Red Neuronal Convolucional
-. training		- Entrenamiento de la CNN

@@ -4,15 +4,15 @@
     "use_log": false,
     "n_features_esperadas": 10,
     "features_entrada": [
-        "glszm_ZoneEntropy",
-        "glszm_SizeZoneNonUniformity",
-        "glszm_LargeAreaEmphasis",
-        "gldm_GrayLevelNonUniformity",
-        "glszm_LargeAreaHighGrayLevelEmphasis",
-        "firstorder_TotalEnergy",
-        "firstorder_10Percentile",
+        "glszm_ZoneVariance",
         "glrlm_GrayLevelNonUniformity",
+        "glszm_ZoneEntropy",
+        "glszm_SmallAreaLowGrayLevelEmphasis",
         "glrlm_RunLengthNonUniformity",
-        "glszm_GrayLevelNonUniformity"
+        "gldm_GrayLevelNonUniformity",
+        "log_Energy",
+        "glszm_GrayLevelNonUniformity",
+        "gldm_DependenceNonUniformity",
+        "glszm_SizeZoneNonUniformity"
     ]
 }
