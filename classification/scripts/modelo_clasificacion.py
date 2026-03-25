@@ -36,8 +36,6 @@ from sklearn.metrics import (
     roc_curve, auc, precision_recall_curve, average_precision_score
 )
 from xgboost import XGBClassifier
-#from sklearn.neighbors import KNeighborsClassifier
-#from sklearn.neural_network import MLPClassifier
 
 from classification.scripts.optimizar_classification import seleccionar_features_rfecv
 
@@ -89,8 +87,6 @@ def _crear_stacking_pipeline():
         ("gb", GradientBoostingClassifier(
             n_estimators=200, max_depth=3, learning_rate=0.05,
             random_state=42)),
-        #("knn", KNeighborsClassifier(n_neighbors=5, weights='distance')),
-        #("mlp", MLPClassifier(hidden_layer_sizes=(50,), max_iter=500, random_state=42)),
     ]
     pipe = Pipeline([
         ("scaler", StandardScaler()),
