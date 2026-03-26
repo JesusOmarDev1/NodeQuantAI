@@ -20,7 +20,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
+from sklearn.model_selection import StratifiedKFold
+import optuna
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler, label_binarize
 from sklearn.ensemble import (
     RandomForestClassifier, GradientBoostingClassifier, StackingClassifier,
@@ -43,6 +46,9 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import VotingClassifier
+
+# Silenciamos Optuna para que no llene la consola de texto
+optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 #from classification.scripts.optimizar_classification import seleccionar_features_rfecv
 from optimizar_classification import seleccionar_features_rfecv
@@ -216,12 +222,41 @@ def preparar_datos(df_raw):
 # ===========================================================================
 #  Entrenamiento y evaluacion
 # ===========================================================================
+def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
+    """Utiliza Optimización Bayesiana para encontrar los hiperparámetros perfectos."""
+    def objective(trial):
+        pipe = clone(pipe_tmpl)
+        # Optuna sugiere parámetros inteligentemente basado en intentos anteriores
+        pipe.set_params(
+            lasso_filter__estimator__C=trial.suggest_float("lasso_C", 0.01, 1.0, log=True),
+            model__rf__max_depth=trial.suggest_int("rf_depth", 3, 7),
+            model__xgb__learning_rate=trial.suggest_float("xgb_lr", 0.01, 0.1, log=True),
+            model__xgb__max_depth=trial.suggest_int("xgb_depth", 2, 4),
+            model__mlp__alpha=trial.suggest_float("mlp_alpha", 0.0001, 0.01, log=True)
+        )
+        # Evaluamos qué tan buena fue esta combinación
+        return cross_val_score(pipe, X_train, y_train, cv=2, scoring="f1_weighted", n_jobs=-1).mean()
+
+    estudio = optuna.create_study(direction="maximize")
+    estudio.optimize(objective, n_trials=n_trials)
+
+    # Reconstruimos el pipeline con los parámetros ganadores
+    mejor_pipe = clone(pipe_tmpl)
+    mejor_pipe.set_params(
+        lasso_filter__estimator__C=estudio.best_params["lasso_C"],
+        model__rf__max_depth=estudio.best_params["rf_depth"],
+        model__xgb__learning_rate=estudio.best_params["xgb_lr"],
+        model__xgb__max_depth=estudio.best_params["xgb_depth"],
+        model__mlp__alpha=estudio.best_params["mlp_alpha"]
+    )
+    return mejor_pipe
+
 def entrenar_y_evaluar():
     df_raw = pd.read_csv(RUTA_CSV)
     X_all, y_orig, ids = preparar_datos(df_raw)
     X_all = crear_features_derivadas(X_all)
 
-    print(f"\nMODELADO PREDICTIVO (SOFT VOTING + MLP)")
+    print(f"\nMODELADO PREDICTIVO SVoting + MLP + Optuna)")
     print(f"  Dataset: {len(X_all)} pacientes | {X_all.shape[1]} features iniciales")
 
     pipe_tmpl, nombre_modelo = _crear_voting_pipeline()
@@ -246,20 +281,16 @@ def entrenar_y_evaluar():
 
         fold_pipe = clone(pipe_tmpl)
 
-        param_grid = {
-            "lasso_filter__estimator__C": [0.01, 0.1, 1.0],
-            "model__rf__max_depth": [3, 5],
-            "model__xgb__learning_rate": [0.01, 0.05],
-            "model__xgb__max_depth": [2, 3],
-            "model__mlp__alpha": [0.0001, 0.01]
-        }
+        # 1. Búsqueda Inteligente con Optuna (5 intentos precisos por doblez)
+        mejor_pipe_base = optimizar_con_optuna(X_tr, y_tr, fold_pipe, n_trials=5)
 
-        search = RandomizedSearchCV(
-            fold_pipe, param_distributions=param_grid,
-            n_iter=5, cv=2, scoring="f1_weighted", random_state=42, n_jobs=1
-        )
-        search.fit(X_tr, y_tr)
-        fold_pipe = search.best_estimator_
+        # 2. Calibración de Probabilidades (Platt Scaling / Sigmoid)
+        # Esto afina las probabilidades para que sean clínicamente exactas
+        calibrador = CalibratedClassifierCV(estimator=mejor_pipe_base, method='sigmoid', cv=2)
+        calibrador.fit(X_tr, y_tr)
+
+        # El calibrador se convierte en nuestro nuevo fold_pipe
+        fold_pipe = calibrador
 
         # Predicciones de clase y probabilidades
         pred_tr = fold_pipe.predict(X_tr)
@@ -348,16 +379,21 @@ def entrenar_y_evaluar():
     X_final = X_all[cols_sel_final]
 
     pipe_base_final = clone(pipe_tmpl)
-    search_final = RandomizedSearchCV(
-        pipe_base_final, param_distributions=param_grid,
-        n_iter=10, cv=3, scoring="f1_weighted", random_state=42, n_jobs=-1
-    )
-    search_final.fit(X_final, y_orig)
-    pipe_final = search_final.best_estimator_
 
-    imp_dict = _extraer_importances_voting(pipe_final, list(X_final.columns))
+    # 1. Optuna exhaustivo para el modelo final (20 intentos de alta precisión)
+    print("\n  [Optuna] Buscando hiperparámetros óptimos para producción...")
+    mejor_pipe_final_base = optimizar_con_optuna(X_final, y_orig, pipe_base_final, n_trials=20)
+
+    # 2. Calibración del modelo maestro
+    pipe_final = CalibratedClassifierCV(estimator=mejor_pipe_final_base, method='sigmoid', cv=3)
+    pipe_final.fit(X_final, y_orig)
+
+    # 3. Extracción de Importancias (Atravesando la envoltura del Calibrador)
+    pipeline_interno = pipe_final.calibrated_classifiers_[0].estimator
+    imp_dict = _extraer_importances_voting(pipeline_interno, list(X_final.columns))
     top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
 
+    # 4. Generación de Gráficas Globales
     generar_matriz_confusion(all_y_true, all_y_pred)
     generar_grafica_importancias(top_features)
     generar_curvas_roc(all_y_true, all_y_proba)
@@ -544,7 +580,8 @@ def generar_grafico_arbol(modelo, cols_sel):
 
     try:
         # Navegamos por el pipeline: Pipeline -> Voting -> Random Forest -> Árbol 0
-        voting_clf = modelo.named_steps['model']
+        pipeline_interno = modelo.calibrated_classifiers_[0].estimator
+        voting_clf = pipeline_interno.named_steps['model']
         rf_clf = voting_clf.named_estimators_['rf']  # Busca directamente al Random Forest
         arbol_ejemplo = rf_clf.estimators_[0]  # Sacamos el primer árbol del bosque
 
