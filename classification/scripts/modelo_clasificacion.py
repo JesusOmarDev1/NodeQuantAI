@@ -256,7 +256,7 @@ def entrenar_y_evaluar():
     X_all, y_orig, ids = preparar_datos(df_raw)
     X_all = crear_features_derivadas(X_all)
 
-    print(f"\nMODELADO PREDICTIVO SVoting + MLP + Optuna)")
+    print(f"\nMODELADO PREDICTIVO (SVoting + MLP + Optuna + Platt Scaling)")
     print(f"  Dataset: {len(X_all)} pacientes | {X_all.shape[1]} features iniciales")
 
     pipe_tmpl, nombre_modelo = _crear_voting_pipeline()

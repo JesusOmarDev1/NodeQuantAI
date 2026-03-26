@@ -1,4 +1,95 @@
 =================================================================
+   PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS SVoting + MLP + Optuna + Platt Scaling
+=================================================================
+  Dataset: 508 pacientes | 96 features iniciales
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 33
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 8
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 20
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 19
+        [RFECV] Evaluando 64 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 60
+
+=================================================================
+       PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)
+=================================================================
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.8366
+  • Precisión Ponderada       : 0.8389
+  • Sensibilidad (Recall)     : 0.8366
+  • Especificidad Macro       : 0.9046
+  • Valor Predictivo Neg. NPV : 0.9115
+  • F1-Score Ponderado        : 0.8361
+
+ [Métricas de Probabilidad y Robustez Estadistica]
+  • ROC-AUC (OVR)             : 0.9354
+  • Coeficiente Matthews (MCC): 0.7360
+  • Log Loss (Cross-Entropy)  : 0.4296
+
+ [Métricas de Gravedad Ordinal]
+  • Índice Kappa Cuadrático   : 0.8296
+  • MAE Categórico (Escalones): 0.1634
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9172
+  • Test F1-Score             : 0.8361
+  • Train Accuracy            : 0.9173
+  • Test Accuracy             : 0.8366
+  • Gap de Sobreajuste (F1)   : 8.8%
+=================================================================
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.87      0.83      0.85       127
+  Intermedio       0.81      0.88      0.84       254
+     Crítico       0.86      0.76      0.81       127
+
+    accuracy                           0.84       508
+   macro avg       0.85      0.82      0.83       508
+weighted avg       0.84      0.84      0.84       508
+
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 26
+
+  [Optuna] Buscando hiperparámetros óptimos para producción...
+
+EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\joblib):
+  [OK] modelo_riesgo.joblib guardado (26 features)
+  [ALERTA] No se pudo generar el gráfico de árbol: 'CalibratedClassifierCV' object has no attribute 'named_steps'
+
+======================================================================
+ VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA (5 pacientes)
+======================================================================
+  [Métricas de Rendimiento Global Holdout]
+  • Exactitud (Accuracy) : 0.8000
+  • F1-Score Ponderado   : 0.7867
+  • Log Loss (Certeza)   : 0.2503
+  • Error Medio Global   : 0.20 escalones de riesgo en promedio
+  • Overfitting Holdout  : 14.2% (Caída respecto al Train)
+
+  [Análisis Forense por Paciente]
+   case_0854 -> ACIERTO | Real: Bajo       | Pred: Bajo
+        ↳ Error: 0 escalón(es) | Bajo:87% | Int:10% | Cri:3%
+   case_0864 -> ACIERTO | Real: Intermedio | Pred: Intermedio
+        ↳ Error: 0 escalón(es) | Bajo:5% | Int:91% | Cri:4%
+   case_0165 -> FALLO | Real: Bajo       | Pred: Intermedio
+        ↳ Error: 1 escalón(es) | Bajo:44% | Int:52% | Cri:4%
+   case_0303 -> ACIERTO | Real: Crítico    | Pred: Crítico
+        ↳ Error: 0 escalón(es) | Bajo:3% | Int:7% | Cri:90%
+   case_0545 -> ACIERTO | Real: Intermedio | Pred: Intermedio
+        ↳ Error: 0 escalón(es) | Bajo:5% | Int:91% | Cri:3%
+
+
+
+
+
+
+
+=================================================================
    PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS Soft Voting + MLP + RandomizedSearchCV
 =================================================================
   Dataset: 508 pacientes | 96 features iniciales
