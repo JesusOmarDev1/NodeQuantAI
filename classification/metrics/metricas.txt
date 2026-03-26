@@ -1,4 +1,92 @@
 =================================================================
+   PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS Soft Voting + MLP + RandomizedSearchCV
+=================================================================
+  Dataset: 508 pacientes | 96 features iniciales
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 43
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 10
+        [RFECV] Evaluando 60 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 43
+        [RFECV] Evaluando 63 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 25
+        [RFECV] Evaluando 64 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 57
+
+=================================================================
+       PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)
+=================================================================
+ [Métricas de Clasificación Médica]
+  • Exactitud (Accuracy)      : 0.8327
+  • Precisión Ponderada       : 0.8337
+  • Sensibilidad (Recall)     : 0.8327
+  • Especificidad Macro       : 0.9038
+  • Valor Predictivo Neg. NPV : 0.9092
+  • F1-Score Ponderado        : 0.8321
+
+ [Métricas de Probabilidad y Robustez Estadistica]
+  • ROC-AUC (OVR)             : 0.9317
+  • Coeficiente Matthews (MCC): 0.7298
+  • Log Loss (Cross-Entropy)  : 0.4360
+
+ [Métricas de Gravedad Ordinal]
+  • Índice Kappa Cuadrático   : 0.8147
+  • MAE Categórico (Escalones): 0.1713
+
+ [Diagnóstico de Aprendizaje y Sobreajuste]
+  • Train F1-Score            : 0.9813
+  • Test F1-Score             : 0.8321
+  • Train Accuracy            : 0.9813
+  • Test Accuracy             : 0.8327
+  • Gap de Sobreajuste (F1)   : 15.2%
+=================================================================
+
+REPORTE DETALLADO POR CATEGORÍA:
+              precision    recall  f1-score   support
+
+        Bajo       0.86      0.83      0.85       127
+  Intermedio       0.82      0.87      0.84       254
+     Crítico       0.84      0.76      0.80       127
+
+    accuracy                           0.83       508
+   macro avg       0.84      0.82      0.83       508
+weighted avg       0.83      0.83      0.83       508
+
+        [RFECV] Evaluando 62 features para encontrar el subset óptimo (F1-Score)...
+        [RFECV] ¡Completado! Número óptimo de características: 38
+
+EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\joblib):
+  [OK] modelo_riesgo.joblib guardado (38 features)
+
+======================================================================
+ VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA (5 pacientes)
+======================================================================
+  [Métricas de Rendimiento Global Holdout]
+  • Exactitud (Accuracy) : 0.8000
+  • F1-Score Ponderado   : 0.7867
+  • Log Loss (Certeza)   : 0.3266
+  • Error Medio Global   : 0.20 escalones de riesgo en promedio
+  • Overfitting Holdout  : 19.8% (Caída respecto al Train)
+
+  [Análisis Forense por Paciente]
+   case_0854 -> ACIERTO | Real: Bajo       | Pred: Bajo
+        ↳ Error: 0 escalón(es) | Bajo:80% | Int:19% | Cri:1%
+   case_0864 -> ACIERTO | Real: Intermedio | Pred: Intermedio
+        ↳ Error: 0 escalón(es) | Bajo:11% | Int:83% | Cri:6%
+   case_0165 -> FALLO | Real: Bajo       | Pred: Intermedio
+        ↳ Error: 1 escalón(es) | Bajo:38% | Int:59% | Cri:3%
+   case_0303 -> ACIERTO | Real: Crítico    | Pred: Crítico
+        ↳ Error: 0 escalón(es) | Bajo:1% | Int:6% | Cri:93%
+   case_0545 -> ACIERTO | Real: Intermedio | Pred: Intermedio
+        ↳ Error: 0 escalón(es) | Bajo:13% | Int:84% | Cri:4%
+
+
+
+
+
+
+
+=================================================================
    PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold) XGB, RF, GB
 =================================================================
 MODELADO PREDICTIVO (CLASIFICACIÓN MULTICLASE)
