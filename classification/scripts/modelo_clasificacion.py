@@ -37,15 +37,12 @@ from sklearn.metrics import (
 )
 
 from xgboost import XGBClassifier
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import log_loss, matthews_corrcoef
-
-from sklearn.tree import plot_tree
+from sklearn.ensemble import VotingClassifier
 
 #from classification.scripts.optimizar_classification import seleccionar_features_rfecv
 from optimizar_classification import seleccionar_features_rfecv
@@ -70,7 +67,7 @@ CORR_UMBRAL = 0.03
 INTER_CORR_UMBRAL = 0.98
 
 COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
-NOMBRES_CLASES = ["Bajo", "Moderado", "Medio-Alto", "Crítico"]
+NOMBRES_CLASES = ["Bajo", "Intermedio", "Crítico"]
 
 # Estilo global matplotlib
 plt.rcParams.update({
@@ -81,58 +78,61 @@ plt.rcParams.update({
     "grid.alpha": 0.3,
 })
 
+
 # ===========================================================================
-#  Stacking Pipeline (Clasificación)
+#  Soft Voting + Red Neuronal
 # ===========================================================================
-def _crear_stacking_pipeline():
+def _crear_voting_pipeline():
     estimators = [
         ("xgb", XGBClassifier(
             n_estimators=200, max_depth=3, learning_rate=0.05,
             subsample=0.8, colsample_bytree=0.8,
-            random_state=42, eval_metric='mlogloss', n_jobs=2)),
+            random_state=42, eval_metric='mlogloss')),
         ("rf", RandomForestClassifier(
             n_estimators=200, max_depth=7,
             class_weight='balanced',
-            random_state=42, n_jobs=2)),
+            random_state=42)),
         ("gb", GradientBoostingClassifier(
             n_estimators=200, max_depth=3, learning_rate=0.05,
             random_state=42)),
-        #("knn", KNeighborsClassifier(n_neighbors=5, weights='distance')),
-        #("mlp", MLPClassifier(hidden_layer_sizes=(50,), max_iter=500, random_state=42))
+        ("mlp", MLPClassifier(
+            hidden_layer_sizes=(100, 50), max_iter=1000, early_stopping=True, random_state=42))
     ]
     pipe = Pipeline([
         ("scaler", StandardScaler()),
-        # Filtro L1 (LASSO para clasificación) usando el motor 'saga'
         ("lasso_filter", SelectFromModel(
             LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced',
                                random_state=42, max_iter=2000))),
-        ("model", StackingClassifier(
+        # EL CONSEJO DEL PROFESOR: Soft Voting
+        ("model", VotingClassifier(
             estimators=estimators,
-            final_estimator=LogisticRegression(class_weight='balanced', random_state=42),
-            cv=5,
-            n_jobs=-1,
+            voting='soft',
+            n_jobs=None
         )),
     ])
-    return pipe, "Stacking Classifier (L1 + XGB+RF+GB)"
+    return pipe, "Soft Voting (XGB+RF+GB+MLP)"
 
-def _extraer_importances_stacking(pipe, feature_names):
+def _extraer_importances_voting(pipe, feature_names):
     lasso_step = pipe.named_steps["lasso_filter"]
     surviving_features = np.array(feature_names)[lasso_step.get_support()]
-    stacking = pipe.named_steps["model"]
+    voting = pipe.named_steps["model"]
 
-    # En multiclase, coef_ tiene forma (n_classes, n_features). Promediamos el impacto absoluto.
-    coefs = np.mean(np.abs(stacking.final_estimator_.coef_), axis=0)
     importances = np.zeros(len(surviving_features))
-
-    for est, coef in zip(stacking.estimators_, coefs):
+    # Promediamos la importancia solo de los árboles (excluyendo MLP)
+    for est in voting.estimators_:
         if hasattr(est, "feature_importances_"):
-            importances += est.feature_importances_ * coef
+            importances += est.feature_importances_
 
     total = importances.sum()
     if total > 0:
         importances /= total
+    else:
+        # Si ningún árbol arrojó importancias válidas (fallo de Sklearn), repártelas igual
+        importances = np.ones(len(surviving_features)) / len(surviving_features)
 
     return dict(zip(surviving_features, importances))
+
+
 
 # ===========================================================================
 #  Feature engineering
@@ -160,7 +160,9 @@ def crear_features_derivadas(X):
     if "firstorder_Variance" in X.columns:
         Xd["log_Variance"] = np.log1p(X["firstorder_Variance"].abs())
 
-    Xd = Xd.replace([np.inf, -np.inf], np.nan).fillna(0)
+    Xd = Xd.replace([np.inf, -np.inf], np.nan)
+    Xd = Xd.fillna(0)
+
     return Xd
 
 # ===========================================================================
@@ -197,7 +199,9 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 # ===========================================================================
 def preparar_datos(df_raw):
     df_raw = df_raw.drop_duplicates(subset="Paciente_ID").reset_index(drop=True)
-    y = df_raw["target_riesgo"].values
+    # Fusionamos Moderado (1) y Medio-Alto (2) en "Intermedio" (1), y bajamos Crítico (3) a (2)
+    y_orig = df_raw["target_riesgo"].values
+    y = np.where(y_orig == 3, 2, np.where(y_orig >= 1, 1, 0))
     ids = df_raw["Paciente_ID"].values
 
     # ANTI-DATA LEAKAGE: Eliminar features de forma y targets de regresión continuos
@@ -217,10 +221,10 @@ def entrenar_y_evaluar():
     X_all, y_orig, ids = preparar_datos(df_raw)
     X_all = crear_features_derivadas(X_all)
 
-    print(f"\nMODELADO PREDICTIVO (CLASIFICACIÓN MULTICLASE)")
+    print(f"\nMODELADO PREDICTIVO (SOFT VOTING + MLP)")
     print(f"  Dataset: {len(X_all)} pacientes | {X_all.shape[1]} features iniciales")
 
-    pipe_tmpl, nombre_modelo = _crear_stacking_pipeline()
+    pipe_tmpl, nombre_modelo = _crear_voting_pipeline()
 
     # Variables para guardar predicciones de todo el K-Fold
     all_y_true = []
@@ -244,10 +248,10 @@ def entrenar_y_evaluar():
 
         param_grid = {
             "lasso_filter__estimator__C": [0.01, 0.1, 1.0],
-            "model__final_estimator__C": [0.1, 1.0, 10.0],
             "model__rf__max_depth": [3, 5],
             "model__xgb__learning_rate": [0.01, 0.05],
-            "model__xgb__max_depth": [2, 3]
+            "model__xgb__max_depth": [2, 3],
+            "model__mlp__alpha": [0.0001, 0.01]
         }
 
         search = RandomizedSearchCV(
@@ -289,13 +293,13 @@ def entrenar_y_evaluar():
     FN = cm.sum(axis=1) - np.diag(cm)
     TP = np.diag(cm)
     TN = cm.sum() - (FP + FN + TP)
-    especificidad = np.mean(TN / (TN + FP))
-    npv = np.mean(TN / (TN + FN))
+    especificidad = np.mean(TN / np.maximum(TN + FP, 1))
+    npv = np.mean(TN / np.maximum(TN + FN, 1))
 
     # 3. Métricas Probabilísticas y de Calibración
     auc_global = roc_auc_score(all_y_true, all_y_proba, multi_class='ovr', average='weighted')
     mcc_global = matthews_corrcoef(all_y_true, all_y_pred)
-    log_loss_global = log_loss(all_y_true, all_y_proba)
+    log_loss_global = log_loss(all_y_true, all_y_proba, labels=[0, 1, 2])
 
     # 4. Métricas de Orden / Severidad
     kappa_global = cohen_kappa_score(all_y_true, all_y_pred, weights='quadratic')
@@ -304,27 +308,27 @@ def entrenar_y_evaluar():
     # 5. Overfitting y Estabilidad
     train_f1_mean = np.mean(train_f1s)
     train_acc_mean = np.mean(train_accs)
-    gap_f1 = ((train_f1_mean - f1_global) / train_f1_mean) * 100
+    gap_f1 = ((train_f1_mean - f1_global) / train_f1_mean * 100) if train_f1_mean > 0 else 0.0
 
     print(f"\n" + "=" * 65)
     print(f"       PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)")
     print(f"=" * 65)
     print(f" [Métricas de Clasificación Médica]")
-    print(f"  • Exactitud (Accuracy)      : {acc_global:.4f}  (Aciertos totales)")
-    print(f"  • Precisión Ponderada       : {prec_global:.4f}  (Fiabilidad cuando detecta algo)")
-    print(f"  • Sensibilidad (Recall)     : {rec_global:.4f}  (Capacidad de no dejar ir positivos)")
-    print(f"  • Especificidad Macro       : {especificidad:.4f}  (Capacidad de descartar sanos)")
-    print(f"  • Valor Predictivo Neg. NPV : {npv:.4f}  (Seguridad de un diagnóstico negativo)")
-    print(f"  • F1-Score Ponderado        : {f1_global:.4f}  (Balance Precisión/Sensibilidad)")
+    print(f"  • Exactitud (Accuracy)      : {acc_global:.4f} ")
+    print(f"  • Precisión Ponderada       : {prec_global:.4f} ")
+    print(f"  • Sensibilidad (Recall)     : {rec_global:.4f} ")
+    print(f"  • Especificidad Macro       : {especificidad:.4f} ")
+    print(f"  • Valor Predictivo Neg. NPV : {npv:.4f}")
+    print(f"  • F1-Score Ponderado        : {f1_global:.4f}")
     print(f"")
     print(f" [Métricas de Probabilidad y Robustez Estadistica]")
-    print(f"  • ROC-AUC (OVR)             : {auc_global:.4f}  (Calidad probabilística)")
-    print(f"  • Coeficiente Matthews (MCC): {mcc_global:.4f}  (Correlación global de aciertos)")
-    print(f"  • Log Loss (Cross-Entropy)  : {log_loss_global:.4f}  (Incertidumbre en las probabilidades)")
+    print(f"  • ROC-AUC (OVR)             : {auc_global:.4f}")
+    print(f"  • Coeficiente Matthews (MCC): {mcc_global:.4f}")
+    print(f"  • Log Loss (Cross-Entropy)  : {log_loss_global:.4f}")
     print(f"")
     print(f" [Métricas de Gravedad Ordinal]")
-    print(f"  • Índice Kappa Cuadrático   : {kappa_global:.4f}  (Concordancia penalizando errores graves)")
-    print(f"  • MAE Categórico (Escalones): {mae_ordinal:.4f}  (Desviación promedio en niveles de riesgo)")
+    print(f"  • Índice Kappa Cuadrático   : {kappa_global:.4f}")
+    print(f"  • MAE Categórico (Escalones): {mae_ordinal:.4f}")
     print(f"")
     print(f" [Diagnóstico de Aprendizaje y Sobreajuste]")
     print(f"  • Train F1-Score            : {train_f1_mean:.4f}")
@@ -346,12 +350,12 @@ def entrenar_y_evaluar():
     pipe_base_final = clone(pipe_tmpl)
     search_final = RandomizedSearchCV(
         pipe_base_final, param_distributions=param_grid,
-        n_iter=10, cv=3, scoring="f1_weighted", random_state=42, n_jobs=None
+        n_iter=10, cv=3, scoring="f1_weighted", random_state=42, n_jobs=-1
     )
     search_final.fit(X_final, y_orig)
     pipe_final = search_final.best_estimator_
 
-    imp_dict = _extraer_importances_stacking(pipe_final, list(X_final.columns))
+    imp_dict = _extraer_importances_voting(pipe_final, list(X_final.columns))
     top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
 
     generar_matriz_confusion(all_y_true, all_y_pred)
@@ -414,11 +418,11 @@ def generar_grafica_importancias(top_features):
 
 def generar_curvas_roc(y_true, y_proba):
     # Binarizamos las etiquetas para el enfoque Uno-vs-Resto (OVR)
-    y_bin = label_binarize(y_true, classes=[0, 1, 2, 3])
+    y_bin = label_binarize(y_true, classes=[0, 1, 2])
     plt.figure(figsize=(8, 6))
-    colores = ['#2ecc71', '#f1c40f', '#e67e22', '#e74c3c']
+    colores = ['#2ecc71', '#f1c40f', '#e74c3c']
 
-    for i, color in zip(range(4), colores):
+    for i, color in zip(range(3), colores):
         fpr, tpr, _ = roc_curve(y_bin[:, i], y_proba[:, i])
         roc_auc = auc(fpr, tpr)
         plt.plot(fpr, tpr, color=color, lw=2,
@@ -437,11 +441,11 @@ def generar_curvas_roc(y_true, y_proba):
 
 
 def generar_curvas_pr(y_true, y_proba):
-    y_bin = label_binarize(y_true, classes=[0, 1, 2, 3])
+    y_bin = label_binarize(y_true, classes=[0, 1, 2])
     plt.figure(figsize=(8, 6))
-    colores = ['#2ecc71', '#f1c40f', '#e67e22', '#e74c3c']
+    colores = ['#2ecc71', '#f1c40f', '#e74c3c']
 
-    for i, color in zip(range(4), colores):
+    for i, color in zip(range(3), colores):
         precision, recall, _ = precision_recall_curve(y_bin[:, i], y_proba[:, i])
         avg_pr = average_precision_score(y_bin[:, i], y_proba[:, i])
         plt.plot(recall, precision, color=color, lw=2,
@@ -485,7 +489,8 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
     print(f" VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA ({len(df_prueba)} pacientes)")
     print(f"======================================================================")
 
-    y_real = df_prueba["target_riesgo"].values
+    y_orig_holdout = df_prueba["target_riesgo"].values
+    y_real = np.where(y_orig_holdout == 3, 2, np.where(y_orig_holdout >= 1, 1, 0))
     ids = df_prueba["Paciente_ID"].values
 
     # 1. Limpieza anti-data leakage
@@ -506,19 +511,19 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
     acc = accuracy_score(y_real, y_pred)
     f1 = f1_score(y_real, y_pred, average='weighted')
     mae = mean_absolute_error(y_real, y_pred)
-    logloss = log_loss(y_real, y_proba, labels=[0, 1, 2, 3])
+    logloss = log_loss(y_real, y_proba, labels=[0, 1, 2])
 
     print(f"  [Métricas de Rendimiento Global Holdout]")
     print(f"  • Exactitud (Accuracy) : {acc:.4f}")
     print(f"  • F1-Score Ponderado   : {f1:.4f}")
-    print(f"  • Log Loss (Certeza)   : {logloss:.4f} (Más cerca a 0 es mejor)")
+    print(f"  • Log Loss (Certeza)   : {logloss:.4f}")
     print(f"  • Error Medio Global   : {mae:.2f} escalones de riesgo en promedio")
 
     if train_f1 is not None:
         gap_holdout = ((train_f1 - f1) / train_f1) * 100
         print(f"  • Overfitting Holdout  : {gap_holdout:.1f}% (Caída respecto al Train)")
 
-    print("\n  [Análisis Forense por Paciente (Probabilidades y Error)]")
+    print("\n  [Análisis Forense por Paciente]")
     for i, (pac, real, pred) in enumerate(zip(ids, y_real, y_pred)):
         r_nom = NOMBRES_CLASES[int(real)]
         p_nom = NOMBRES_CLASES[int(pred)]
@@ -527,7 +532,7 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
 
         # Formatear las probabilidades
         p = y_proba[i] * 100
-        str_probs = f"Bajo:{p[0]:.0f}% | Mod:{p[1]:.0f}% | M-A:{p[2]:.0f}% | Cri:{p[3]:.0f}%"
+        str_probs = f"Bajo:{p[0]:.0f}% | Int:{p[1]:.0f}% | Cri:{p[2]:.0f}%"
 
         print(f"   {pac} -> {marca} | Real: {r_nom:<10} | Pred: {p_nom:<10}")
         print(f"        ↳ Error: {error_local} escalón(es) | {str_probs}")
@@ -538,9 +543,9 @@ def generar_grafico_arbol(modelo, cols_sel):
     plt.figure(figsize=(22, 12))
 
     try:
-        # Navegamos por el pipeline: Pipeline -> Stacking -> Random Forest -> Árbol 0
-        stacking_clf = modelo.named_steps['model']
-        rf_clf = stacking_clf.estimators_[1]  # El índice 1 es el Random Forest
+        # Navegamos por el pipeline: Pipeline -> Voting -> Random Forest -> Árbol 0
+        voting_clf = modelo.named_steps['model']
+        rf_clf = voting_clf.named_estimators_['rf']  # Busca directamente al Random Forest
         arbol_ejemplo = rf_clf.estimators_[0]  # Sacamos el primer árbol del bosque
 
         plot_tree(arbol_ejemplo,
@@ -551,17 +556,18 @@ def generar_grafico_arbol(modelo, cols_sel):
                   max_depth=3,  # Limitamos a 3 niveles para que sea legible
                   fontsize=10)
 
-        plt.title("Lógica de Decisión Radiómica (Muestra de 1 Árbol del Ensamble)", fontweight="bold", fontsize=16)
+        plt.title("Lógica de Decisión Radiómica (Voting Classifier)", fontweight="bold", fontsize=16)
         plt.tight_layout()
         plt.savefig(os.path.join(CARPETA_METRICAS, "arbol_decision.png"), dpi=200)
-        plt.close()
     except Exception as e:
         print(f"  [ALERTA] No se pudo generar el gráfico de árbol: {e}")
+    finally:
+        plt.close()  # [MEJORA]: Cierre absoluto y seguro de la gráfica en memoria
 
 
 def comparar_modelos_individuales():
     print("\n" + "=" * 70)
-    print(" INICIANDO TORNEO DE MODELOS INDIVIDUALES (BASELINES)")
+    print(" TORNEO DE MODELOS BASELINES ")
     print("=" * 70)
 
     # 1. Preparar datos una sola vez para que la competencia sea justa
@@ -576,7 +582,8 @@ def comparar_modelos_individuales():
     # Preparar Casos de Prueba (Holdout)
     if os.path.exists(RUTA_PRUEBA):
         df_prueba = pd.read_csv(RUTA_PRUEBA)
-        y_real_holdout = df_prueba["target_riesgo"].values
+        y_orig_h = df_prueba["target_riesgo"].values
+        y_real_holdout = np.where(y_orig_h == 3, 2, np.where(y_orig_h >= 1, 1, 0))
         ids_holdout = df_prueba["Paciente_ID"].values
         shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
         cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto",
@@ -589,15 +596,15 @@ def comparar_modelos_individuales():
     # 2. Definir los contendientes
     modelos = {
         "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=7, class_weight='balanced',
-                                                random_state=42),
+                                                random_state=42, n_jobs=-1),
         "Decision Tree": DecisionTreeClassifier(max_depth=7, class_weight='balanced', random_state=42),
         "SVM (SVC)": SVC(kernel='rbf', probability=True, class_weight='balanced', random_state=42),
         "Reg. Logística": LogisticRegression(max_iter=2000, class_weight='balanced', solver='saga', random_state=42),
         "XGBoost": XGBClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, random_state=42,
-                                 eval_metric='mlogloss'),
+                                 eval_metric='mlogloss', n_jobs=-1),
         "Gradient Boost": GradientBoostingClassifier(n_estimators=200, max_depth=3, learning_rate=0.05,
                                                      random_state=42),
-        "KNN": KNeighborsClassifier(n_neighbors=5, weights='distance'),
+        "KNN": KNeighborsClassifier(n_neighbors=5, weights='distance', n_jobs=-1),
         "Naive Bayes": GaussianNB()
     }
 
@@ -649,15 +656,15 @@ def comparar_modelos_individuales():
         cm = confusion_matrix(all_y_true, all_y_pred)
         FN = cm.sum(axis=1) - np.diag(cm)
         TN = cm.sum() - (cm.sum(axis=0) - np.diag(cm) + FN + np.diag(cm))
-        npv = np.mean(TN / (TN + FN))
+        npv = np.mean(TN / np.maximum(TN + FN, 1))
 
         t_f1 = np.mean(train_f1s)
         t_acc = np.mean(train_accs)
-        gap = ((t_f1 - f1) / t_f1) * 100
+        gap = ((t_f1 - f1) / t_f1 * 100) if t_f1 > 0 else 0.0
 
         # Guardar para gráficas combinadas
         diccionario_mae[nombre] = mae
-        y_bin = label_binarize(all_y_true, classes=[0, 1, 2, 3])
+        y_bin = label_binarize(all_y_true, classes=[0, 1, 2])
         all_y_proba = np.array(all_y_proba)
         # ROC micro-average (ideal para comparar múltiples modelos multiclase de un vistazo)
         fpr, tpr, _ = roc_curve(y_bin.ravel(), all_y_proba.ravel())
@@ -703,8 +710,7 @@ def comparar_modelos_individuales():
                 marca = "CORRECTO" if real == pred else "INCORRECTO"
                 err = abs(real - pred)
                 p = y_proba_h[i] * 100
-                print(
-                    f"   {marca} {pac}: Real={NOMBRES_CLASES[int(real)]:<10} | Pred={NOMBRES_CLASES[int(pred)]:<10} | Err: {err} | Probs: B:{p[0]:.0f}% M:{p[1]:.0f}% MA:{p[2]:.0f}% C:{p[3]:.0f}%")
+                print(f"   {marca} {pac}: Real={NOMBRES_CLASES[int(real)]:<10} | Pred={NOMBRES_CLASES[int(pred)]:<10} | Err: {err} | Probs: B:{p[0]:.0f}% Int:{p[1]:.0f}% C:{p[2]:.0f}%")
 
     # 4. Generar Gráficas Combinadas
     # Gráfica ROC Combinada

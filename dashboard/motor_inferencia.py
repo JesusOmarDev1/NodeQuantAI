@@ -250,7 +250,7 @@ class MotorInferenciaNodeQuant:
             X_clf = df_procesado.reindex(columns=meta_clf["features_entrada"], fill_value=0)
             riesgo_idx = modelo_clf.predict(X_clf)[0]
 
-            mapa_riesgo = {0: "Bajo", 1: "Moderado", 2: "Medio-Alto", 3: "Crítico"}
+            mapa_riesgo = {0: "Bajo", 1: "Intermedio", 2: "Crítico"}
             resultados_finales["riesgo"] = mapa_riesgo.get(int(riesgo_idx), "Desconocido")
         else:
             resultados_finales["riesgo"] = "Modelo de clasificación no cargado"
