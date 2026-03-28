@@ -31,7 +31,7 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectFromModel, mutual_info_classif
 from sklearn.pipeline import Pipeline
-from sklearn.base import clone
+from sklearn.base import clone, BaseEstimator, ClassifierMixin
 from sklearn.metrics import (
     f1_score, accuracy_score, classification_report, confusion_matrix,
     precision_score, recall_score, roc_auc_score, cohen_kappa_score,
@@ -54,6 +54,44 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 #from classification.scripts.optimizar_classification import seleccionar_features_rfecv
 from optimizar_classification import seleccionar_features_rfecv
 warnings.filterwarnings("ignore")
+
+# ===========================================================================
+#  PARADIGMA ORDINAL (Frank & Hall)
+# ===========================================================================
+class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
+    """Convierte cualquier clasificador en un modelo Ordinal de gravedad clínica."""
+    def __init__(self, estimator):
+        self.estimator = estimator
+
+    def fit(self, X, y):
+        self.classes_ = np.sort(np.unique(y))
+        self.estimators_ = []
+        
+        # Entrenar K-1 clasificadores binarios (Ej: P(Riesgo > Bajo), P(Riesgo > Intermedio))
+        for i in range(len(self.classes_) - 1):
+            y_binario = (y > self.classes_[i]).astype(int)
+            clon = clone(self.estimator)
+            clon.fit(X, y_binario)
+            self.estimators_.append(clon)
+        return self
+
+    def predict_proba(self, X):
+        # Obtener las probabilidades de "ser mayor que" cada escalón
+        probs_mayor_que = [est.predict_proba(X)[:, 1] for est in self.estimators_]
+        probs = np.zeros((X.shape[0], len(self.classes_)))
+        
+        # Matemáticas Ordinales de Frank & Hall
+        probs[:, 0] = 1.0 - probs_mayor_que[0] # P(Bajo)
+        for i in range(1, len(self.classes_) - 1):
+            probs[:, i] = probs_mayor_que[i-1] - probs_mayor_que[i] # P(Intermedio)
+        probs[:, -1] = probs_mayor_que[-1] # P(Crítico)
+        
+        # Limpieza de ruido matemático (evitar probabilidades negativas minúsculas)
+        probs = np.clip(probs, 0.0, 1.0)
+        return probs / probs.sum(axis=1, keepdims=True) # Normalizar al 100%
+
+    def predict(self, X):
+        return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
 
 # ---------------------------------------------------------------------------
 #  Rutas
@@ -89,63 +127,57 @@ plt.rcParams.update({
 # ===========================================================================
 #  Soft Voting + Red Neuronal
 # ===========================================================================
-def _crear_voting_pipeline():
+def _crear_ordinal_stacking_pipeline():
     estimators = [
-        # XGBoost maneja el desbalance con scale_pos_weight en binario,
-        # pero en multiclase confía en el subsampling y el Voting.
-        ("xgb", XGBClassifier(
-            n_estimators=200, max_depth=3, learning_rate=0.05,
-            subsample=0.8, colsample_bytree=0.8,
-            random_state=42, eval_metric='mlogloss')),
-
-        ("rf", RandomForestClassifier(
-            n_estimators=200, max_depth=7,
-            class_weight='balanced',  # Peso dinámico nativo
-            random_state=42)),
-
-        # LightGBM (Rápido, por hojas, con pesos dinámicos)
-        ("lgbm", LGBMClassifier(
-            n_estimators=200, max_depth=3, learning_rate=0.05,
-            class_weight='balanced',  # Peso dinámico nativo
-            random_state=42, verbose=-1)),
-
-        # CatBoost (El rey de los datos tabulares pequeños)
-        ("cat", CatBoostClassifier(
-            iterations=200, depth=4, learning_rate=0.05,
-            auto_class_weights='Balanced',  # Peso dinámico nativo
-            verbose=0, random_state=42))
+        ("xgb", XGBClassifier(n_estimators=200, max_depth=3, learning_rate=0.05,
+                              subsample=0.8, colsample_bytree=0.8,
+                              random_state=42, eval_metric='logloss')), # Ajustado a binario
+        ("rf", RandomForestClassifier(n_estimators=200, max_depth=7, class_weight='balanced', random_state=42)),
+        ("lgbm", LGBMClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, class_weight='balanced', random_state=42, verbose=-1)),
+        ("cat", CatBoostClassifier(iterations=200, depth=4, learning_rate=0.05, auto_class_weights='Balanced', verbose=0, random_state=42))
     ]
+    
+    # El Meta-Algoritmo que aprenderá cuándo confiar en qué modelo
+    meta_learner = LogisticRegression(class_weight='balanced', random_state=42)
+    
+    # 1. Creamos el Stacking
+    stacking = StackingClassifier(
+        estimators=estimators,
+        final_estimator=meta_learner,
+        cv=3, n_jobs=-1
+    )
+    
+    # 2. Envolvemos el Stacking en la mente Ordinal
+    modelo_ordinal = ClasificadorOrdinalFrankHall(estimator=stacking)
+    
     pipe = Pipeline([
         ("scaler", StandardScaler()),
         ("lasso_filter", SelectFromModel(
-            LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced',
-                               random_state=42, max_iter=5000))), #2000 2500 3000 3000 4000 5000
-        ("model", VotingClassifier(
-            estimators=estimators,
-            voting='soft',
-            n_jobs=None
-        )),
+            LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced', random_state=42, max_iter=5000))),
+        ("model", modelo_ordinal),
     ])
-    return pipe, "Soft Voting (XGB+RF+LGBM+CAT)"
+    
+    return pipe, "Stacking Ordinal (XGB+RF+LGBM+CAT -> LR)"
 
-def _extraer_importances_voting(pipe, feature_names):
+def _extraer_importances_ordinal_stacking(pipe, feature_names):
+    """Extrae la importancia promediando los árboles base dentro del Stacking Ordinal."""
     lasso_step = pipe.named_steps["lasso_filter"]
     surviving_features = np.array(feature_names)[lasso_step.get_support()]
-    voting = pipe.named_steps["model"]
-
+    ordinal_model = pipe.named_steps["model"]
+    
     importances = np.zeros(len(surviving_features))
-    # Promediamos la importancia solo de los árboles (excluyendo MLP)
-    for est in voting.estimators_:
-        if hasattr(est, "feature_importances_"):
-            importances += est.feature_importances_
-
+    # Recorremos cada clasificador binario del Ordinal (P(y>0) y P(y>1))
+    for stack_clf in ordinal_model.estimators_:
+        # Recorremos los estimadores base del Stacking
+        for base_est in stack_clf.estimators_:
+            if hasattr(base_est, "feature_importances_"):
+                importances += base_est.feature_importances_
+                
     total = importances.sum()
     if total > 0:
         importances /= total
     else:
-        # Si ningún árbol arrojó importancias válidas (fallo de Sklearn), repártelas igual
         importances = np.ones(len(surviving_features)) / len(surviving_features)
-
     return dict(zip(surviving_features, importances))
 
 
@@ -237,13 +269,13 @@ def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
     def objective(trial):
         pipe = clone(pipe_tmpl)
 
-        # Optuna afina a los 4 titanes (Subimos un poco el mínimo de lasso_C para evitar que borre todo)
+        # Optuna afina a los 4 titanes navegando a través del Ordinal y el Stacking
         pipe.set_params(
             lasso_filter__estimator__C=trial.suggest_float("lasso_C", 0.05, 5.0, log=True),
-            model__rf__max_depth=trial.suggest_int("rf_depth", 3, 7),
-            model__xgb__learning_rate=trial.suggest_float("xgb_lr", 0.01, 0.1, log=True),
-            model__lgbm__learning_rate=trial.suggest_float("lgbm_lr", 0.01, 0.1, log=True),
-            model__cat__depth=trial.suggest_int("cat_depth", 3, 6)
+            model__estimator__rf__max_depth=trial.suggest_int("rf_depth", 3, 7),
+            model__estimator__xgb__learning_rate=trial.suggest_float("xgb_lr", 0.01, 0.1, log=True),
+            model__estimator__lgbm__learning_rate=trial.suggest_float("lgbm_lr", 0.01, 0.1, log=True),
+            model__estimator__cat__depth=trial.suggest_int("cat_depth", 3, 6)
         )
 
         # Try-Except para evitar que Optuna crashee si una combinación destruye los datos
@@ -253,20 +285,19 @@ def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
                 return 0.0
             return score
         except Exception:
-            # Si el modelo explota (ej. LASSO borró todas las columnas), devolvemos 0 para que Optuna descarte esa ruta
             return 0.0
 
     estudio = optuna.create_study(direction="maximize")
     estudio.optimize(objective, n_trials=n_trials)
 
-    # Reconstruimos el pipeline con los parámetros ganadores
+    # Reconstruimos el pipeline con los parámetros ganadores (AQUÍ ESTABA EL ERROR)
     mejor_pipe = clone(pipe_tmpl)
     mejor_pipe.set_params(
         lasso_filter__estimator__C=estudio.best_params["lasso_C"],
-        model__rf__max_depth=estudio.best_params["rf_depth"],
-        model__xgb__learning_rate=estudio.best_params["xgb_lr"],
-        model__lgbm__learning_rate=estudio.best_params["lgbm_lr"],
-        model__cat__depth=estudio.best_params["cat_depth"]
+        model__estimator__rf__max_depth=estudio.best_params["rf_depth"],
+        model__estimator__xgb__learning_rate=estudio.best_params["xgb_lr"],
+        model__estimator__lgbm__learning_rate=estudio.best_params["lgbm_lr"],
+        model__estimator__cat__depth=estudio.best_params["cat_depth"]
     )
     return mejor_pipe
 
@@ -279,7 +310,7 @@ def entrenar_y_evaluar():
     print(f"\nMODELADO PREDICTIVO (SVoting + MLP + Optuna + PScaling + LGBM + CAT)")
     print(f"  Dataset: {len(X_all)} pacientes | {X_all.shape[1]} features iniciales")
 
-    pipe_tmpl, nombre_modelo = _crear_voting_pipeline()
+    pipe_tmpl, nombre_modelo = _crear_ordinal_stacking_pipeline()
 
     # Variables para guardar predicciones de todo el K-Fold
     all_y_true = []
@@ -410,7 +441,7 @@ def entrenar_y_evaluar():
 
     # 3. Extracción de Importancias (Atravesando la envoltura del Calibrador)
     pipeline_interno = pipe_final.calibrated_classifiers_[0].estimator
-    imp_dict = _extraer_importances_voting(pipeline_interno, list(X_final.columns))
+    imp_dict = _extraer_importances_ordinal_stacking(pipeline_interno, list(X_final.columns))
     top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
 
     # 4. Generación de Gráficas Globales
@@ -599,11 +630,12 @@ def generar_grafico_arbol(modelo, cols_sel):
     plt.figure(figsize=(22, 12))
 
     try:
-        # Navegamos por el pipeline: Pipeline -> Voting -> Random Forest -> Árbol 0
+        # Calibrador -> Pipeline -> Ordinal -> Stacking(Binario 0) -> Random Forest -> Árbol 0
         pipeline_interno = modelo.calibrated_classifiers_[0].estimator
-        voting_clf = pipeline_interno.named_steps['model']
-        rf_clf = voting_clf.named_estimators_['rf']  # Busca directamente al Random Forest
-        arbol_ejemplo = rf_clf.estimators_[0]  # Sacamos el primer árbol del bosque
+        ordinal_clf = pipeline_interno.named_steps['model']
+        stacking_clf = ordinal_clf.estimators_[0] 
+        rf_clf = stacking_clf.named_estimators_['rf']
+        arbol_ejemplo = rf_clf.estimators_[0]
 
         plot_tree(arbol_ejemplo,
                   feature_names=cols_sel,
