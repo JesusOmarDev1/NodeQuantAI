@@ -40,7 +40,8 @@ from sklearn.metrics import (
 )
 
 from xgboost import XGBClassifier
-from sklearn.neural_network import MLPClassifier
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -90,33 +91,42 @@ plt.rcParams.update({
 # ===========================================================================
 def _crear_voting_pipeline():
     estimators = [
+        # XGBoost maneja el desbalance con scale_pos_weight en binario,
+        # pero en multiclase confía en el subsampling y el Voting.
         ("xgb", XGBClassifier(
             n_estimators=200, max_depth=3, learning_rate=0.05,
             subsample=0.8, colsample_bytree=0.8,
             random_state=42, eval_metric='mlogloss')),
+
         ("rf", RandomForestClassifier(
             n_estimators=200, max_depth=7,
-            class_weight='balanced',
+            class_weight='balanced',  # Peso dinámico nativo
             random_state=42)),
-        ("gb", GradientBoostingClassifier(
+
+        # LightGBM (Rápido, por hojas, con pesos dinámicos)
+        ("lgbm", LGBMClassifier(
             n_estimators=200, max_depth=3, learning_rate=0.05,
-            random_state=42)),
-        ("mlp", MLPClassifier(
-            hidden_layer_sizes=(100, 50), max_iter=1000, early_stopping=True, random_state=42))
+            class_weight='balanced',  # Peso dinámico nativo
+            random_state=42, verbose=-1)),
+
+        # CatBoost (El rey de los datos tabulares pequeños)
+        ("cat", CatBoostClassifier(
+            iterations=200, depth=4, learning_rate=0.05,
+            auto_class_weights='Balanced',  # Peso dinámico nativo
+            verbose=0, random_state=42))
     ]
     pipe = Pipeline([
         ("scaler", StandardScaler()),
         ("lasso_filter", SelectFromModel(
             LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced',
-                               random_state=42, max_iter=2000))),
-        # EL CONSEJO DEL PROFESOR: Soft Voting
+                               random_state=42, max_iter=5000))), #2000 2500 3000 3000 4000 5000
         ("model", VotingClassifier(
             estimators=estimators,
             voting='soft',
             n_jobs=None
         )),
     ])
-    return pipe, "Soft Voting (XGB+RF+GB+MLP)"
+    return pipe, "Soft Voting (XGB+RF+LGBM+CAT)"
 
 def _extraer_importances_voting(pipe, feature_names):
     lasso_step = pipe.named_steps["lasso_filter"]
@@ -144,7 +154,6 @@ def _extraer_importances_voting(pipe, feature_names):
 #  Feature engineering
 # ===========================================================================
 def crear_features_derivadas(X):
-    # (Mantengo tu función exacta, ya que las derivadas sirven para ambos modelos)
     Xd = X.copy()
     _eps = 1e-9
     if "firstorder_Energy" in X.columns and "firstorder_Entropy" in X.columns:
@@ -224,18 +233,28 @@ def preparar_datos(df_raw):
 # ===========================================================================
 def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
     """Utiliza Optimización Bayesiana para encontrar los hiperparámetros perfectos."""
+
     def objective(trial):
         pipe = clone(pipe_tmpl)
-        # Optuna sugiere parámetros inteligentemente basado en intentos anteriores
+
+        # Optuna afina a los 4 titanes (Subimos un poco el mínimo de lasso_C para evitar que borre todo)
         pipe.set_params(
-            lasso_filter__estimator__C=trial.suggest_float("lasso_C", 0.01, 1.0, log=True),
+            lasso_filter__estimator__C=trial.suggest_float("lasso_C", 0.05, 5.0, log=True),
             model__rf__max_depth=trial.suggest_int("rf_depth", 3, 7),
             model__xgb__learning_rate=trial.suggest_float("xgb_lr", 0.01, 0.1, log=True),
-            model__xgb__max_depth=trial.suggest_int("xgb_depth", 2, 4),
-            model__mlp__alpha=trial.suggest_float("mlp_alpha", 0.0001, 0.01, log=True)
+            model__lgbm__learning_rate=trial.suggest_float("lgbm_lr", 0.01, 0.1, log=True),
+            model__cat__depth=trial.suggest_int("cat_depth", 3, 6)
         )
-        # Evaluamos qué tan buena fue esta combinación
-        return cross_val_score(pipe, X_train, y_train, cv=2, scoring="f1_weighted", n_jobs=-1).mean()
+
+        # Try-Except para evitar que Optuna crashee si una combinación destruye los datos
+        try:
+            score = cross_val_score(pipe, X_train, y_train, cv=2, scoring="f1_weighted", n_jobs=-1).mean()
+            if np.isnan(score):
+                return 0.0
+            return score
+        except Exception:
+            # Si el modelo explota (ej. LASSO borró todas las columnas), devolvemos 0 para que Optuna descarte esa ruta
+            return 0.0
 
     estudio = optuna.create_study(direction="maximize")
     estudio.optimize(objective, n_trials=n_trials)
@@ -246,17 +265,18 @@ def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
         lasso_filter__estimator__C=estudio.best_params["lasso_C"],
         model__rf__max_depth=estudio.best_params["rf_depth"],
         model__xgb__learning_rate=estudio.best_params["xgb_lr"],
-        model__xgb__max_depth=estudio.best_params["xgb_depth"],
-        model__mlp__alpha=estudio.best_params["mlp_alpha"]
+        model__lgbm__learning_rate=estudio.best_params["lgbm_lr"],
+        model__cat__depth=estudio.best_params["cat_depth"]
     )
     return mejor_pipe
+
 
 def entrenar_y_evaluar():
     df_raw = pd.read_csv(RUTA_CSV)
     X_all, y_orig, ids = preparar_datos(df_raw)
     X_all = crear_features_derivadas(X_all)
 
-    print(f"\nMODELADO PREDICTIVO (SVoting + MLP + Optuna + Platt Scaling)")
+    print(f"\nMODELADO PREDICTIVO (SVoting + MLP + Optuna + PScaling + LGBM + CAT)")
     print(f"  Dataset: {len(X_all)} pacientes | {X_all.shape[1]} features iniciales")
 
     pipe_tmpl, nombre_modelo = _crear_voting_pipeline()
