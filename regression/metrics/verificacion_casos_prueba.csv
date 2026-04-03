@@ -1,6 +1,6 @@
 Paciente_ID,Target,Unidad,Real,Predicho,Error,Error %,Nivel_Real,Nivel_Predicho
-case_0854,Volumen Tumoral,mm³,2139.0,2130.3,8.7,0.41,Bajo,Bajo
-case_0864,Volumen Tumoral,mm³,7761.0,8096.67,335.67,4.33,Moderado,Moderado
-case_0165,Volumen Tumoral,mm³,4206.0,3967.57,238.43,5.67,Bajo,Bajo
-case_0303,Volumen Tumoral,mm³,35640.0,32734.61,2905.39,8.15,Crítico,Crítico
-case_0545,Volumen Tumoral,mm³,18326.0,14819.58,3506.42,19.13,Medio-Alto,Medio-Alto
+case_0854,Volumen Tumoral,mm³,2139.0,2164.82,25.82,1.21,Bajo,Bajo
+case_0864,Volumen Tumoral,mm³,7761.0,8327.9,566.9,7.3,Moderado,Moderado
+case_0165,Volumen Tumoral,mm³,4206.0,3756.41,449.59,10.69,Bajo,Bajo
+case_0303,Volumen Tumoral,mm³,35640.0,31966.05,3673.95,10.31,Crítico,Crítico
+case_0545,Volumen Tumoral,mm³,18326.0,16895.61,1430.39,7.81,Medio-Alto,Medio-Alto

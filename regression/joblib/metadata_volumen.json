@@ -4,17 +4,17 @@
     "use_log": true,
     "n_features_esperadas": 12,
     "features_entrada": [
-        "gldm_DependenceEntropy",
-        "shape_Sphericity",
-        "glszm_LargeAreaEmphasis",
+        "glrlm_LongRunLowGrayLevelEmphasis",
         "glszm_ZoneEntropy",
-        "glszm_SmallAreaEmphasis",
-        "glszm_LargeAreaLowGrayLevelEmphasis",
+        "shape_Elongation",
+        "glcm_Idmn",
+        "glrlm_RunEntropy",
         "glszm_SmallAreaLowGrayLevelEmphasis",
         "glrlm_LongRunHighGrayLevelEmphasis",
-        "glcm_Idmn",
+        "glszm_SmallAreaEmphasis",
+        "shape_Sphericity",
+        "gldm_DependenceEntropy",
         "gldm_DependenceNonUniformityNormalized",
-        "glrlm_RunEntropy",
-        "glrlm_LongRunLowGrayLevelEmphasis"
+        "glszm_LargeAreaEmphasis"
     ]
 }

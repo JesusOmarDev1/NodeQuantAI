@@ -28,6 +28,8 @@ import os
 import sys
 import time
 import warnings
+import seaborn as sns
+from scipy.stats import spearmanr
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT_DIR not in sys.path:
@@ -55,6 +57,7 @@ from sklearn.metrics import (
     explained_variance_score, mean_absolute_percentage_error,
 )
 from sklearn.feature_selection import mutual_info_regression
+from sklearn.model_selection import learning_curve
 
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
@@ -147,7 +150,7 @@ def _obtener_config_modelo(target_slug):
             ("gb", GradientBoostingRegressor(n_estimators=80, subsample=0.8, random_state=42)),
             ("rf", RandomForestRegressor(n_estimators=80, max_samples=0.8, random_state=42, n_jobs=None))
         ]
-        nombre = "Dream Team (LGBM + GB + RF - Estrictos)"
+        nombre = "(LGBM) + GB + RF)"
 
         # [EL CAMBIO MAESTRO]
         # positive=True: Prohíbe restar predicciones (evita caos)
@@ -835,7 +838,7 @@ def generar_graficas(df_pred, informacion_modelos):
                   fontsize=14, fontweight="bold", pad=12)
     ax2.legend(fontsize=9, loc="upper left")
     ax2.text(0.5, -0.1,
-             "Porcentaje de pacientes cuyo error de prediccion "
+             "Porcentaje de pacientes cuyo error de predicción "
              "esta por debajo de cada umbral",
              ha="center", fontsize=8, color="#888", transform=ax2.transAxes)
     fig2.tight_layout()
@@ -872,7 +875,7 @@ def generar_graficas(df_pred, informacion_modelos):
         ax.fill_between(xs, xs * 0.85, xs * 1.15,
                         alpha=0.10, color="#27ae60", label="Banda +/-15%")
         ax.plot(xs, xs, "--", color="#888", linewidth=1.5, alpha=0.7,
-                label="Prediccion perfecta")
+                label="Predicción perfecta")
 
         # Puntos coloreados por error
         colores_pts = np.where(errs < 15, "#27ae60",
@@ -884,7 +887,7 @@ def generar_graficas(df_pred, informacion_modelos):
         ax.set_ylim(lims)
         ax.set_aspect("equal")
         ax.set_xlabel(f"Valor Real ({u})", fontsize=10)
-        ax.set_ylabel(f"Prediccion ({u})", fontsize=10)
+        ax.set_ylabel(f"Predicción ({u})", fontsize=10)
         ax.set_title(f"{_NOMBRES_CORTOS.get(t['nombre'], t['nombre'])}\n"
                      f"{modelo}  |  R2={r2:.3f}  |  MAE={mae:.1f} {u}",
                      fontsize=11, pad=8)
@@ -1046,7 +1049,7 @@ def generar_graficas(df_pred, informacion_modelos):
                      f"  ({info.get('nombre_modelo', '')})",
                      fontsize=11, pad=8)
 
-    fig6.suptitle("Metricas de Validacion Cruzada (10-Fold)",
+    fig6.suptitle("Métricas de Validación Cruzada (10-Fold)",
                   fontsize=14, fontweight="bold", y=1.01)
     fig6.text(0.5, -0.02,
               "Gap% bajo indica estabilidad del modelo (sin sobreajuste).",
@@ -1103,7 +1106,7 @@ def generar_graficas(df_pred, informacion_modelos):
                      f"  ({info.get('nombre_modelo', '')})",
                      fontsize=11, pad=8)
 
-    fig7.suptitle("Caracteristicas mas Importantes para la Prediccion",
+    fig7.suptitle("Características Más Importantes para la Predicción",
                   fontsize=14, fontweight="bold", y=1.01)
     fig7.text(0.5, -0.02,
               "Azul: FirstOrder  |  Naranja: GLCM  |  Verde: GLRLM  |  "
@@ -1459,7 +1462,7 @@ def gran_torneo_volumen():
     plt.figure(figsize=(12, 8))
     bars = plt.barh(df_res["Modelo"][::-1], df_res["MAE"][::-1], color='#3498db', edgecolor='white')
     plt.xlabel('Error Medio Absoluto (MAE) en mm³')
-    plt.title('Torneo: ¿Qué modelo predice mejor el Volumen Tumoral?', fontweight='bold')
+    plt.title('Comparación de Modelos Baseline', fontweight='bold')
     for bar in bars:
         plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f' {bar.get_width():.1f}', va='center')
     plt.tight_layout()
@@ -1474,7 +1477,7 @@ def gran_torneo_volumen():
     bars2 = plt.barh(df_res_gap["Modelo"][::-1], df_res_gap["Gap_Overfitting"][::-1], color=colores_gap,
                      edgecolor='white')
     plt.xlabel('Brecha de Sobreajuste (Gap %)')
-    plt.title('Torneo: Estabilidad frente al Sobreajuste (Menos es mejor)', fontweight='bold')
+    plt.title('Estabilidad frente al Sobreajuste (modelos baseline)', fontweight='bold')
     for bar in bars2:
         plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f' {bar.get_width():.1f}%', va='center')
     plt.tight_layout()
@@ -1483,11 +1486,6 @@ def gran_torneo_volumen():
 
     print(f"\n[!] Torneo finalizado. Revisa las nuevas gráficas en la carpeta de metrics.")
     print("=" * 80)
-
-
-import seaborn as sns
-from scipy.stats import spearmanr
-
 
 def auditar_fuga_de_datos():
     print("\n" + "=" * 70)
@@ -1562,7 +1560,93 @@ def analizar_residuos(df_pred, X_raw):
 
     ruta_csv = os.path.join(CARPETA_METRICAS, "auditoria_peores_20_casos.csv")
     peores_20_features.to_csv(ruta_csv, index=False)
-    print(f"\n  [🕵️] ¡Análisis listo! Residuos graficados y auditoría guardada en: {ruta_csv}")
+    print(f"\n  ¡Análisis listo! Residuos graficados y auditoría guardada en: {ruta_csv}")
+
+
+def generar_graficas_avanzadas(df_pred, informacion_modelos):
+    """Genera Gráfico de Bland-Altman y Curvas de Aprendizaje para validación clínica."""
+    plt.close("all")
+    print("\n  Generando gráficas clínicas avanzadas:")
+
+    info = informacion_modelos.get("Volumen Tumoral")
+    if not info:
+        print("    [!] No se encontró información del modelo de Volumen.")
+        return
+
+    sub = df_pred[df_pred["Target"] == "Volumen Tumoral"]
+    real = sub["Real"].values
+    pred = sub["Predicho"].values
+    residuos = pred - real
+
+    # ===================================================================
+    #  1. Gráfico de Bland-Altman (Concordancia Clínica)
+    # ===================================================================
+    media_medidas = (real + pred) / 2
+    mean_diff = np.mean(residuos)
+    std_diff = np.std(residuos)
+
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    ax1.scatter(media_medidas, residuos, alpha=0.7, color="#8e44ad", edgecolors="white", s=50)
+
+    # Líneas de sesgo y límites de acuerdo (95%)
+    ax1.axhline(mean_diff, color="black", linestyle="-", linewidth=2, label=f"Sesgo Medio: {mean_diff:.1f}")
+    ax1.axhline(mean_diff + 1.96 * std_diff, color="#e74c3c", linestyle="--",
+                label=f"+1.96 SD ({mean_diff + 1.96 * std_diff:.1f})")
+    ax1.axhline(mean_diff - 1.96 * std_diff, color="#e74c3c", linestyle="--",
+                label=f"-1.96 SD ({mean_diff - 1.96 * std_diff:.1f})")
+
+    ax1.set_xlabel("Media de Volumen (Real y Predicho) mm³", fontsize=10)
+    ax1.set_ylabel("Diferencia (Predicho - Real) mm³", fontsize=10)
+    ax1.set_title("Gráfico de Bland-Altman (Concordancia Clínica)", fontsize=12, fontweight="bold")
+    ax1.legend(loc="upper right")
+
+    # Ajuste de límites simétricos para mayor legibilidad
+    max_diff = max(abs(residuos.max()), abs(residuos.min())) * 1.2
+    ax1.set_ylim(-max_diff, max_diff)
+
+    ruta_ba = os.path.join(CARPETA_METRICAS, "avanzado_01_bland_altman.png")
+    fig1.savefig(ruta_ba, dpi=200, bbox_inches="tight", facecolor="white")
+    plt.close(fig1)
+    print("    -> avanzado_01_bland_altman.png")
+
+    # ===================================================================
+    #  2. Curvas de Aprendizaje (Learning Curves)
+    # ===================================================================
+    print("    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...")
+
+    # Usamos un KFold rápido para ver cómo mejora el modelo al inyectarle más datos
+    kf_lc = KFold(n_splits=5, shuffle=True, random_state=42)
+
+    modelo = info["mejor_pipe"]
+    X_final = info["X"]
+    y_orig = info["y"]
+
+    train_sizes, train_scores, test_scores = learning_curve(
+        modelo, X_final, y_orig, cv=kf_lc,
+        scoring='neg_mean_absolute_error',
+        n_jobs=None,
+        train_sizes=np.linspace(0.2, 1.0, 6)  # 6 puntos de evaluación progresivos
+    )
+
+    # Convertimos los scores negativos de sklearn a MAE positivo
+    train_scores_mean = -np.mean(train_scores, axis=1)
+    test_scores_mean = -np.mean(test_scores, axis=1)
+
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    ax2.plot(train_sizes, train_scores_mean, 'o-', color="#3498db", linewidth=2, label="Error de Entrenamiento")
+    ax2.plot(train_sizes, test_scores_mean, 'o-', color="#2ecc71", linewidth=2, label="Error de Validación (CV)")
+
+    ax2.set_xlabel("Número de Pacientes en Entrenamiento", fontsize=10)
+    ax2.set_ylabel("Error Medio Absoluto (MAE) mm³", fontsize=10)
+    ax2.set_title("Curvas de Aprendizaje (Learning Curve)", fontsize=12, fontweight="bold")
+    ax2.legend(loc="upper right")
+    ax2.grid(True, linestyle=":", alpha=0.7)
+
+    ruta_lc = os.path.join(CARPETA_METRICAS, "avanzado_02_learning_curve.png")
+    fig2.savefig(ruta_lc, dpi=200, bbox_inches="tight", facecolor="white")
+    plt.close(fig2)
+    print("    -> avanzado_02_learning_curve.png")
+
 
 # ===========================================================================
 #  Main
@@ -1575,6 +1659,9 @@ if __name__ == "__main__":
 
     # 1. Generamos TODAS las gráficas de entrenamiento
     generar_graficas(df_pred, info_modelos)
+
+    # 1.5. Generar gráficas clínicas avanzadas (NUEVO)
+    generar_graficas_avanzadas(df_pred, info_modelos)
 
     # 2. Predecimos los casos de prueba y generamos su gráfica
     df_verif = predecir_casos_prueba(info_modelos)

@@ -34,15 +34,16 @@ MODELO DE REGRESIÓN: PREDICCIÓN DE VOLUMEN
 ================================================================================
 Venga otra vez... se logró?
 Target	Modelo	Validacion	MAE	MSE	RMSE	R2	MedAE	MaxErr	MAPE %	EVS	Gap_%
-Volumen Tumoral	Dream Team (LGBM + GB + RF - Estrictos)	KFold	4329.088	84746602.3	9205.7918	0.7701	1572.1852	76644.1381	25.68	0.7825	21.78
+Volumen Tumoral	(LGBM) + GB + RF)	KFold	4141.7026	77280396.61	8790.9269	0.7903	1498.5576	74074.4901	24.97	0.8016	21.47
 
 
 Paciente_ID	Target	Unidad	Real	Predicho	Error	Error %	Nivel_Real	Nivel_Predicho
-case_0854	Volumen Tumoral	mmÂ³	2139	2130.3	8.7	0.41	Bajo	Bajo
-case_0864	Volumen Tumoral	mmÂ³	7761	8096.67	335.67	4.33	Moderado	Moderado
-case_0165	Volumen Tumoral	mmÂ³	4206	3967.57	238.43	5.67	Bajo	Bajo
-case_0303	Volumen Tumoral	mmÂ³	35640	32734.61	2905.39	8.15	CrÃ­tico	CrÃ­tico
-case_0545	Volumen Tumoral	mmÂ³	18326	14819.58	3506.42	19.13	Medio-Alto	Medio-Alto
+case_0854	Volumen Tumoral	mmÂ³	2139	2164.82	25.82	1.21	Bajo	Bajo
+case_0864	Volumen Tumoral	mmÂ³	7761	8327.9	566.9	7.3	Moderado	Moderado
+case_0165	Volumen Tumoral	mmÂ³	4206	3756.41	449.59	10.69	Bajo	Bajo
+case_0303	Volumen Tumoral	mmÂ³	35640	31966.05	3673.95	10.31	CrÃ­tico	CrÃ­tico
+case_0545	Volumen Tumoral	mmÂ³	18326	16895.61	1430.39	7.81	Medio-Alto	Medio-Alto
+
 
 
 

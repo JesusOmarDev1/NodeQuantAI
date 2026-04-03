@@ -6,48 +6,41 @@
        PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)
 =================================================================
  [Métricas de Clasificación Médica]
-  • Exactitud (Accuracy)      : 0.8346
-  • Precisión Ponderada       : 0.8343
-  • Sensibilidad (Recall)     : 0.8346
-  • Especificidad Macro       : 0.9086
-  • Valor Predictivo Neg. NPV : 0.9085
-  • F1-Score Ponderado        : 0.8342
+  • Exactitud (Accuracy)      : 0.8366
+  • Precisión Ponderada       : 0.8367
+  • Sensibilidad (Recall)     : 0.8366
+  • Especificidad Macro       : 0.9103
+  • Valor Predictivo Neg. NPV : 0.9095
+  • F1-Score Ponderado        : 0.8366
 
  [Métricas de Probabilidad y Robustez Estadistica]
-  • ROC-AUC (OVR)             : 0.9272
-  • Coeficiente Matthews (MCC): 0.7358
-  • Log Loss (Cross-Entropy)  : 0.4486
+  • ROC-AUC (OVR)             : 0.9282
+  • Coeficiente Matthews (MCC): 0.7392
+  • Log Loss (Cross-Entropy)  : 0.4503
 
  [Métricas de Gravedad Ordinal]
-  • Índice Kappa Cuadrático   : 0.8291
+  • Índice Kappa Cuadrático   : 0.8258
   • MAE Categórico (Escalones): 0.1673
 
  [Diagnóstico de Aprendizaje y Sobreajuste]
-  • Train F1-Score            : 0.9157
-  • Test F1-Score             : 0.8342
-  • Train Accuracy            : 0.9158
-  • Test Accuracy             : 0.8346
-  • Gap de Sobreajuste (F1)   : 8.9%
+  • Train F1-Score            : 0.9227
+  • Test F1-Score             : 0.8366
+  • Train Accuracy            : 0.9227
+  • Test Accuracy             : 0.8366
+  • Gap de Sobreajuste (F1)   : 9.3%
 =================================================================
 
 REPORTE DETALLADO POR CATEGORÍA:
               precision    recall  f1-score   support
 
-        Bajo       0.84      0.89      0.87       127
+        Bajo       0.84      0.85      0.84       127
   Intermedio       0.84      0.83      0.84       254
-     Crítico       0.82      0.78      0.80       127
+     Crítico       0.82      0.83      0.82       127
 
-    accuracy                           0.83       508
-   macro avg       0.83      0.83      0.83       508
-weighted avg       0.83      0.83      0.83       508
+    accuracy                           0.84       508
+   macro avg       0.83      0.84      0.84       508
+weighted avg       0.84      0.84      0.84       508
 
-        [RFECV] Evaluando 60 features para encontrar el subset óptimo (F1-Score)...
-        [RFECV] ¡Completado! Número óptimo de características: 32
-
-  [Optuna] Buscando hiperparámetros óptimos para producción...
-
-EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\joblib):
-  [OK] modelo_riesgo.joblib guardado (32 features)
 
 ======================================================================
  VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA (5 pacientes)
@@ -55,17 +48,17 @@ EXPORTANDO MODELO A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovat
   [Métricas de Rendimiento Global Holdout]
   • Exactitud (Accuracy) : 1.0000
   • F1-Score Ponderado   : 1.0000
-  • Log Loss (Certeza)   : 0.2283
+  • Log Loss (Certeza)   : 0.2029
   • Error Medio Global   : 0.00 escalones de riesgo en promedio
-  • Overfitting Holdout  : -9.2% (Caída respecto al Train)
+  • Overfitting Holdout  : -8.4% (Caída respecto al Train)
 
   [Análisis Forense por Paciente]
    case_0854 -> ACIERTO | Real: Bajo       | Pred: Bajo
-        ↳ Error: 0 escalón(es) | Bajo:82% | Int:14% | Cri:3%
+        ↳ Error: 0 escalón(es) | Bajo:82% | Int:15% | Cri:3%
    case_0864 -> ACIERTO | Real: Intermedio | Pred: Intermedio
-        ↳ Error: 0 escalón(es) | Bajo:4% | Int:92% | Cri:4%
+        ↳ Error: 0 escalón(es) | Bajo:3% | Int:93% | Cri:4%
    case_0165 -> ACIERTO | Real: Bajo       | Pred: Bajo
-        ↳ Error: 0 escalón(es) | Bajo:55% | Int:41% | Cri:4%
+        ↳ Error: 0 escalón(es) | Bajo:63% | Int:33% | Cri:4%
    case_0303 -> ACIERTO | Real: Crítico    | Pred: Crítico
         ↳ Error: 0 escalón(es) | Bajo:3% | Int:15% | Cri:82%
    case_0545 -> ACIERTO | Real: Intermedio | Pred: Intermedio
