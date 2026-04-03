@@ -1,10 +1,12 @@
 import os
+import sys
 import json
 import joblib
 import numpy as np
 import pandas as pd
 import subprocess
-import sys
+import tempfile
+import SimpleITK as sitk
 from typing import List, Tuple
 
 # --- AJUSTE DE RUTAS ---
@@ -30,8 +32,8 @@ class MotorInferenciaNodeQuant:
         print("Cargando cerebro de NodeQuant AI...")
         print(f"  [OK] Intérprete radiomics seleccionado: {self.python_radiomics_exe}")
 
-        # 1. Cargar los 3 modelos de regresión
-        targets = ["volumen", "eje_corto", "eje_largo"]
+        # 1. Cargar el modelo de regresión (AHORA SOLO VOLUMEN)
+        targets = ["volumen"]
         for t in targets:
             ruta_joblib = os.path.join(self.ruta_reg, f"modelo_{t}.joblib")
             ruta_json = os.path.join(self.ruta_reg, f"metadata_{t}.json")
@@ -44,9 +46,9 @@ class MotorInferenciaNodeQuant:
                     "modelo": joblib.load(ruta_joblib),
                     "metadata": metadata
                 }
-                print(f"  [OK] Modelo regresión {t} cargado.")
+                print(f"  [OK] Modelo regresión '{t}' cargado.")
             else:
-                print(f"  [ALERTA] Faltan archivos para {t} en {self.ruta_reg}")
+                print(f"  [ALERTA] Faltan archivos para '{t}' en {self.ruta_reg}")
 
         # 2. Cargar modelo de Clasificación de Riesgo (Independiente del bucle anterior)
         ruta_clf_joblib = os.path.join(self.ruta_clf, "modelo_riesgo.joblib")
@@ -216,33 +218,71 @@ class MotorInferenciaNodeQuant:
 
         return pd.DataFrame([resultado_json])
 
-    def predecir_paciente(self, ruta_imagen, ruta_mascara):
-        """Ejecuta todo el pipeline: Extracción -> Derivadas -> Regresión -> Clasificación"""
+    def _resamplear_fantasma(self, ruta_in, ruta_out, es_mascara=False):
+        """Re-muestreo a 1x1x1 mm exclusivo para la matemática interna del modelo."""
+        imagen = sitk.ReadImage(ruta_in)
+        espaciado_original = imagen.GetSpacing()
+        tamano_original = imagen.GetSize()
+        espaciado_objetivo = (1.0, 1.0, 1.0)
 
-        # 1. Extracción y Derivadas
-        df_crudo = self.extraer_radiomica(ruta_imagen, ruta_mascara)
+        nuevo_tamano = [
+            int(np.round(tamano_original[0] * (espaciado_original[0] / espaciado_objetivo[0]))),
+            int(np.round(tamano_original[1] * (espaciado_original[1] / espaciado_objetivo[1]))),
+            int(np.round(tamano_original[2] * (espaciado_original[2] / espaciado_objetivo[2])))
+        ]
+
+        resampler = sitk.ResampleImageFilter()
+        resampler.SetSize(nuevo_tamano)
+        resampler.SetOutputSpacing(espaciado_objetivo)
+        resampler.SetOutputOrigin(imagen.GetOrigin())
+        resampler.SetOutputDirection(imagen.GetDirection())
+
+        if es_mascara:
+            resampler.SetInterpolator(sitk.sitkNearestNeighbor)
+            resampler.SetDefaultPixelValue(0)
+        else:
+            resampler.SetInterpolator(sitk.sitkLinear)
+            resampler.SetDefaultPixelValue(-1000)  # HU del aire
+
+        imagen_resampleada = resampler.Execute(imagen)
+        sitk.WriteImage(imagen_resampleada, ruta_out)
+
+    def predecir_paciente(self, ruta_imagen, ruta_mascara):
+        """Ejecuta todo el pipeline usando copias temporales resampleadas a 1x1x1mm."""
+
+        # 1. Crear entorno temporal (se autodestruye al terminar)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ruta_img_res = os.path.join(tmpdir, "img_1x1x1.nii.gz")
+            ruta_mask_res = os.path.join(tmpdir, "mask_1x1x1.nii.gz")
+
+            # 2. Resampling Fantasma
+            self._resamplear_fantasma(ruta_imagen, ruta_img_res, es_mascara=False)
+            self._resamplear_fantasma(ruta_mascara, ruta_mask_res, es_mascara=True)
+
+            # 3. Extracción (USANDO LOS ARCHIVOS RESAMPLEADOS)
+            df_crudo = self.extraer_radiomica(ruta_img_res, ruta_mask_res)
+
+        # 4. Derivadas (ya fuera del entorno temporal porque tenemos el DataFrame)
         df_procesado = crear_features_derivadas(df_crudo)
 
         resultados_finales = {}
 
-        # 2. Predicciones de Regresión
+        # 5. Predicciones de Regresión (Volumen)
         for target, info in self.modelos_regresion.items():
             modelo = info["modelo"]
             meta = info["metadata"]
+
             X_input = df_procesado.reindex(columns=meta["features_entrada"], fill_value=0)
 
             pred_raw = modelo.predict(X_input)[0]
-            if meta.get("use_log", False):
-                pred_final = np.maximum(0, np.expm1(pred_raw))
-            else:
-                pred_final = np.maximum(0, pred_raw)
+            pred_final = np.maximum(0, pred_raw)
 
             resultados_finales[target] = {
                 "valor": round(pred_final, 2),
                 "unidad": meta["unidad"]
             }
 
-        # 3. Predicción de Clasificación
+        # 6. Predicción de Clasificación (Riesgo)
         if self.modelo_clasificacion:
             modelo_clf = self.modelo_clasificacion["modelo"]
             meta_clf = self.modelo_clasificacion["metadata"]
@@ -275,9 +315,8 @@ if __name__ == "__main__":
         reporte = motor.predecir_paciente(img_test, mask_test)
 
         print("\n--- REPORTE CLÍNICO NODEQUANT ---")
-        print(f"Volumen Estimado:   {reporte['volumen']['valor']} {reporte['volumen']['unidad']}")
-        print(f"Eje Corto Estimado: {reporte['eje_corto']['valor']} {reporte['eje_corto']['unidad']}")
-        print(f"Eje Largo Estimado: {reporte['eje_largo']['valor']} {reporte['eje_largo']['unidad']}")
+        # El diccionario 'reporte' ahora solo contiene la clave 'volumen' y 'riesgo'
+        print(f"Volumen Estimado:   {reporte['volumen']['valor']:,.1f} {reporte['volumen']['unidad']}")
         print(f"Nivel de Riesgo:    {reporte['riesgo']}")
         print("---------------------------------")
 

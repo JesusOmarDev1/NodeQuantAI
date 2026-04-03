@@ -40,12 +40,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Wedge
 
-from sklearn.model_selection import KFold, RandomizedSearchCV
+from sklearn.model_selection import KFold, RandomizedSearchCV, cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import (
     RandomForestRegressor, GradientBoostingRegressor, StackingRegressor,
 )
-from sklearn.linear_model import Ridge, Lasso
+from sklearn.linear_model import Ridge, Lasso, LinearRegression
 from sklearn.feature_selection import SelectFromModel
 from sklearn.pipeline import Pipeline
 from sklearn.base import clone
@@ -56,11 +56,19 @@ from sklearn.metrics import (
 )
 from sklearn.feature_selection import mutual_info_regression
 
-from xgboost import XGBRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
+from sklearn.svm import SVR
+from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, StackingRegressor
+from lightgbm import LGBMRegressor
+from sklearn.linear_model import HuberRegressor
 
-from regression.scripts.optimizar_regression import detectar_overfitting, seleccionar_features_rfecv
+import optuna
+from sklearn.decomposition import PCA
+from sklearn.compose import TransformedTargetRegressor
+
+from regression.scripts.optimizar_regresion import detectar_overfitting, seleccionar_features_rfecv
 
 warnings.filterwarnings("ignore")
 
@@ -94,10 +102,10 @@ COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
 TARGETS = [
     {"nombre": "Volumen Tumoral",    "col": "target_regresion",
      "origen": "shape_VoxelVolume",  "u": "mm\u00b3", "slug": "volumen"},
-    {"nombre": "Diametro Eje Corto", "col": "target_eje_corto",
-     "origen": "shape_MinorAxisLength", "u": "mm", "slug": "eje_corto"},
-    {"nombre": "Diametro Eje Largo", "col": "target_eje_largo",
-     "origen": "shape_MajorAxisLength", "u": "mm", "slug": "eje_largo"},
+    #{"nombre": "Diametro Eje Corto", "col": "target_eje_corto",
+     #"origen": "shape_MinorAxisLength", "u": "mm", "slug": "eje_corto"},
+    #{"nombre": "Diametro Eje Largo", "col": "target_eje_largo",
+     #"origen": "shape_MajorAxisLength", "u": "mm", "slug": "eje_largo"},
 ]
 COLS_TARGET = [t["col"] for t in TARGETS]
 
@@ -129,68 +137,74 @@ plt.rcParams.update({
 
 
 # ===========================================================================
-#  Stacking Pipeline
+#  OBTENER LA CONFIGURACIÓN DE LOS MODELOS
 # ===========================================================================
-def _crear_stacking_pipeline():
-    """
-    Retorna (Pipeline, nombre_modelo) con StackingRegressor.
-    Base estimators: XGBoost + Random Forest + Gradient Boosting.
-    Meta-learner: Ridge(alpha=10).
-    Filtro previo: LASSO para eliminar colinealidad.
-    """
-    estimators = [
-        ("xgb", XGBRegressor(
-            n_estimators=200, max_depth=3, learning_rate=0.05,
-            reg_alpha=5, reg_lambda=10, min_child_weight=10,
-            subsample=0.8, colsample_bytree=0.8,
-            random_state=42, verbosity=0)),
-        ("rf", RandomForestRegressor(
-            n_estimators=200, max_depth=7,
-            min_samples_leaf=4, max_features=0.8,
-            random_state=42)),
-        ("gb", GradientBoostingRegressor(
-            n_estimators=200, max_depth=3, learning_rate=0.05,
-            subsample=0.8, min_samples_leaf=5,
-            random_state=42)),
-        #("knn", KNeighborsRegressor(n_neighbors=5, weights='distance')),
-        #("mlp", MLPRegressor(hidden_layer_sizes=(50,), max_iter=500, random_state=42))
-    ]
+def _obtener_config_modelo(target_slug):
+    if target_slug == "volumen":
+        estimators = [
+            # Bajamos a 80 estimadores y usamos el 80% de los datos para forzar generalización
+            ("lgbm", LGBMRegressor(n_estimators=80, subsample=0.8, random_state=42, verbose=-1, n_jobs=None)),
+            ("gb", GradientBoostingRegressor(n_estimators=80, subsample=0.8, random_state=42)),
+            ("rf", RandomForestRegressor(n_estimators=80, max_samples=0.8, random_state=42, n_jobs=None))
+        ]
+        nombre = "Dream Team (LGBM + GB + RF - Estrictos)"
+
+        # [EL CAMBIO MAESTRO]
+        # positive=True: Prohíbe restar predicciones (evita caos)
+        # fit_intercept=False: Prohíbe sumar la base fantasma que está inflando el 80%
+        # Volvemos a Ridge para tener penalización L2 (evita que un modelo se vuelva loco como en el 0545)
+        # Mantenemos positive=True y fit_intercept=False para que sea un promedio estricto.
+        meta_learner = Ridge(alpha=10.0, positive=True, fit_intercept=False)
+
+    stacking = StackingRegressor(
+        estimators=estimators,
+        final_estimator=meta_learner,
+        cv=5,
+        n_jobs=None,
+    )
+
+    # Volvemos al log1p: Matemáticamente estable para errores porcentuales
     pipe = Pipeline([
         ("scaler", StandardScaler()),
-        # --- NUEVO: Filtro LASSO ---
-        # alpha=0.01 es un buen punto de partida para que no elimine demasiadas
-        ("lasso_filter", SelectFromModel(Lasso(alpha=0.01, random_state=42, max_iter=10000))), 
-        ("model", StackingRegressor(
-            estimators=estimators,
-            final_estimator=Ridge(alpha=10.0),
-            cv=5,
-            n_jobs=None, # Probar None en lugar de -1 si la compu se congela o tarda mucho
-        )),
+        ("model", TransformedTargetRegressor(
+            regressor=stacking,
+            func=np.log1p,
+            inverse_func=np.expm1
+        ))
     ])
-    return pipe, "Stacking (LASSO + XGB+RF+GB)"
+
+    return pipe, nombre, {}
 
 
 def _extraer_importances_stacking(pipe, feature_names):
-    """Importances ponderadas: base estimators x coef Ridge."""
-    
-    # 1. Identificar qué variables sobrevivieron al filtro LASSO
-    lasso_step = pipe.named_steps["lasso_filter"]
-    surviving_features = np.array(feature_names)[lasso_step.get_support()]
+    """Extrae las importancias promediadas del pipeline directo."""
+    # [CORRECCIÓN] Como volvió el envoltorio, el Stacking está escondido en .regressor_
+    stacking = pipe.named_steps["model"].regressor_
 
-    # 2. Extraer los coeficientes del Stacking solo para las variables sobrevivientes
-    stacking = pipe.named_steps["model"]
+    # Obtenemos los coeficientes del meta-learner (Ridge/LinearRegression)
     coefs = stacking.final_estimator_.coef_
-    importances = np.zeros(len(surviving_features))
+
+    # Si hay PCA se ajustan los nombres, si no, se usan las variables crudas
+    if "pca" in pipe.named_steps:
+        n_components = pipe.named_steps["pca"].n_components_
+        nombres_reales = [f"PCA_Componente_{i + 1}" for i in range(n_components)]
+    else:
+        nombres_reales = feature_names
+
+    importances = np.zeros(len(nombres_reales))
 
     for est, coef in zip(stacking.estimators_, coefs):
         if hasattr(est, "feature_importances_"):
+            # Ponderamos la importancia del árbol por el peso que le dio el meta-learner
             importances += est.feature_importances_ * abs(coef)
 
     total = importances.sum()
     if total > 0:
         importances /= total
+    else:
+        importances = np.ones(len(nombres_reales)) / len(nombres_reales)
 
-    return dict(zip(surviving_features, importances))
+    return dict(zip(nombres_reales, importances))
 
 
 # ===========================================================================
@@ -275,6 +289,17 @@ def crear_features_derivadas(X):
     if "firstorder_Entropy" in X.columns and "glcm_JointEntropy" in X.columns:
         Xd["inter_Entropy_JEntropy"] = X["firstorder_Entropy"] * X["glcm_JointEntropy"]
 
+    # Flag Clínico: Detección de Necrosis / Conglomerado Masivo
+    # Usando percentiles relativos a la distribución del dataset
+    if "firstorder_Minimum" in X.columns and "glszm_ZoneVariance" in X.columns:
+        # [CORRECCIÓN] Valores estáticos (Usa los de tu dataset o estos aproximados)
+        min_umbral = -30.0
+        var_umbral = 15000.0
+
+        Xd["flag_conglomerado_necrotico"] = np.where(
+            (X["firstorder_Minimum"] <= min_umbral) & (X["glszm_ZoneVariance"] >= var_umbral),1, 0
+        )
+
     # Reemplazar inf/NaN
     Xd = Xd.replace([np.inf, -np.inf], np.nan).fillna(0)
 
@@ -291,35 +316,43 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
       2. Poda de Colinealidad (INTER_CORR_UMBRAL) para eliminar variables gemelas.
       3. RFECV para encontrar el subset óptimo.
     """
+    # ELIMINADO: y_1d = np.cbrt(y_target)
+    # Ahora usamos y_target directamente en todo el bloque.
+
+    # ¡CRÍTICO: Transformar el target para estabilizar la varianza!
+    y_transformado = np.log1p(y_target)
+
     # --- PASO 1: FILTRO GRUESO (Ruido) ---
-    corrs = X.corrwith(pd.Series(y_target, index=X.index)).abs().fillna(0)
+    corrs = X.corrwith(pd.Series(y_transformado, index=X.index)).abs().fillna(0)
     cols_corr = set(corrs[corrs > CORR_UMBRAL].index)
 
-    mi = mutual_info_regression(X, y_target, random_state=42, n_neighbors=5)
+    mi = mutual_info_regression(X, y_transformado, random_state=42, n_neighbors=5)
     mi_series = pd.Series(mi, index=X.columns)
     mi_umbral = np.percentile(mi_series.values, 20)
     cols_mi = set(mi_series[mi_series > mi_umbral].index)
 
     cols_ok = list(cols_corr | cols_mi)
+
+    # --- EL SALVAVIDAS DE LA BANDERA ---
+    if "flag_conglomerado_necrotico" in X.columns and "flag_conglomerado_necrotico" not in cols_ok:
+        cols_ok.append("flag_conglomerado_necrotico")
+
     if not cols_ok:
         cols_ok = list(X.columns)
-        
+
     X_filt = X[cols_ok].copy()
 
-    # --- PASO 2: PODA DE COLINEALIDAD (El paso perdido) ---
-    # Calculamos la matriz de correlación de las características sobrevivientes
+    # --- PASO 2: PODA DE COLINEALIDAD ---
     corr_matrix = X_filt.corr().abs()
-    # Tomamos solo el triángulo superior de la matriz para no borrar ambas variables
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    # Encontramos las columnas con correlación mayor al 95%
     to_drop = [column for column in upper.columns if any(upper[column] > INTER_CORR_UMBRAL)]
     X_filt = X_filt.drop(columns=to_drop)
-    
+
     cols_ok = list(X_filt.columns)
 
     # --- PASO 3: RFECV (EL QUIRÓFANO) ---
-    if usar_rfecv and len(cols_ok) > 5:
-        resultado_rfecv = seleccionar_features_rfecv(X_filt, y_target, cv=3, min_features=5)
+    if usar_rfecv and len(cols_ok) > 12:
+        resultado_rfecv = seleccionar_features_rfecv(X_filt, y_transformado, cv=3, min_features=12)
         cols_finales = resultado_rfecv["columnas_seleccionadas"]
         return cols_finales
     else:
@@ -331,8 +364,8 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 # ===========================================================================
 def preparar_datos(df_raw):
     """
-    Deduplica, crea targets desde shape_*, elimina shape_* (data leakage).
-    Returns: X, dict_targets, ids, info
+    Deduplica, crea targets desde shape_*, elimina shape_* y
+    BLOQUEA variables radiómicas con Fuga de Datos (Volume-Confounded).
     """
     n_raw = len(df_raw)
     df_raw = df_raw.drop_duplicates(subset="Paciente_ID")
@@ -343,11 +376,29 @@ def preparar_datos(df_raw):
     for t in TARGETS:
         df[t["col"]] = df_raw[t["origen"]]
 
-    shape_cols = [c for c in df.columns if c.startswith("shape_")]
-    df = df.drop(columns=shape_cols)
+    # --- TODO ESTO SALIÓ DEL BUCLE FOR ---
+    # 1. Escudo contra tamaño, pero SALVAMOS las proporciones morfológicas (No tienen fuga de datos)
+    shape_cols = [c for c in df.columns if
+                  c.startswith("shape_") and c not in ["shape_Sphericity", "shape_Elongation", "shape_Flatness"]]
 
-    cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET + COLS_CLINICAS
+    # 2. ESCUDO DINÁMICO DE SPEARMAN (Anti-Leakage)
+    y_temp_vol = df_raw["shape_VoxelVolume"].values
+    fuga_cols = []
+
+    # Excluimos las columnas que ya sabemos que son targets o shape
+    cols_a_evaluar = [c for c in df.columns if
+                      c not in COLS_TARGET + COLS_CLINICAS + shape_cols and c != "Paciente_ID"]
+
+    for col in cols_a_evaluar:
+        coef, _ = spearmanr(df[col], y_temp_vol)
+        # Tu regla de oro: Si Spearman > 0.75, a la basura
+        if abs(coef) > 0.75:
+            fuga_cols.append(col)
+
+    # Juntamos todas las columnas prohibidas
+    cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET + COLS_CLINICAS + shape_cols + fuga_cols
     X = df.drop(columns=[c for c in cols_drop if c in df.columns])
+    # -------------------------------------
 
     ids = df_raw["Paciente_ID"].values
     targets = {t["col"]: df[t["col"]].values for t in TARGETS}
@@ -366,6 +417,7 @@ def preparar_datos(df_raw):
         "n_muestras": n_dedup,
         "n_features": X.shape[1],
         "shape_eliminadas": len(shape_cols),
+        "fugas_eliminadas": len(fuga_cols),  # Para tener registro
         "familias": familias,
     }
     return X, targets, ids, info
@@ -398,6 +450,81 @@ def categorizar_nivel(valor, y_total):
     return "Crítico"
 
 
+def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
+    """Utiliza Optimización Bayesiana para encontrar los hiperparámetros perfectos."""
+
+    def objective(trial):
+        pipe = clone(pipe_tmpl)
+
+        # RANGOS ANTI-MEMORIZACIÓN (AÚN MÁS ESTRICTOS)
+        rf_depth = trial.suggest_int("rf_depth", 2, 4)  # Máximo 4 niveles
+        rf_min_samples = trial.suggest_int("rf_min_samples", 12, 25)  # Más muestras requeridas
+
+        lgbm_lr = trial.suggest_float("lgbm_lr", 0.01, 0.04, log=True)
+        lgbm_depth = trial.suggest_int("lgbm_depth", 2, 3)
+        lgbm_min_child = trial.suggest_int("lgbm_min_child_samples", 12, 25)
+        lgbm_alpha = trial.suggest_float("lgbm_reg_alpha", 0.1, 10.0, log=True)  # NUEVO: Regularización L1
+
+        gb_lr = trial.suggest_float("gb_lr", 0.01, 0.04, log=True)
+        gb_depth = trial.suggest_int("gb_depth", 2, 3)
+        gb_min_samples = trial.suggest_int("gb_min_samples_leaf", 12, 25)
+
+        # [CORRECCIÓN CRÍTICA] ¡Volvió el envoltorio logarítmico! Debe llevar "regressor__"
+        try:
+            pipe.set_params(
+                model__regressor__rf__max_depth=rf_depth,
+                model__regressor__rf__min_samples_leaf=rf_min_samples,
+                model__regressor__lgbm__learning_rate=lgbm_lr,
+                model__regressor__lgbm__max_depth=lgbm_depth,
+                model__regressor__lgbm__min_child_samples=lgbm_min_child,
+                model__regressor__gb__learning_rate=gb_lr,
+                model__regressor__gb__max_depth=gb_depth,
+                model__regressor__gb__min_samples_leaf=gb_min_samples,
+                model__regressor__lgbm__reg_alpha=lgbm_alpha
+            )
+        except ValueError as e:
+            print(f"\n[!] ERROR DE RUTAS EN PIPELINE: {e}")
+            raise e
+
+        try:
+            score = cross_val_score(
+                pipe, X_train, y_train, cv=3,
+                scoring="neg_mean_absolute_percentage_error",
+                n_jobs=None  # Vital mantenerlo en None para no saturar tus 12GB de RAM
+            ).mean()
+
+            if np.isnan(score):
+                return -999999.0
+            return score
+
+        except Exception as e:
+            print(f"\n[!] ERROR EN CROSS VAL OPTUNA: {e}")
+            return -999999.0
+
+    # Limpiamos los fantasmas duplicados de Optuna aquí afuera
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+    estudio = optuna.create_study(direction="maximize")
+
+    print(f"        [Optuna] Explorando {n_trials} combinaciones inteligentes...")
+    estudio.optimize(objective, n_trials=n_trials)
+
+    mejor_pipe = clone(pipe_tmpl)
+
+    # [CORRECCIÓN CRÍTICA] Rutas corregidas también aquí al asignar al pipe final
+    mejor_pipe.set_params(
+        model__regressor__rf__max_depth=estudio.best_params["rf_depth"],
+        model__regressor__rf__min_samples_leaf=estudio.best_params["rf_min_samples"],
+        model__regressor__lgbm__learning_rate=estudio.best_params["lgbm_lr"],
+        model__regressor__lgbm__max_depth=estudio.best_params["lgbm_depth"],
+        model__regressor__lgbm__min_child_samples=estudio.best_params["lgbm_min_child_samples"],
+        model__regressor__gb__learning_rate=estudio.best_params["gb_lr"],
+        model__regressor__gb__max_depth=estudio.best_params["gb_depth"],
+        model__regressor__gb__min_samples_leaf=estudio.best_params["gb_min_samples_leaf"],
+        model__regressor__lgbm__reg_alpha=estudio.best_params["lgbm_reg_alpha"]
+    )
+    return mejor_pipe, estudio.best_params
+
+
 # ===========================================================================
 #  Entrenamiento y evaluacion
 # ===========================================================================
@@ -407,6 +534,16 @@ def entrenar_y_evaluar():
     Returns: df_pred, resultados_globales, informacion_modelos
     """
     df_raw = pd.read_csv(RUTA_CSV)
+
+    # =======================================================================
+    # ELIMINACIÓN DE OUTLIERS SUAVIZADA (Percentil 98 en lugar de IQR)
+    # =======================================================================
+    col_volumen = "shape_VoxelVolume"
+    limite_superior = df_raw[col_volumen].quantile(0.98)  # Conserva el 98% de los datos
+
+    df_raw = df_raw[df_raw[col_volumen] <= limite_superior].copy()
+    # =======================================================================
+
     X_all, targets_dict, ids, info = preparar_datos(df_raw)
 
     # Feature engineering: agregar ratios e interacciones
@@ -434,118 +571,79 @@ def entrenar_y_evaluar():
     for t in TARGETS:
         slug = t["slug"]
         y_orig = targets_dict[t["col"]]
-        y_train_space = np.log1p(y_orig)
+        y_train_space = y_orig  # Ya no transformamos aquí
         u = t["u"]
 
-        pipe_tmpl, nombre_modelo = _crear_stacking_pipeline()
+        # [CAMBIO AQUI]: Llamamos a la nueva función que devuelve TODO adaptado al target
+        pipe_tmpl, nombre_modelo, param_grid_dinamico = _obtener_config_modelo(slug)
 
         print(f"\n  {t['nombre']} ({u}) | {nombre_modelo}")
         print(f"    Rango: [{y_orig.min():.1f}, {y_orig.max():.1f}]  Media: {y_orig.mean():.1f}")
 
-        # ---------------------------------------------------------------
-        #  KFold CV (out-of-fold predictions) SIN DATA LEAKAGE
-        # ---------------------------------------------------------------
         all_y_pred_kf = np.zeros(N)
         all_y_count_kf = np.zeros(N)
         kf_train_maes = []
         kf_test_maes = []
-        features_seleccionadas_por_fold = [] # Para rastrear cuántas selecciona
+        features_seleccionadas_por_fold = []
 
+        # -------------------------------------------------------------------
+        # 1. ENCONTRAR LAS FEATURES MAESTRAS (RFECV GLOBAL)
+        # -------------------------------------------------------------------
+        print(f"    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...")
+        cols_sel_final = seleccionar_features(X_all, y_train_space, usar_rfecv=True)
+        X_final = X_all[cols_sel_final]
+
+        # -------------------------------------------------------------------
+        # 2. ENCONTRAR LOS HIPERPARÁMETROS MAESTROS
+        # -------------------------------------------------------------------
+        print(f"    [2/3] Buscando hiperparámetros óptimos...")
+        # [CORRECCIÓN] Pasamos la variable cruda. El TransformedTargetRegressor del pipeline hace el resto.
+        pipe_optimo, mejores_params = optimizar_con_optuna_regresion(
+            X_final, y_train_space, clone(pipe_tmpl), n_trials=20
+        )
+        print(f"    [Optuna] Listo. Validando modelo definitivo...")
+
+        # -------------------------------------------------------------------
+        # 3. VALIDACIÓN K-FOLD LIGERA (El examen final de la arquitectura)
+        # -------------------------------------------------------------------
         for rep in range(N_REPEATS):
             kf = KFold(n_splits=N_SPLITS, shuffle=True, random_state=42 + rep)
-            # Fíjate que ahora dividimos X_all, no la X filtrada
-            for train_idx, test_idx in kf.split(X_all): 
-                X_tr_completo, X_te_completo = X_all.iloc[train_idx], X_all.iloc[test_idx]
-                y_tr_space = y_train_space[train_idx]
-                #y_tr_orig = y_orig[train_idx]
+            for train_idx, test_idx in kf.split(X_final):
+                X_tr, X_te = X_final.iloc[train_idx], X_final.iloc[test_idx]
+                y_tr_space_fold = y_train_space[train_idx]
                 y_te_orig = y_orig[test_idx]
 
-                # 1. SELECCIÓN ESTRICTA: Solo vemos los datos de entrenamiento
-                cols_sel_fold = seleccionar_features(X_tr_completo, y_tr_space)
-                features_seleccionadas_por_fold.append(len(cols_sel_fold))
+                # Usamos el pipeline podado e inteligente con las features exactas
+                fold_pipe = clone(pipe_optimo)
+                fold_pipe.fit(X_tr, y_tr_space_fold)
 
-                # 2. FILTRADO: Aplicamos las columnas ganadoras al train y al test
-                X_tr = X_tr_completo[cols_sel_fold]
-                X_te = X_te_completo[cols_sel_fold]
-
-                # 3. ENTRENAMIENTO Y AFINACIÓN: Buscamos los mejores parámetros para el ensamble
-                fold_pipe = clone(pipe_tmpl)
-                
-                # Definimos la red de hiperparámetros a explorar
-                param_grid = {
-                    "lasso_filter__estimator__alpha": [0.001, 0.01, 0.1], # Decidir cuánta colinealidad limpiar
-                    "model__final_estimator__alpha": [0.1, 1.0, 10.0, 50.0], # Ajuste del juez (Ridge)
-                    "model__rf__max_depth": [2,3,4], #[3, 5, 7]              # Ajuste de Random Forest
-                    "model__xgb__learning_rate": [0.01, 0.05, 0.1],          # Ajuste de XGBoost
-                    "model__xgb__max_depth": [2,3], #[3, 5]
-                    "model__gb__learning_rate": [0.01, 0.05, 0.1]            # Ajuste de Gradient Boost
-                }
-                
-                # Usamos RandomizedSearchCV para buscar rápido (solo prueba 5 combinaciones al azar)
-                # cv=2 es suficiente aquí porque ya estamos dentro de un K-Fold externo
-                search = RandomizedSearchCV(
-                    fold_pipe, 
-                    param_distributions=param_grid,
-                    n_iter=5, 
-                    cv=2, 
-                    scoring="neg_mean_absolute_error",
-                    random_state=42,
-                    n_jobs=None
-                )
-                
-                # Entrenamos la búsqueda
-                search.fit(X_tr, y_tr_space)
-                
-                # Nos quedamos con el mejor pipeline encontrado
-                fold_pipe = search.best_estimator_
-
-                # 4. PREDICCIÓN CON LÍMITE FÍSICO
-                # Evitamos que la inversa del logaritmo genere volúmenes negativos
-                pred_tr = np.maximum(0, np.expm1(fold_pipe.predict(X_tr)))
-                pred_te = np.maximum(0, np.expm1(fold_pipe.predict(X_te)))
-
-                kf_train_maes.append(mean_absolute_error(np.expm1(y_tr_space), pred_tr))
-                kf_test_maes.append(mean_absolute_error(y_te_orig, pred_te))
+                pred_te = fold_pipe.predict(X_te)
+                pred_tr = fold_pipe.predict(X_tr)
 
                 all_y_pred_kf[test_idx] += pred_te
                 all_y_count_kf[test_idx] += 1
+
+                kf_train_maes.append(mean_absolute_error(y_tr_space_fold, pred_tr))
+                kf_test_maes.append(mean_absolute_error(y_te_orig, pred_te))
+                # ========================================================
 
         y_pred_kf = all_y_pred_kf / np.maximum(all_y_count_kf, 1)
         metricas_kf = calcular_metricas(y_orig, y_pred_kf)
 
         kf_train_mae = np.mean(kf_train_maes)
         kf_test_mae = np.mean(kf_test_maes)
-        kf_gap = ((kf_test_mae - kf_train_mae) / kf_test_mae * 100
-                   ) if kf_test_mae != 0 else 0
-                   
-        avg_features = np.mean(features_seleccionadas_por_fold)
+        kf_gap = ((kf_test_mae - kf_train_mae) / kf_test_mae * 100) if kf_test_mae != 0 else 0
 
         print(f"    KFold  R2={metricas_kf['R2']:.4f}  MAE={metricas_kf['MAE']:.1f}  "
-              f"Gap={kf_gap:.1f}%  (Promedio de features: {avg_features:.0f})")
+              f"Gap={kf_gap:.1f}%  (Features finales: {len(cols_sel_final)})")
 
         # ---------------------------------------------------------------
-        #  Modelo final (todos los datos) - SOLO PARA PRODUCCIÓN
+        # 4. ENTRENAMIENTO PARA PRODUCCIÓN
         # ---------------------------------------------------------------
-        # Aquí sí usamos todo X_all porque el modelo final va al dashboard
-        cols_sel_final = seleccionar_features(X_all, y_train_space)
-        X_final = X_all[cols_sel_final]
-        
-        # ENTRENAMIENTO Y AFINACIÓN DEL MODELO DE PRODUCCIÓN
-        pipe_base_final = clone(pipe_tmpl)
-        
-        search_final = RandomizedSearchCV(
-            pipe_base_final, 
-            param_distributions=param_grid,
-            n_iter=10, # Usamos 10 iteraciones aquí porque es el modelo definitivo
-            cv=3,      # CV de 3 para mayor robustez
-            scoring="neg_mean_absolute_error",
-            random_state=42,
-            n_jobs=None
-        )
-        search_final.fit(X_final, y_train_space)
-        pipe_final = search_final.best_estimator_
-        
-        print(f"    Mejores parámetros finales: {search_final.best_params_}")
+        pipe_final = clone(pipe_optimo)
+        pipe_final.fit(X_final, y_train_space)
+
+        print(f"    Mejores parámetros finales: {mejores_params}")
 
         imp_dict = _extraer_importances_stacking(pipe_final, list(X_final.columns))
         top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
@@ -594,7 +692,7 @@ def entrenar_y_evaluar():
                 "Error": round(err_abs, 2),
                 "Error %": round(err_pct, 2),
             })
-            
+
     # CSVs
     df_pred = pd.DataFrame(predicciones_totales)
     df_pred.to_csv(os.path.join(CARPETA_METRICAS, "predicciones_kfold.csv"),
@@ -1029,13 +1127,13 @@ def predecir_casos_prueba(informacion_modelos):
     df_prueba = pd.read_csv(RUTA_PRUEBA)
     print(f"\n  VERIFICACION CASOS DE PRUEBA ({len(df_prueba)} casos)")
 
-    shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
+    # [CORRECCIÓN CRÍTICA] Salvar las proporciones morfológicas de ser borradas
+    shape_cols = [c for c in df_prueba.columns if
+                  c.startswith("shape_") and c not in ["shape_Sphericity", "shape_Elongation", "shape_Flatness"]]
+
     cols_drop = ["Paciente_ID", "target_riesgo"] + shape_cols + COLS_CLINICAS
     X_prueba = df_prueba.drop(
         columns=[c for c in cols_drop if c in df_prueba.columns])
-
-    # Aplicar las mismas features derivadas que en entrenamiento
-    X_prueba = crear_features_derivadas(X_prueba)
 
     resultados_prueba = []
 
@@ -1057,13 +1155,9 @@ def predecir_casos_prueba(informacion_modelos):
             X_pred = X_prueba
 
         y_real = df_prueba[t["origen"]].values
-        
-        # Aplicamos el límite a las predicciones finales
-        y_pred_raw = pipe.predict(X_pred)
-        if info.get("use_log"):
-            y_pred = np.maximum(0, np.expm1(y_pred_raw))
-        else:
-            y_pred = np.maximum(0, y_pred_raw)
+
+        # El modelo ya devuelve el volumen en mm3 reales automáticamente
+        y_pred = pipe.predict(X_pred)
 
         metricas = calcular_metricas(y_real, y_pred)
         print(f"    {nombre}: R2={metricas['R2']:.4f}  "
@@ -1234,12 +1328,257 @@ def exportar_modelos_produccion(informacion_modelos):
         print(f"         -> {ruta_json}")
 
 
+
+
+# ===========================================================================
+#  Torneo de Algoritmos
+# ===========================================================================
+def gran_torneo_volumen():
+    print("\n" + "=" * 80)
+    print("GRAN TORNEO DE ALGORITMOS: PREDICCIÓN DE VOLUMEN TUMORAL")
+    print("=" * 80)
+
+    # 1. Preparar datos
+    df_raw = pd.read_csv(RUTA_CSV)
+    X_all_raw, targets_dict, ids, info = preparar_datos(df_raw)
+    X_all = crear_features_derivadas(X_all_raw)
+
+    # Nos concentramos SOLO en el volumen
+    y_orig = targets_dict["target_regresion"]
+    y_train_space = y_orig
+
+    # 2. Selección de Características
+    print("\n  [1/3] Seleccionando las mejores características (RFECV)...")
+    cols_sel = seleccionar_features(X_all, y_train_space, usar_rfecv=True)
+    X_filt = X_all[cols_sel]
+    p = X_filt.shape[1]
+    print(f"        -> Se seleccionaron {p} variables clave.")
+
+    # 3. Catálogo Masivo de Modelos de Regresión
+    from sklearn.linear_model import (LinearRegression, Ridge, Lasso, ElasticNet,
+                                      PoissonRegressor, HuberRegressor, BayesianRidge)
+    from sklearn.svm import SVR
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+    from sklearn.neighbors import KNeighborsRegressor
+    from sklearn.neural_network import MLPRegressor
+    from xgboost import XGBRegressor
+    from lightgbm import LGBMRegressor
+
+    modelos = {
+        "Regresión Lineal": LinearRegression(),
+        "Ridge": Ridge(alpha=1.0),
+        "Lasso": Lasso(alpha=0.01),
+        "ElasticNet": ElasticNet(alpha=0.01, l1_ratio=0.5),
+        "Huber (Robusto)": HuberRegressor(max_iter=2000),
+        "Bayesian Ridge": BayesianRidge(),
+        "Poisson Regressor": PoissonRegressor(max_iter=2000),
+        "KNN": KNeighborsRegressor(n_neighbors=5, weights='distance'),
+        "SVR (Radial)": SVR(kernel='rbf', C=10.0, epsilon=0.1),
+        "Árbol de Decisión": DecisionTreeRegressor(max_depth=5, random_state=42),
+        "Random Forest": RandomForestRegressor(n_estimators=100, max_depth=3, min_samples_leaf=2, random_state=42,
+                                               n_jobs=-1),
+        "Gradient Boosting": GradientBoostingRegressor(n_estimators=100, max_depth=3, random_state=42),
+        "XGBoost": XGBRegressor(n_estimators=100, max_depth=3, learning_rate=0.05, subsample=0.8, random_state=42,
+                                n_jobs=-1),
+        "LightGBM": LGBMRegressor(n_estimators=100, max_depth=3, learning_rate=0.05, subsample=0.8, random_state=42,
+                                  verbose=-1),
+        "Red Neuronal (MLP)": MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=1500, early_stopping=True,
+                                           random_state=42)
+    }
+
+    resultados = []
+
+    print("\n  [2/3] Iniciando combates en la Arena (5-Fold CV)...")
+    for nombre_mod, modelo in modelos.items():
+        kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+        all_y_real = []
+        all_y_pred = []
+        train_maes = []
+
+        for train_idx, test_idx in kf.split(X_filt):
+            X_tr, X_te = X_filt.iloc[train_idx], X_filt.iloc[test_idx]
+            y_tr_space, y_te_orig = y_train_space[train_idx], y_orig[test_idx]
+
+            # Estandarizamos para modelos sensibles (SVM, KNN, Redes Neuronales)
+            scaler = StandardScaler()
+            X_tr_sc = scaler.fit_transform(X_tr)
+            X_te_sc = scaler.transform(X_te)
+
+            clon = clone(modelo)
+
+            try:
+                # Entrenamiento
+                clon.fit(X_tr_sc, y_tr_space)
+
+                # Predicciones
+                pred_tr_space = clon.predict(X_tr_sc)
+                pred_te_space = clon.predict(X_te_sc)
+
+                # Revertir raíz cúbica para calcular métricas en mm³ reales
+                pred_tr = np.maximum(0, pred_tr_space)
+                pred_te = np.maximum(0, pred_te_space)
+                y_tr_orig = y_tr_space
+
+                all_y_real.extend(y_te_orig)
+                all_y_pred.extend(pred_te)
+                train_maes.append(mean_absolute_error(y_tr_orig, pred_tr))
+            except Exception as e:
+                print(f"      [!] {nombre_mod} falló internamente: {e}")
+                continue
+
+        if len(all_y_real) == 0: continue
+
+        all_y_real = np.array(all_y_real)
+        all_y_pred = np.array(all_y_pred)
+
+        # Calcular todas tus métricas solicitadas
+        mae = mean_absolute_error(all_y_real, all_y_pred)
+        rmse = np.sqrt(mean_squared_error(all_y_real, all_y_pred))
+        mape = mean_absolute_percentage_error(all_y_real, all_y_pred) * 100
+        r2 = r2_score(all_y_real, all_y_pred)
+
+        n_samples = len(all_y_real)
+        r2_adj = 1 - ((1 - r2) * (n_samples - 1) / (n_samples - p - 1)) if n_samples > p + 1 else 0
+
+        t_mae = np.mean(train_maes)
+        gap = ((mae - t_mae) / mae * 100) if mae > 0 else 0.0
+
+        resultados.append({
+            "Modelo": nombre_mod, "MAE": mae, "RMSE": rmse, "MAPE": mape,
+            "R2": r2, "R2_Adj": r2_adj, "Train_MAE": t_mae, "Gap_Overfitting": gap
+        })
+        print(f"    • {nombre_mod:<20} -> MAE: {mae:>8.1f} | R2: {r2:>6.3f} | Gap: {gap:>5.1f}%")
+
+    # 4. Generar Reporte Visual
+    print("\n  [3/3] Generando gráficas del torneo...")
+    df_res = pd.DataFrame(resultados).sort_values(by="MAE", ascending=True)
+
+    # Gráfica 1: MAE
+    plt.figure(figsize=(12, 8))
+    bars = plt.barh(df_res["Modelo"][::-1], df_res["MAE"][::-1], color='#3498db', edgecolor='white')
+    plt.xlabel('Error Medio Absoluto (MAE) en mm³')
+    plt.title('Torneo: ¿Qué modelo predice mejor el Volumen Tumoral?', fontweight='bold')
+    for bar in bars:
+        plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f' {bar.get_width():.1f}', va='center')
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_masivo_mae_volumen.png"), dpi=150)
+    plt.close()
+
+    # Gráfica 2: Overfitting Gap
+    df_res_gap = df_res.sort_values(by="Gap_Overfitting", ascending=True)
+    plt.figure(figsize=(12, 8))
+    colores_gap = ['#27ae60' if g < 15 else '#f39c12' if g < 30 else '#e74c3c' for g in
+                   df_res_gap["Gap_Overfitting"][::-1]]
+    bars2 = plt.barh(df_res_gap["Modelo"][::-1], df_res_gap["Gap_Overfitting"][::-1], color=colores_gap,
+                     edgecolor='white')
+    plt.xlabel('Brecha de Sobreajuste (Gap %)')
+    plt.title('Torneo: Estabilidad frente al Sobreajuste (Menos es mejor)', fontweight='bold')
+    for bar in bars2:
+        plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f' {bar.get_width():.1f}%', va='center')
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_masivo_overfitting_volumen.png"), dpi=150)
+    plt.close()
+
+    print(f"\n[!] Torneo finalizado. Revisa las nuevas gráficas en la carpeta de metrics.")
+    print("=" * 80)
+
+
+import seaborn as sns
+from scipy.stats import spearmanr
+
+
+def auditar_fuga_de_datos():
+    print("\n" + "=" * 70)
+    print(" 🕵️ AUDITORÍA DE FUGA DE DATOS (SPEARMAN / PEARSON) 🕵️ ")
+    print("=" * 70)
+
+    df_raw = pd.read_csv(RUTA_CSV)
+    X_all_raw, targets_dict, _, _ = preparar_datos(df_raw)
+    X_all = crear_features_derivadas(X_all_raw)
+    y_vol = targets_dict["target_regresion"]
+
+    # 1. Calcular Pearson (Relaciones lineales)
+    corrs_pearson = X_all.corrwith(pd.Series(y_vol, index=X_all.index)).abs()
+
+    # 2. Calcular Spearman (Relaciones No-Lineales)
+    corrs_spearman = {}
+    for col in X_all.columns:
+        coef, _ = spearmanr(X_all[col], y_vol)
+        corrs_spearman[col] = abs(coef)
+    corrs_spearman = pd.Series(corrs_spearman)
+
+    # Unir resultados
+    df_fuga = pd.DataFrame({
+        "Pearson": corrs_pearson,
+        "Spearman": corrs_spearman
+    }).sort_values(by="Spearman", ascending=False)
+
+    # Imprimir a los mayores sospechosos
+    print("\n  [TOP 10 VARIABLES MÁS CORRELACIONADAS CON EL VOLUMEN]")
+    for idx, row in df_fuga.head(10).iterrows():
+        alerta = " 🚨 ¡POSIBLE FUGA!" if row['Spearman'] > 0.85 else ""
+        print(f"  • {idx:<30} | Spearman: {row['Spearman']:.3f} | Pearson: {row['Pearson']:.3f}{alerta}")
+
+    # Generar Heatmap de los sospechosos
+    top_cols = df_fuga.head(15).index.tolist()
+    df_plot = X_all[top_cols].copy()
+    df_plot["TARGET_VOLUMEN"] = y_vol
+
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(df_plot.corr(method='spearman'), annot=True, fmt=".2f", cmap="coolwarm", center=0)
+    plt.title("Matriz de Correlación de Spearman (Top 15 Sospechosos vs Target)", fontweight="bold")
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "auditoria_fuga_datos.png"), dpi=150)
+    plt.close()
+
+    print("\n  [!] Auditoría completada. Heatmap guardado en metrics/auditoria_fuga_datos.png")
+
+
+def analizar_residuos(df_pred, X_raw):
+    """Genera gráfico de residuos y extrae un CSV con los 20 peores casos y sus texturas."""
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    sub = df_pred[df_pred["Target"] == "Volumen Tumoral"].copy()
+    sub["Residuo"] = sub["Predicho"] - sub["Real"]
+
+    # 1. Gráfico de Residuos
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x="Real", y="Residuo", data=sub, alpha=0.7, color="#3498db")
+    plt.axhline(0, color="red", linestyle="--")
+    plt.title("Valores Reales vs Residuos", fontweight="bold")
+    plt.xlabel("Volumen Real (mm³)")
+    plt.ylabel("Residuo (Predicción - Real)")
+    plt.savefig(os.path.join(CARPETA_METRICAS, "residuos_volumen.png"), dpi=150)
+    plt.close()
+
+    # 2. Extracción de los 20 peores casos
+    peores_20 = sub.assign(Error_Abs=sub["Residuo"].abs()).nlargest(20, "Error_Abs")
+
+    # Cruzar con las features crudas originales
+    peores_20_features = peores_20.merge(X_raw, on="Paciente_ID", how="left")
+
+    ruta_csv = os.path.join(CARPETA_METRICAS, "auditoria_peores_20_casos.csv")
+    peores_20_features.to_csv(ruta_csv, index=False)
+    print(f"\n  [🕵️] ¡Análisis listo! Residuos graficados y auditoría guardada en: {ruta_csv}")
+
 # ===========================================================================
 #  Main
 # ===========================================================================
 if __name__ == "__main__":
     df_pred, _, info_modelos = entrenar_y_evaluar()
+
+    df_raw = pd.read_csv(RUTA_CSV)
+    analizar_residuos(df_pred, df_raw)
+
+    # 1. Generamos TODAS las gráficas de entrenamiento
     generar_graficas(df_pred, info_modelos)
+
+    # 2. Predecimos los casos de prueba y generamos su gráfica
     df_verif = predecir_casos_prueba(info_modelos)
     generar_grafica_casos_prueba(df_verif, info_modelos)
+
+    # 3. EXPORTAMOS A PRODUCCIÓN (Joblib + JSON)
     exportar_modelos_produccion(info_modelos)

@@ -2,13 +2,19 @@
     "target": "Volumen Tumoral",
     "unidad": "mm\u00b3",
     "use_log": true,
-    "n_features_esperadas": 6,
+    "n_features_esperadas": 12,
     "features_entrada": [
-        "gldm_GrayLevelNonUniformity",
-        "glrlm_GrayLevelNonUniformity",
+        "gldm_DependenceEntropy",
+        "shape_Sphericity",
+        "glszm_LargeAreaEmphasis",
+        "glszm_ZoneEntropy",
+        "glszm_SmallAreaEmphasis",
+        "glszm_LargeAreaLowGrayLevelEmphasis",
+        "glszm_SmallAreaLowGrayLevelEmphasis",
+        "glrlm_LongRunHighGrayLevelEmphasis",
+        "glcm_Idmn",
+        "gldm_DependenceNonUniformityNormalized",
         "glrlm_RunEntropy",
-        "glcm_Imc1",
-        "glszm_LargeAreaHighGrayLevelEmphasis",
-        "glrlm_RunLengthNonUniformity"
+        "glrlm_LongRunLowGrayLevelEmphasis"
     ]
 }

@@ -52,7 +52,7 @@ from sklearn.ensemble import VotingClassifier
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 #from classification.scripts.optimizar_classification import seleccionar_features_rfecv
-from optimizar_classification import seleccionar_features_rfecv
+from optimizar_clasificacion import seleccionar_features_rfecv
 warnings.filterwarnings("ignore")
 
 # ===========================================================================

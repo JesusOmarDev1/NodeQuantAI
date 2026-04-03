@@ -2,7 +2,47 @@ import streamlit as st
 import os
 import sys
 import tempfile
+import numpy as np
+import SimpleITK as sitk
+import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+
+# ===========================================================================
+# 0. HACK PARA JOBLIB (El "Fantasma" de __main__)
+# Al clonar la clase aquí, joblib la encontrará cuando despierte el modelo
+# ===========================================================================
+from sklearn.base import clone, BaseEstimator, ClassifierMixin
+
+
+class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
+    """Convierte cualquier clasificador en un modelo Ordinal de gravedad clínica."""
+
+    def __init__(self, estimator):
+        self.estimator = estimator
+
+    def fit(self, X, y):
+        self.classes_ = np.sort(np.unique(y))
+        self.estimators_ = []
+        for i in range(len(self.classes_) - 1):
+            y_binario = (y > self.classes_[i]).astype(int)
+            clon = clone(self.estimator)
+            clon.fit(X, y_binario)
+            self.estimators_.append(clon)
+        return self
+
+    def predict_proba(self, X):
+        probs_mayor_que = [est.predict_proba(X)[:, 1] for est in self.estimators_]
+        probs = np.zeros((X.shape[0], len(self.classes_)))
+        probs[:, 0] = 1.0 - probs_mayor_que[0]
+        for i in range(1, len(self.classes_) - 1):
+            probs[:, i] = probs_mayor_que[i - 1] - probs_mayor_que[i]
+        probs[:, -1] = probs_mayor_que[-1]
+        probs = np.clip(probs, 0.0, 1.0)
+        return probs / probs.sum(axis=1, keepdims=True)
+
+    def predict(self, X):
+        return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
+
 
 # ==========================================
 # 1. Configuración y Rutas del Proyecto
@@ -14,19 +54,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Ajusta tu ruta raíz para que Python encuentre tus módulos
+# Ajusta tu ruta raíz (Puedes dejarla fija o hacerla dinámica)
 ruta_raiz = r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI"
 if ruta_raiz not in sys.path:
     sys.path.insert(0, ruta_raiz)
 
-# Importamos tu motor de inferencia y la función de visualización
+# Importamos tu motor de inferencia
 from dashboard.motor_inferencia import MotorInferenciaNodeQuant
-
-# (Pegar aquí la función `generar_figura_fusion` que creamos en el paso anterior,
-# o impórtala si la guardaste en otro archivo)
-import numpy as np
-import SimpleITK as sitk
-import matplotlib.pyplot as plt
 
 
 def generar_figura_fusion(ruta_img, ruta_mask):
@@ -39,18 +73,11 @@ def generar_figura_fusion(ruta_img, ruta_mask):
         resampler.SetDefaultPixelValue(0)
         resampler.SetTransform(sitk.Transform())
         mask_alineada = resampler.Execute(mask_itk)
+
         img_data = sitk.GetArrayFromImage(ct_itk)
         mask_data = sitk.GetArrayFromImage(mask_alineada)
 
-        # Buscando el centro de la máscara
-        # 1. Revisa todas las rebanadas del escáner y detecta cuáles tienen al menos un píxel de la máscara
-        #slices_con_ganglio = np.any(mask_data > 0, axis=(1, 2))
-        # 2. Guarda los números de esos cortes
-        #indices_validos = np.where(slices_con_ganglio)[0]
-        # 3. Va a la lista de cortes válidos y elige el que está exactamente a la mitad
-        #slice_idx = indices_validos[len(indices_validos) // 2] if len(indices_validos) > 0 else img_data.shape[0] // 2
-
-        # Buscando el área más grande la máscara
+        # Buscando el área más grande de la máscara
         pixeles_por_slice = np.sum(mask_data > 0, axis=(1, 2))
         if pixeles_por_slice.max() > 0:
             slice_idx = np.argmax(pixeles_por_slice)
@@ -114,7 +141,6 @@ def generar_figura_fusion(ruta_img, ruta_mask):
 def cargar_motor():
     ruta_reg = os.path.join(ruta_raiz, "regression", "joblib")
     ruta_clf = os.path.join(ruta_raiz, "classification", "joblib")
-    # Inicializa y devuelve la clase de tu motor
     return MotorInferenciaNodeQuant(ruta_reg, ruta_clf)
 
 
@@ -148,7 +174,7 @@ with col2:
 if archivo_img and archivo_mask:
     if st.button("Procesar Paciente", type="primary", use_container_width=True):
 
-        with st.spinner("Analizando biomarcadores..."):
+        with st.spinner("Analizando biomarcadores y calculando predicciones..."):
             # 1. Guardar en temporales
             ruta_img = guardar_archivo_temporal(archivo_img)
             ruta_mask = guardar_archivo_temporal(archivo_mask)
@@ -160,20 +186,21 @@ if archivo_img and archivo_mask:
                 # 3. Llamada al Visor Espacial
                 figura = generar_figura_fusion(ruta_img, ruta_mask)
 
-                # 4. Despliegue de Resultados Clínicos (Métricas de Streamlit)
+                # 4. Despliegue de Resultados Clínicos (Ajustado solo a Volumen y Riesgo)
                 st.success("¡Análisis completado exitosamente!")
                 st.subheader("Reporte Clínico")
 
-                m1, m2, m3, m4 = st.columns(4)
-                m1.metric("Volumen Tumoral", f"{reporte['volumen']['valor']} {reporte['volumen']['unidad']}")
-                m2.metric("Eje Corto", f"{reporte['eje_corto']['valor']} {reporte['eje_corto']['unidad']}")
-                m3.metric("Eje Largo", f"{reporte['eje_largo']['valor']} {reporte['eje_largo']['unidad']}")
+                m1, m2 = st.columns(2)
 
-                # Lógica de colores para el riesgo
-                riesgo = reporte['riesgo']
-                iconos_riesgo = {"Bajo": "🟢", "Moderado": "🟡", "Medio-Alto": "🟠", "Crítico": "🔴"}
+                # Métrica 1: Volumen Tumoral
+                vol_str = f"{reporte['volumen']['valor']:,.1f} {reporte['volumen']['unidad']}"
+                m1.metric("Volumen Tumoral Estimado", vol_str)
+
+                # Métrica 2: Riesgo con Lógica de Colores
+                riesgo = reporte.get('riesgo', 'Desconocido')
+                iconos_riesgo = {"Bajo": "🟢", "Intermedio": "🟡", "Crítico": "🔴"}
                 icono = iconos_riesgo.get(riesgo, "⚪")
-                m4.metric("Riesgo de Malignidad", f"{icono} {riesgo}")
+                m2.metric("Riesgo de Malignidad", f"{icono} {riesgo}")
 
                 # 5. Despliegue de la imagen de fusión
                 st.divider()
