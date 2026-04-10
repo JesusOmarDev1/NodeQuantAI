@@ -25,28 +25,48 @@ GRAN TORNEO DE ALGORITMOS: PREDICCIÓN DE VOLUMEN TUMORAL CON RAÍZ CÚBICA
     • Red Neuronal (MLP)   -> MAE:   7315.3 | R2:  0.714 | Gap:  12.9%
 
   [3/3] Generando gráficas del torneo...
-
-[!] Torneo finalizado. Revisa las nuevas gráficas en la carpeta de metrics.
 ================================================================================
 
 ================================================================================
 MODELO DE REGRESIÓN: PREDICCIÓN DE VOLUMEN
 ================================================================================
-Venga otra vez... se logró?
-Target	Modelo	Validacion	MAE	MSE	RMSE	R2	MedAE	MaxErr	MAPE %	EVS	Gap_%
-Volumen Tumoral	(LGBM) + GB + RF)	KFold	4141.7026	77280396.61	8790.9269	0.7903	1498.5576	74074.4901	24.97	0.8016	21.47
 
+------------------- GANADOR!!! -------------------
+Target	Modelo		  Validacion	MAE		MSE		RMSE		R2	MedAE	   MaxErr	MAPE %	EVS	Gap_%
+Volumen	(LGBM) + GB + RF) KFold		3990.8933	72280342.82	8501.7847	0.8039	1473.8476  73962.8197	23.93	0.814	22.51
 
 Paciente_ID	Target	Unidad	Real	Predicho	Error	Error %	Nivel_Real	Nivel_Predicho
-case_0854	Volumen Tumoral	mmÂ³	2139	2164.82	25.82	1.21	Bajo	Bajo
-case_0864	Volumen Tumoral	mmÂ³	7761	8327.9	566.9	7.3	Moderado	Moderado
-case_0165	Volumen Tumoral	mmÂ³	4206	3756.41	449.59	10.69	Bajo	Bajo
-case_0303	Volumen Tumoral	mmÂ³	35640	31966.05	3673.95	10.31	CrÃ­tico	CrÃ­tico
+case_0854	Volumen	mmÂ³	2139	2130.98	8.02	0.37	Bajo	Bajo
+case_0864	Volumen	mmÂ³	7761	8628.77	867.77	11.18	Moderado	Moderado
+case_0165	Volumen	mmÂ³	4206	3730.47	475.53	11.31	Bajo	Bajo
+case_0303	Volumen	mmÂ³	35640	32368.85	3271.15	9.18	CrÃ­tico	CrÃ­tico
+case_0545	Volumen	mmÂ³	18326	17114.72	1211.28	6.61	Medio-Alto	Medio-Alto
+
+
+
+Prueba anterior
+Target	Modelo		Validacion	MAE	  MSE		RMSE	   R2	   MedAE	MaxErr		MAPE %	EVS	Gap_%
+Volumen Tumoral	(LGBM) + GB + RF) KFold	4141.7026 77280396.61	8790.9269  0.7903  1498.5576	74074.4901	24.97	0.8016	21.47
+
+NO MENCIONAR EL MAPE, CENTRARNOS EN EL R2 Y RMSE
+
+Paciente_ID	Target		Unidad	Real	Predicho	Error	Error %	Nivel_Real	Nivel_Predicho
+case_0854	Volumen Tumoral	mmÂ³	2139	2164.82		25.82	1.21	Bajo		Bajo
+case_0864	Volumen Tumoral	mmÂ³	7761	8327.9		566.9	7.3	Moderado	Moderado
+case_0165	Volumen Tumoral	mmÂ³	4206	3756.41		449.59	10.69	Bajo		Bajo
+case_0303	Volumen Tumoral	mmÂ³	35640	31966.05	3673.95	10.31	CrÃ­tico		CrÃ­tico
 case_0545	Volumen Tumoral	mmÂ³	18326	16895.61	1430.39	7.81	Medio-Alto	Medio-Alto
 
 
+MLP + MixMax + Top3Features
+Target	Modelo				Validacion	MAE		MSE		RMSE		R2	MedAE		MaxErr		MAPE %	EVS	Gap_%
+Volumen Tumoral	(LGBM + GB + RF + MLP)	KFold		4655.1989	87160297.88	9335.968	0.7635	1623.7388	74402.2557	29.44	0.7776	12.34
 
 
+
+MixMax + Top3Features
+Target		Modelo		 Validacion	MAE		MSE		RMSE		R2	MedAE		MaxErr		MAPE %	EVS	Gap_%
+Volumen Tumoral	(LGBM + GB + RF) KFold		4228.3651	73992655.14	8601.8983	0.7992	1758.4129	74158.0436	25.75	0.8078	21.62
 
 
 

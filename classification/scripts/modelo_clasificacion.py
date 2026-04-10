@@ -604,7 +604,7 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
     print(f"  • Exactitud (Accuracy) : {acc:.4f}")
     print(f"  • F1-Score Ponderado   : {f1:.4f}")
     print(f"  • Log Loss (Certeza)   : {logloss:.4f}")
-    print(f"  • Error Medio Global   : {mae:.2f} escalones de riesgo en promedio")
+    print(f"  • Error Medio Global   : {mae:.6f} escalones de riesgo en promedio")
 
     if train_f1 is not None:
         gap_holdout = ((train_f1 - f1) / train_f1) * 100

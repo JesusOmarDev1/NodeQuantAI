@@ -7,39 +7,40 @@
 =================================================================
  [Métricas de Clasificación Médica]
   • Exactitud (Accuracy)      : 0.8366
-  • Precisión Ponderada       : 0.8367
+  • Precisión Ponderada       : 0.8364
   • Sensibilidad (Recall)     : 0.8366
-  • Especificidad Macro       : 0.9103
-  • Valor Predictivo Neg. NPV : 0.9095
-  • F1-Score Ponderado        : 0.8366
+  • Especificidad Macro       : 0.9094
+  • Valor Predictivo Neg. NPV : 0.9098
+  • F1-Score Ponderado        : 0.8364
 
  [Métricas de Probabilidad y Robustez Estadistica]
-  • ROC-AUC (OVR)             : 0.9282
-  • Coeficiente Matthews (MCC): 0.7392
-  • Log Loss (Cross-Entropy)  : 0.4503
+  • ROC-AUC (OVR)             : 0.9284
+  • Coeficiente Matthews (MCC): 0.7385
+  • Log Loss (Cross-Entropy)  : 0.4482
 
  [Métricas de Gravedad Ordinal]
-  • Índice Kappa Cuadrático   : 0.8258
+  • Índice Kappa Cuadrático   : 0.8245
   • MAE Categórico (Escalones): 0.1673
 
  [Diagnóstico de Aprendizaje y Sobreajuste]
-  • Train F1-Score            : 0.9227
-  • Test F1-Score             : 0.8366
-  • Train Accuracy            : 0.9227
+  • Train F1-Score            : 0.9296
+  • Test F1-Score             : 0.8364
+  • Train Accuracy            : 0.9296
   • Test Accuracy             : 0.8366
-  • Gap de Sobreajuste (F1)   : 9.3%
+  • Gap de Sobreajuste (F1)   : 10.0%
 =================================================================
 
 REPORTE DETALLADO POR CATEGORÍA:
               precision    recall  f1-score   support
 
-        Bajo       0.84      0.85      0.84       127
-  Intermedio       0.84      0.83      0.84       254
-     Crítico       0.82      0.83      0.82       127
+        Bajo       0.85      0.87      0.86       127
+  Intermedio       0.84      0.84      0.84       254
+     Crítico       0.82      0.79      0.80       127
 
     accuracy                           0.84       508
-   macro avg       0.83      0.84      0.84       508
+   macro avg       0.84      0.83      0.83       508
 weighted avg       0.84      0.84      0.84       508
+
 
 
 ======================================================================
@@ -48,9 +49,9 @@ weighted avg       0.84      0.84      0.84       508
   [Métricas de Rendimiento Global Holdout]
   • Exactitud (Accuracy) : 1.0000
   • F1-Score Ponderado   : 1.0000
-  • Log Loss (Certeza)   : 0.2029
-  • Error Medio Global   : 0.00 escalones de riesgo en promedio
-  • Overfitting Holdout  : -8.4% (Caída respecto al Train)
+  • Log Loss (Certeza)   : 0.1950
+  • Error Medio Global   : 0.000000 escalones de riesgo en promedio
+  • Overfitting Holdout  : -7.6% (Caída respecto al Train)
 
   [Análisis Forense por Paciente]
    case_0854 -> ACIERTO | Real: Bajo       | Pred: Bajo
@@ -58,12 +59,11 @@ weighted avg       0.84      0.84      0.84       508
    case_0864 -> ACIERTO | Real: Intermedio | Pred: Intermedio
         ↳ Error: 0 escalón(es) | Bajo:3% | Int:93% | Cri:4%
    case_0165 -> ACIERTO | Real: Bajo       | Pred: Bajo
-        ↳ Error: 0 escalón(es) | Bajo:63% | Int:33% | Cri:4%
+        ↳ Error: 0 escalón(es) | Bajo:66% | Int:31% | Cri:3%
    case_0303 -> ACIERTO | Real: Crítico    | Pred: Crítico
         ↳ Error: 0 escalón(es) | Bajo:3% | Int:15% | Cri:82%
    case_0545 -> ACIERTO | Real: Intermedio | Pred: Intermedio
-        ↳ Error: 0 escalón(es) | Bajo:4% | Int:92% | Cri:4%
-
+        ↳ Error: 0 escalón(es) | Bajo:5% | Int:92% | Cri:4%
 
 
 

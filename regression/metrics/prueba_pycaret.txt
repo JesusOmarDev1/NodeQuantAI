@@ -1,0 +1,168 @@
+-- Con los datos en crudo para que no rompa
+                                    Model           MAE           MSE  \
+gbr           Gradient Boosting Regressor  4.242811e+03  6.778840e+07
+et                  Extra Trees Regressor  4.267472e+03  6.207349e+07
+rf                Random Forest Regressor  4.711297e+03  7.909565e+07
+lightgbm  Light Gradient Boosting Machine  4.975378e+03  7.952117e+07
+huber                     Huber Regressor  6.212823e+03  1.365271e+08
+br                         Bayesian Ridge  6.643005e+03  1.304296e+08
+llar         Lasso Least Angle Regression  6.643698e+03  1.446225e+08
+ridge                    Ridge Regression  6.748934e+03  1.231847e+08
+dt                Decision Tree Regressor  6.796339e+03  1.698253e+08
+omp           Orthogonal Matching Pursuit  6.981704e+03  1.570758e+08
+lasso                    Lasso Regression  7.047650e+03  1.366063e+08
+ada                    AdaBoost Regressor  7.267569e+03  9.626588e+07
+par          Passive Aggressive Regressor  7.559623e+03  2.178645e+08
+lr                      Linear Regression  8.082767e+03  1.725499e+08
+knn                 K Neighbors Regressor  8.118441e+03  1.813901e+08
+en                            Elastic Net  1.134650e+04  2.889691e+08
+dummy                     Dummy Regressor  1.418812e+04  4.216326e+08
+lar                Least Angle Regression  8.354988e+18           inf
+
+
+                RMSE      R2    RMSLE          MAPE  TT (Sec)
+gbr        7755.2458  0.8519   0.3229  2.864000e-01     0.414
+et         7600.9398  0.8549   0.3671  3.429000e-01     0.312
+rf         8518.6658  0.8233   0.3571  3.324000e-01     0.538
+lightgbm   8733.7607  0.8104   0.4712  3.769000e-01     0.278
+huber     11268.8842  0.6896   0.6213  8.282000e-01     0.060
+br        10746.4674  0.7148   0.8697  1.261400e+00     0.056
+llar      11090.8507  0.6896   0.8224  1.025200e+00     0.050
+ridge     10611.6539  0.7254   0.7452  1.145400e+00     0.040
+dt        12675.6336  0.6041   0.4769  4.055000e-01     0.052
+omp       11497.1990  0.6685   0.8277  1.235100e+00     0.040
+lasso     11174.1090  0.6867   0.9150  1.509900e+00     1.650
+ada        9516.3892  0.7747   0.8827  1.423100e+00     0.184
+par       14361.4890  0.4824   0.6001  5.699000e-01     0.072
+lr        12558.3133  0.6012   1.0911  1.722200e+00     7.368
+knn       13097.8066  0.5693   0.7510  8.780000e-01     0.040
+en        16688.5975  0.3102   1.0113  1.631800e+00     0.044
+dummy     20249.1959 -0.0221   1.2909  2.771100e+00     0.050
+lar              inf    -inf  22.9706  1.702998e+15     0.056
+
+============================================================
+ TABLA DE POSICIONES PYCARET (Baselines) 
+============================================================
+                MAE        RMSE      R2    MAPE
+gbr       4242.8114   7755.2458  0.8519  0.2864
+et        4267.4718   7600.9398  0.8549  0.3429
+rf        4711.2966   8518.6658  0.8233  0.3324
+lightgbm  4975.3782   8733.7607  0.8104  0.3769
+huber     6212.8233  11268.8842  0.6896  0.8282
+br        6643.0047  10746.4674  0.7148  1.2614
+llar      6643.6978  11090.8507  0.6896  1.0252
+ridge     6748.9337  10611.6539  0.7254  1.1454
+dt        6796.3391  12675.6336  0.6041  0.4055
+omp       6981.7045  11497.1990  0.6685  1.2351
+
+
+-- Usando cm^3 en lugar de mm^3 para usar las transformaciones sin que truene
+                                    Model      MAE          MSE      RMSE  \
+lightgbm  Light Gradient Boosting Machine   4.1105      84.1515    8.6650
+gbr           Gradient Boosting Regressor   4.1636      78.0200    8.3414
+rf                Random Forest Regressor   4.7348     103.7544    9.4916
+et                  Extra Trees Regressor   4.7627     104.7533    9.6358
+ada                    AdaBoost Regressor   4.7895      98.9071    9.4430
+dt                Decision Tree Regressor   7.0224     175.0829   13.0863
+knn                 K Neighbors Regressor   7.7738     209.9464   13.9977
+lr                      Linear Regression   9.2199    8005.5660   43.6931
+huber                     Huber Regressor  11.8218   11005.9730   52.5526
+lasso                    Lasso Regression  12.2561     478.0599   21.4845
+en                            Elastic Net  12.2561     478.0599   21.4845
+llar         Lasso Least Angle Regression  12.2561     478.0599   21.4845
+dummy                     Dummy Regressor  12.2561     478.0599   21.4845
+br                         Bayesian Ridge  13.5353   22132.8604   70.7629
+omp           Orthogonal Matching Pursuit  33.9322  161223.7971  185.5319
+ridge                    Ridge Regression  36.6274  196150.1498  204.9868
+par          Passive Aggressive Regressor  64.8815  862144.6104  421.0803
+
+                 R2   RMSLE    MAPE  TT (Sec)
+lightgbm     0.8155  0.2657  0.2220     0.272
+gbr          0.8250  0.2679  0.2378     0.506
+rf           0.7810  0.3013  0.2712     0.522
+et           0.7743  0.3052  0.2781     0.362
+ada          0.7841  0.3097  0.3040     0.288
+dt           0.5468  0.4662  0.4570     0.048
+knn          0.5155  0.5894  0.6537     0.042
+lr         -12.4939  0.2585  0.2694     2.700
+huber      -17.5600  0.2862  0.2870     0.070
+lasso       -0.1427  0.9828  1.3925     1.734
+en          -0.1427  0.9828  1.3925     0.048
+llar        -0.1427  0.9828  1.3925     0.050
+dummy       -0.1427  0.9828  1.3925     0.048
+br         -36.2749  0.2845  0.3041     0.066
+omp       -270.4169  0.3354  0.5439     0.048
+ridge     -329.2174  0.3766  0.5872     0.048
+par      -1450.2455  0.3731  0.8594     0.052
+
+============================================================
+TABLA DE POSICIONES PYCARET (Baselines)
+============================================================
+              MAE     RMSE       R2    MAPE
+lightgbm   4.1105   8.6650   0.8155  0.2220
+gbr        4.1636   8.3414   0.8250  0.2378
+rf         4.7348   9.4916   0.7810  0.2712
+et         4.7627   9.6358   0.7743  0.2781
+ada        4.7895   9.4430   0.7841  0.3040
+dt         7.0224  13.0863   0.5468  0.4570
+knn        7.7738  13.9977   0.5155  0.6537
+lr         9.2199  43.6931 -12.4939  0.2694
+huber     11.8218  52.5526 -17.5600  0.2870
+lasso     12.2561  21.4845  -0.1427  1.3925
+
+
+-- Usando log1p en lugar de yeo-jonhson y mm^3
+                                    Model         MAE           MSE  \
+br                         Bayesian Ridge  1.816000e-01  8.750000e-02
+huber                     Huber Regressor  1.867000e-01  9.640000e-02
+lr                      Linear Regression  1.898000e-01  8.200000e-02
+omp           Orthogonal Matching Pursuit  2.075000e-01  1.217000e-01
+lightgbm  Light Gradient Boosting Machine  2.162000e-01  9.070000e-02
+gbr           Gradient Boosting Regressor  2.324000e-01  8.990000e-02
+ridge                    Ridge Regression  2.332000e-01  1.380000e-01
+par          Passive Aggressive Regressor  2.341000e-01  1.332000e-01
+et                  Extra Trees Regressor  2.647000e-01  1.205000e-01
+rf                Random Forest Regressor  2.692000e-01  1.176000e-01
+ada                    AdaBoost Regressor  2.902000e-01  1.341000e-01
+dt                Decision Tree Regressor  4.304000e-01  3.257000e-01
+knn                 K Neighbors Regressor  5.341000e-01  4.773000e-01
+lasso                    Lasso Regression  9.087000e-01  1.299100e+00
+en                            Elastic Net  9.087000e-01  1.299100e+00
+llar         Lasso Least Angle Regression  9.087000e-01  1.299100e+00
+dummy                     Dummy Regressor  9.087000e-01  1.299100e+00
+lar                Least Angle Regression  2.751460e+13  1.181461e+28
+
+                  RMSE            R2    RMSLE          MAPE  TT (Sec)
+br        2.850000e-01  9.324000e-01   0.0286  2.050000e-02     0.044
+huber     2.956000e-01  9.256000e-01   0.0289  2.060000e-02     0.054
+lr        2.771000e-01  9.361000e-01   0.0286  2.160000e-02     2.154
+omp       3.231000e-01  9.063000e-01   0.0306  2.260000e-02     0.034
+lightgbm  2.966000e-01  9.285000e-01   0.0293  2.390000e-02     0.358
+gbr       2.980000e-01  9.292000e-01   0.0295  2.570000e-02     0.516
+ridge     3.513000e-01  8.924000e-01   0.0320  2.530000e-02     0.036
+par       3.496000e-01  8.953000e-01   0.0331  2.580000e-02     0.034
+et        3.457000e-01  9.049000e-01   0.0348  2.960000e-02     0.332
+rf        3.414000e-01  9.079000e-01   0.0340  2.990000e-02     0.394
+ada       3.653000e-01  8.948000e-01   0.0370  3.270000e-02     0.244
+dt        5.687000e-01  7.431000e-01   0.0555  4.750000e-02     0.042
+knn       6.873000e-01  6.267000e-01   0.0700  6.070000e-02     0.034
+lasso     1.136200e+00 -1.450000e-02   0.1143  1.029000e-01     1.500
+en        1.136200e+00 -1.450000e-02   0.1143  1.029000e-01     0.038
+llar      1.136200e+00 -1.450000e-02   0.1143  1.029000e-01     0.032
+dummy     1.136200e+00 -1.450000e-02   0.1143  1.029000e-01     0.060
+lar       4.861022e+13 -8.057232e+27  16.4734  3.360544e+12     0.048
+
+============================================================
+TABLA DE POSICIONES PYCARET (Baselines)
+============================================================
+             MAE    RMSE      R2    MAPE
+br        0.1816  0.2850  0.9324  0.0205
+huber     0.1867  0.2956  0.9256  0.0206
+lr        0.1898  0.2771  0.9361  0.0216
+omp       0.2075  0.3231  0.9063  0.0226
+lightgbm  0.2162  0.2966  0.9285  0.0239
+gbr       0.2324  0.2980  0.9292  0.0257
+ridge     0.2332  0.3513  0.8924  0.0253
+par       0.2341  0.3496  0.8953  0.0258
+et        0.2647  0.3457  0.9049  0.0296
+rf        0.2692  0.3414  0.9079  0.0299

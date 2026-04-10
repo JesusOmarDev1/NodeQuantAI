@@ -43,7 +43,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Wedge
 
 from sklearn.model_selection import KFold, RandomizedSearchCV, cross_val_score
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, Normalizer
 from sklearn.ensemble import (
     RandomForestRegressor, GradientBoostingRegressor, StackingRegressor,
 )
@@ -103,7 +103,7 @@ INTER_CORR_UMBRAL = 0.95
 COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
 
 TARGETS = [
-    {"nombre": "Volumen Tumoral",    "col": "target_regresion",
+    {"nombre": "Volumen",    "col": "target_regresion",
      "origen": "shape_VoxelVolume",  "u": "mm\u00b3", "slug": "volumen"},
     #{"nombre": "Diametro Eje Corto", "col": "target_eje_corto",
      #"origen": "shape_MinorAxisLength", "u": "mm", "slug": "eje_corto"},
@@ -115,9 +115,9 @@ COLS_TARGET = [t["col"] for t in TARGETS]
 # Colores globales para graficas
 _COLORES_TARGET = ["#3498db", "#e74c3c", "#2ecc71"]
 _NOMBRES_CORTOS = {
-    "Volumen Tumoral": "Volumen",
-    "Diametro Eje Corto": "Eje Corto",
-    "Diametro Eje Largo": "Eje Largo",
+    "Volumen": "Volumen",
+    #"Diametro Eje Corto": "Eje Corto",
+    #"Diametro Eje Largo": "Eje Largo",
 }
 
 # ---------------------------------------------------------------------------
@@ -457,22 +457,37 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
     """Utiliza Optimización Bayesiana para encontrar los hiperparámetros perfectos."""
 
     def objective(trial):
+        from sklearn.base import clone
         pipe = clone(pipe_tmpl)
 
+        # =========================================================
+        # [EXPERIMENTO ACADÉMICO]: Optuna elige el escalador al azar
+        # =========================================================
+        scaler_name = trial.suggest_categorical("scaler", ["standard", "minmax", "normalizer"])
+        if scaler_name == "standard":
+            nuevo_scaler = StandardScaler()
+        elif scaler_name == "minmax":
+            nuevo_scaler = MinMaxScaler()
+        else:
+            nuevo_scaler = Normalizer()
+
+        # Como el scaler es el primer paso en tu Pipeline, lo reemplazamos directamente
+        pipe.steps[0] = ('scaler', nuevo_scaler)
+        # =========================================================
+
         # RANGOS ANTI-MEMORIZACIÓN (AÚN MÁS ESTRICTOS)
-        rf_depth = trial.suggest_int("rf_depth", 2, 4)  # Máximo 4 niveles
-        rf_min_samples = trial.suggest_int("rf_min_samples", 12, 25)  # Más muestras requeridas
+        rf_depth = trial.suggest_int("rf_depth", 2, 4)
+        rf_min_samples = trial.suggest_int("rf_min_samples", 12, 25)
 
         lgbm_lr = trial.suggest_float("lgbm_lr", 0.01, 0.04, log=True)
         lgbm_depth = trial.suggest_int("lgbm_depth", 2, 3)
         lgbm_min_child = trial.suggest_int("lgbm_min_child_samples", 12, 25)
-        lgbm_alpha = trial.suggest_float("lgbm_reg_alpha", 0.1, 10.0, log=True)  # NUEVO: Regularización L1
+        lgbm_alpha = trial.suggest_float("lgbm_reg_alpha", 0.1, 10.0, log=True)
 
         gb_lr = trial.suggest_float("gb_lr", 0.01, 0.04, log=True)
         gb_depth = trial.suggest_int("gb_depth", 2, 3)
         gb_min_samples = trial.suggest_int("gb_min_samples_leaf", 12, 25)
 
-        # [CORRECCIÓN CRÍTICA] ¡Volvió el envoltorio logarítmico! Debe llevar "regressor__"
         try:
             pipe.set_params(
                 model__regressor__rf__max_depth=rf_depth,
@@ -493,7 +508,7 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
             score = cross_val_score(
                 pipe, X_train, y_train, cv=3,
                 scoring="neg_mean_absolute_percentage_error",
-                n_jobs=None  # Vital mantenerlo en None para no saturar tus 12GB de RAM
+                n_jobs=None
             ).mean()
 
             if np.isnan(score):
@@ -508,12 +523,25 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
     optuna.logging.set_verbosity(optuna.logging.WARNING)
     estudio = optuna.create_study(direction="maximize")
 
-    print(f"        [Optuna] Explorando {n_trials} combinaciones inteligentes...")
+    print(f"        [Optuna] Explorando {n_trials} combinaciones inteligentes (Incluyendo Escaladores)...")
     estudio.optimize(objective, n_trials=n_trials)
 
     mejor_pipe = clone(pipe_tmpl)
 
-    # [CORRECCIÓN CRÍTICA] Rutas corregidas también aquí al asignar al pipe final
+    # =========================================================
+    # APLICAMOS EL ESCALADOR GANADOR AL PIPELINE FINAL
+    # =========================================================
+    mejor_scaler = estudio.best_params["scaler"]
+    if mejor_scaler == "standard":
+        mejor_pipe.steps[0] = ('scaler', StandardScaler())
+    elif mejor_scaler == "minmax":
+        mejor_pipe.steps[0] = ('scaler', MinMaxScaler())
+    else:
+        mejor_pipe.steps[0] = ('scaler', Normalizer())
+
+    print(f"        -> ¡Optuna decidió que el mejor escalador es: {mejor_scaler.upper()}!")
+    # =========================================================
+
     mejor_pipe.set_params(
         model__regressor__rf__max_depth=estudio.best_params["rf_depth"],
         model__regressor__rf__min_samples_leaf=estudio.best_params["rf_min_samples"],
@@ -525,7 +553,10 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
         model__regressor__gb__min_samples_leaf=estudio.best_params["gb_min_samples_leaf"],
         model__regressor__lgbm__reg_alpha=estudio.best_params["lgbm_reg_alpha"]
     )
-    return mejor_pipe, estudio.best_params
+
+    # Devolvemos el pipeline ganador y eliminamos 'scaler' del dict params para no romper código externo
+    params_limpios = {k: v for k, v in estudio.best_params.items() if k != "scaler"}
+    return mejor_pipe, params_limpios
 
 
 # ===========================================================================
@@ -1338,7 +1369,7 @@ def exportar_modelos_produccion(informacion_modelos):
 # ===========================================================================
 def gran_torneo_volumen():
     print("\n" + "=" * 80)
-    print("GRAN TORNEO DE ALGORITMOS: PREDICCIÓN DE VOLUMEN TUMORAL")
+    print("GRAN TORNEO DE ALGORITMOS: PREDICCIÓN DE VOLUMEN")
     print("=" * 80)
 
     # 1. Preparar datos
@@ -1539,7 +1570,7 @@ def analizar_residuos(df_pred, X_raw):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
-    sub = df_pred[df_pred["Target"] == "Volumen Tumoral"].copy()
+    sub = df_pred[df_pred["Target"] == "Volumen"].copy()
     sub["Residuo"] = sub["Predicho"] - sub["Real"]
 
     # 1. Gráfico de Residuos
@@ -1568,12 +1599,12 @@ def generar_graficas_avanzadas(df_pred, informacion_modelos):
     plt.close("all")
     print("\n  Generando gráficas clínicas avanzadas:")
 
-    info = informacion_modelos.get("Volumen Tumoral")
+    info = informacion_modelos.get("Volumen")
     if not info:
         print("    [!] No se encontró información del modelo de Volumen.")
         return
 
-    sub = df_pred[df_pred["Target"] == "Volumen Tumoral"]
+    sub = df_pred[df_pred["Target"] == "Volumen"]
     real = sub["Real"].values
     pred = sub["Predicho"].values
     residuos = pred - real

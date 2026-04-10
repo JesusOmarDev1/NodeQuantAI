@@ -1,498 +1,498 @@
 Paciente_ID,Target,Unidad,Real,Nivel_Real,Predicho,Nivel_Predicho,Error,Error %
-case_0311,Volumen Tumoral,mm³,29150.0,Crítico,28853.79,Crítico,296.21,1.02
-case_0865,Volumen Tumoral,mm³,11031.0,Medio-Alto,13345.1,Medio-Alto,2314.1,20.98
-case_0951,Volumen Tumoral,mm³,7812.0,Moderado,8602.52,Moderado,790.52,10.12
-case_0709,Volumen Tumoral,mm³,13623.0,Medio-Alto,13663.61,Medio-Alto,40.61,0.3
-case_0669,Volumen Tumoral,mm³,1539.0,Bajo,2210.33,Bajo,671.33,43.62
-case_0341,Volumen Tumoral,mm³,16873.0,Medio-Alto,15271.64,Medio-Alto,1601.36,9.49
-case_0621,Volumen Tumoral,mm³,38869.0,Crítico,40201.4,Crítico,1332.4,3.43
-case_0216,Volumen Tumoral,mm³,6715.0,Moderado,5560.79,Moderado,1154.21,17.19
-case_0012,Volumen Tumoral,mm³,2679.0,Bajo,2353.74,Bajo,325.26,12.14
-case_0895,Volumen Tumoral,mm³,1990.0,Bajo,1897.91,Bajo,92.09,4.63
-case_0655,Volumen Tumoral,mm³,35907.0,Crítico,35024.78,Crítico,882.22,2.46
-case_0078,Volumen Tumoral,mm³,40998.0,Crítico,40202.8,Crítico,795.2,1.94
-case_0685,Volumen Tumoral,mm³,2004.0,Bajo,2577.93,Bajo,573.93,28.64
-case_0415,Volumen Tumoral,mm³,23318.0,Crítico,27848.97,Crítico,4530.97,19.43
-case_0023,Volumen Tumoral,mm³,10994.0,Medio-Alto,8952.47,Medio-Alto,2041.53,18.57
-case_0657,Volumen Tumoral,mm³,7317.0,Moderado,12859.6,Medio-Alto,5542.6,75.75
-case_0927,Volumen Tumoral,mm³,5982.0,Moderado,7750.33,Moderado,1768.33,29.56
-case_0354,Volumen Tumoral,mm³,16589.0,Medio-Alto,16308.18,Medio-Alto,280.82,1.69
-case_1047,Volumen Tumoral,mm³,8770.0,Moderado,10640.93,Medio-Alto,1870.93,21.33
-case_0958,Volumen Tumoral,mm³,38204.0,Crítico,27831.17,Crítico,10372.83,27.15
-case_0667,Volumen Tumoral,mm³,8450.0,Moderado,10174.75,Medio-Alto,1724.75,20.41
-case_0069,Volumen Tumoral,mm³,5031.0,Moderado,6969.14,Moderado,1938.14,38.52
-case_0203,Volumen Tumoral,mm³,11787.0,Medio-Alto,7980.52,Moderado,3806.48,32.29
-case_0396,Volumen Tumoral,mm³,12987.0,Medio-Alto,10946.72,Medio-Alto,2040.28,15.71
-case_0952,Volumen Tumoral,mm³,2229.0,Bajo,2187.43,Bajo,41.57,1.87
-case_0117,Volumen Tumoral,mm³,22029.0,Crítico,27818.24,Crítico,5789.24,26.28
-case_0199,Volumen Tumoral,mm³,91063.0,Crítico,59193.35,Crítico,31869.65,35.0
-case_1057,Volumen Tumoral,mm³,6777.0,Moderado,6092.76,Moderado,684.24,10.1
-case_0446,Volumen Tumoral,mm³,5957.0,Moderado,6135.69,Moderado,178.69,3.0
-case_0954,Volumen Tumoral,mm³,32163.0,Crítico,19254.07,Crítico,12908.93,40.14
-case_0615,Volumen Tumoral,mm³,1326.0,Bajo,1140.47,Bajo,185.53,13.99
-case_0883,Volumen Tumoral,mm³,15782.0,Medio-Alto,6655.51,Moderado,9126.49,57.83
-case_0678,Volumen Tumoral,mm³,12705.0,Medio-Alto,17969.98,Medio-Alto,5264.98,41.44
-case_0364,Volumen Tumoral,mm³,19145.0,Medio-Alto,29045.17,Crítico,9900.17,51.71
-case_0697,Volumen Tumoral,mm³,40598.0,Crítico,38647.46,Crítico,1950.54,4.8
-case_0774,Volumen Tumoral,mm³,8108.0,Moderado,8388.58,Moderado,280.58,3.46
-case_0242,Volumen Tumoral,mm³,5706.0,Moderado,7095.66,Moderado,1389.66,24.35
-case_0499,Volumen Tumoral,mm³,4470.0,Moderado,3698.11,Bajo,771.89,17.27
-case_0552,Volumen Tumoral,mm³,30090.0,Crítico,29183.75,Crítico,906.25,3.01
-case_0489,Volumen Tumoral,mm³,5280.0,Moderado,6192.78,Moderado,912.78,17.29
-case_0178,Volumen Tumoral,mm³,17252.0,Medio-Alto,18775.14,Medio-Alto,1523.14,8.83
-case_0113,Volumen Tumoral,mm³,1413.0,Bajo,2753.18,Bajo,1340.18,94.85
-case_0150,Volumen Tumoral,mm³,1214.0,Bajo,1646.11,Bajo,432.11,35.59
-case_0491,Volumen Tumoral,mm³,37830.0,Crítico,40389.05,Crítico,2559.05,6.76
-case_0860,Volumen Tumoral,mm³,376.0,Bajo,959.72,Bajo,583.72,155.25
-case_0826,Volumen Tumoral,mm³,4464.0,Moderado,5912.86,Moderado,1448.86,32.46
-case_0437,Volumen Tumoral,mm³,6983.0,Moderado,8496.25,Moderado,1513.25,21.67
-case_0295,Volumen Tumoral,mm³,5055.0,Moderado,6568.55,Moderado,1513.55,29.94
-case_0171,Volumen Tumoral,mm³,70545.0,Crítico,64391.64,Crítico,6153.36,8.72
-case_0790,Volumen Tumoral,mm³,3123.0,Bajo,3172.05,Bajo,49.05,1.57
-case_0152,Volumen Tumoral,mm³,5319.0,Moderado,6010.13,Moderado,691.13,12.99
-case_1042,Volumen Tumoral,mm³,21040.0,Crítico,21182.02,Crítico,142.02,0.68
-case_0782,Volumen Tumoral,mm³,6956.0,Moderado,9076.13,Medio-Alto,2120.13,30.48
-case_0124,Volumen Tumoral,mm³,70953.0,Crítico,37195.95,Crítico,33757.05,47.58
-case_0969,Volumen Tumoral,mm³,10335.0,Medio-Alto,11056.74,Medio-Alto,721.74,6.98
-case_0746,Volumen Tumoral,mm³,11260.0,Medio-Alto,15312.58,Medio-Alto,4052.58,35.99
-case_0752,Volumen Tumoral,mm³,17940.0,Medio-Alto,24691.62,Crítico,6751.62,37.63
-case_0002,Volumen Tumoral,mm³,34790.0,Crítico,21071.56,Crítico,13718.44,39.43
-case_0796,Volumen Tumoral,mm³,5359.0,Moderado,7087.19,Moderado,1728.19,32.25
-case_0727,Volumen Tumoral,mm³,9442.0,Medio-Alto,6338.84,Moderado,3103.16,32.87
-case_1082,Volumen Tumoral,mm³,8091.0,Moderado,8641.64,Moderado,550.64,6.81
-case_0508,Volumen Tumoral,mm³,16016.0,Medio-Alto,19950.09,Crítico,3934.09,24.56
-case_0909,Volumen Tumoral,mm³,9106.0,Medio-Alto,10066.86,Medio-Alto,960.86,10.55
-case_0445,Volumen Tumoral,mm³,15280.0,Medio-Alto,14556.45,Medio-Alto,723.55,4.74
-case_0524,Volumen Tumoral,mm³,11917.0,Medio-Alto,11048.05,Medio-Alto,868.95,7.29
-case_0413,Volumen Tumoral,mm³,55455.0,Crítico,44275.55,Crítico,11179.45,20.16
-case_0259,Volumen Tumoral,mm³,4026.0,Bajo,3694.25,Bajo,331.75,8.24
-case_0616,Volumen Tumoral,mm³,5444.0,Moderado,6353.5,Moderado,909.5,16.71
-case_0938,Volumen Tumoral,mm³,23529.0,Crítico,34677.72,Crítico,11148.72,47.38
-case_0074,Volumen Tumoral,mm³,25142.0,Crítico,22643.99,Crítico,2498.01,9.94
-case_0474,Volumen Tumoral,mm³,2640.0,Bajo,2437.13,Bajo,202.87,7.68
-case_0720,Volumen Tumoral,mm³,51356.0,Crítico,12575.89,Medio-Alto,38780.11,75.51
-case_0717,Volumen Tumoral,mm³,3422.0,Bajo,3951.0,Bajo,529.0,15.46
-case_0659,Volumen Tumoral,mm³,5262.0,Moderado,6782.88,Moderado,1520.88,28.9
-case_0939,Volumen Tumoral,mm³,11650.0,Medio-Alto,13173.98,Medio-Alto,1523.98,13.08
-case_0887,Volumen Tumoral,mm³,4064.0,Bajo,4686.54,Moderado,622.54,15.32
-case_0607,Volumen Tumoral,mm³,20445.0,Crítico,17518.49,Medio-Alto,2926.51,14.31
-case_0130,Volumen Tumoral,mm³,37280.0,Crítico,54243.83,Crítico,16963.83,45.5
-case_0470,Volumen Tumoral,mm³,17100.0,Medio-Alto,19433.56,Crítico,2333.56,13.65
-case_0979,Volumen Tumoral,mm³,11416.0,Medio-Alto,12954.75,Medio-Alto,1538.75,13.48
-case_0110,Volumen Tumoral,mm³,7497.0,Moderado,6353.49,Moderado,1143.51,15.25
-case_0400,Volumen Tumoral,mm³,1818.0,Bajo,2262.89,Bajo,444.89,24.47
-case_0799,Volumen Tumoral,mm³,12783.0,Medio-Alto,12241.48,Medio-Alto,541.52,4.24
-case_1090,Volumen Tumoral,mm³,2479.0,Bajo,3775.1,Bajo,1296.1,52.28
-case_0395,Volumen Tumoral,mm³,5603.0,Moderado,5981.23,Moderado,378.23,6.75
-case_0880,Volumen Tumoral,mm³,5589.0,Moderado,6566.66,Moderado,977.66,17.49
-case_0676,Volumen Tumoral,mm³,25589.0,Crítico,22417.15,Crítico,3171.85,12.4
-case_0749,Volumen Tumoral,mm³,1345.0,Bajo,2963.59,Bajo,1618.59,120.34
-case_0024,Volumen Tumoral,mm³,7632.0,Moderado,7604.29,Moderado,27.71,0.36
-case_0558,Volumen Tumoral,mm³,5578.0,Moderado,8807.97,Moderado,3229.97,57.91
-case_0804,Volumen Tumoral,mm³,22877.0,Crítico,18330.91,Medio-Alto,4546.09,19.87
-case_0642,Volumen Tumoral,mm³,21705.0,Crítico,15049.13,Medio-Alto,6655.87,30.67
-case_0424,Volumen Tumoral,mm³,1749.0,Bajo,2442.54,Bajo,693.54,39.65
-case_0944,Volumen Tumoral,mm³,8558.0,Moderado,7419.37,Moderado,1138.63,13.3
-case_0825,Volumen Tumoral,mm³,4569.0,Moderado,5495.83,Moderado,926.83,20.29
-case_0436,Volumen Tumoral,mm³,6062.0,Moderado,6036.17,Moderado,25.83,0.43
-case_0577,Volumen Tumoral,mm³,1527.0,Bajo,2489.05,Bajo,962.05,63.0
-case_0487,Volumen Tumoral,mm³,9111.0,Medio-Alto,7506.65,Moderado,1604.35,17.61
-case_0955,Volumen Tumoral,mm³,2790.0,Bajo,4214.7,Bajo,1424.7,51.06
-case_0795,Volumen Tumoral,mm³,41691.0,Crítico,24153.34,Crítico,17537.66,42.07
-case_0229,Volumen Tumoral,mm³,15552.0,Medio-Alto,9301.05,Medio-Alto,6250.95,40.19
-case_0468,Volumen Tumoral,mm³,20838.0,Crítico,13699.64,Medio-Alto,7138.36,34.26
-case_0943,Volumen Tumoral,mm³,2772.0,Bajo,3538.97,Bajo,766.97,27.67
-case_0573,Volumen Tumoral,mm³,1479.0,Bajo,1663.15,Bajo,184.15,12.45
-case_0764,Volumen Tumoral,mm³,5691.0,Moderado,6164.29,Moderado,473.29,8.32
-case_0869,Volumen Tumoral,mm³,67259.0,Crítico,21628.49,Crítico,45630.51,67.84
-case_0673,Volumen Tumoral,mm³,27700.0,Crítico,22901.95,Crítico,4798.05,17.32
-case_0974,Volumen Tumoral,mm³,8040.0,Moderado,9211.98,Medio-Alto,1171.98,14.58
-case_0800,Volumen Tumoral,mm³,6864.0,Moderado,7722.16,Moderado,858.16,12.5
-case_0102,Volumen Tumoral,mm³,7203.0,Moderado,8847.51,Moderado,1644.51,22.83
-case_0187,Volumen Tumoral,mm³,5516.0,Moderado,8077.61,Moderado,2561.61,46.44
-case_0098,Volumen Tumoral,mm³,4341.0,Bajo,6450.03,Moderado,2109.03,48.58
-case_1023,Volumen Tumoral,mm³,6438.0,Moderado,6046.79,Moderado,391.21,6.08
-case_0188,Volumen Tumoral,mm³,46754.0,Crítico,45946.33,Crítico,807.67,1.73
-case_0935,Volumen Tumoral,mm³,1941.0,Bajo,2399.45,Bajo,458.45,23.62
-case_0394,Volumen Tumoral,mm³,584.0,Bajo,1150.12,Bajo,566.12,96.94
-case_0101,Volumen Tumoral,mm³,8988.0,Medio-Alto,10218.49,Medio-Alto,1230.49,13.69
-case_0320,Volumen Tumoral,mm³,3323.0,Bajo,5316.28,Moderado,1993.28,59.98
-case_0546,Volumen Tumoral,mm³,2694.0,Bajo,2427.81,Bajo,266.19,9.88
-case_0057,Volumen Tumoral,mm³,3165.0,Bajo,2863.75,Bajo,301.25,9.52
-case_0238,Volumen Tumoral,mm³,6027.0,Moderado,7291.82,Moderado,1264.82,20.99
-case_0482,Volumen Tumoral,mm³,1008.0,Bajo,1463.71,Bajo,455.71,45.21
-case_0768,Volumen Tumoral,mm³,2915.0,Bajo,3717.39,Bajo,802.39,27.53
-case_0949,Volumen Tumoral,mm³,5037.0,Moderado,7562.69,Moderado,2525.69,50.14
-case_0481,Volumen Tumoral,mm³,3783.0,Bajo,3315.52,Bajo,467.48,12.36
-case_0858,Volumen Tumoral,mm³,2013.0,Bajo,3025.82,Bajo,1012.82,50.31
-case_0582,Volumen Tumoral,mm³,3862.0,Bajo,4378.93,Moderado,516.93,13.39
-case_0119,Volumen Tumoral,mm³,9245.0,Medio-Alto,9589.91,Medio-Alto,344.91,3.73
-case_0267,Volumen Tumoral,mm³,27906.0,Crítico,37856.99,Crítico,9950.99,35.66
-case_0827,Volumen Tumoral,mm³,11445.0,Medio-Alto,12943.56,Medio-Alto,1498.56,13.09
-case_1020,Volumen Tumoral,mm³,8837.0,Moderado,9141.28,Medio-Alto,304.28,3.44
-case_1092,Volumen Tumoral,mm³,9089.0,Medio-Alto,6251.48,Moderado,2837.52,31.22
-case_0331,Volumen Tumoral,mm³,4791.0,Moderado,4818.25,Moderado,27.25,0.57
-case_0385,Volumen Tumoral,mm³,12885.0,Medio-Alto,7196.93,Moderado,5688.07,44.14
-case_1097,Volumen Tumoral,mm³,9992.0,Medio-Alto,16998.73,Medio-Alto,7006.73,70.12
-case_0111,Volumen Tumoral,mm³,840.0,Bajo,1418.34,Bajo,578.34,68.85
-case_0593,Volumen Tumoral,mm³,6374.0,Moderado,12561.55,Medio-Alto,6187.55,97.07
-case_0348,Volumen Tumoral,mm³,8266.0,Moderado,10342.04,Medio-Alto,2076.04,25.12
-case_1019,Volumen Tumoral,mm³,42420.0,Crítico,43006.55,Crítico,586.55,1.38
-case_0193,Volumen Tumoral,mm³,3317.0,Bajo,3427.43,Bajo,110.43,3.33
-case_0902,Volumen Tumoral,mm³,25002.0,Crítico,18442.14,Medio-Alto,6559.86,26.24
-case_0441,Volumen Tumoral,mm³,21420.0,Crítico,19567.66,Crítico,1852.34,8.65
-case_0402,Volumen Tumoral,mm³,1124.0,Bajo,1135.18,Bajo,11.18,1.0
-case_0872,Volumen Tumoral,mm³,84244.0,Crítico,54034.99,Crítico,30209.01,35.86
-case_0751,Volumen Tumoral,mm³,42095.0,Crítico,32523.37,Crítico,9571.63,22.74
-case_0874,Volumen Tumoral,mm³,21522.0,Crítico,9255.6,Medio-Alto,12266.4,56.99
-case_0847,Volumen Tumoral,mm³,22893.0,Crítico,20875.28,Crítico,2017.72,8.81
-case_0604,Volumen Tumoral,mm³,5481.0,Moderado,6091.39,Moderado,610.39,11.14
-case_0044,Volumen Tumoral,mm³,15260.0,Medio-Alto,14592.44,Medio-Alto,667.56,4.37
-case_0679,Volumen Tumoral,mm³,14046.0,Medio-Alto,11888.43,Medio-Alto,2157.57,15.36
-case_0223,Volumen Tumoral,mm³,8763.0,Moderado,7091.03,Moderado,1671.97,19.08
-case_0550,Volumen Tumoral,mm³,104495.0,Crítico,78538.71,Crítico,25956.29,24.84
-case_0278,Volumen Tumoral,mm³,16764.0,Medio-Alto,15066.82,Medio-Alto,1697.18,10.12
-case_0725,Volumen Tumoral,mm³,68733.0,Crítico,65957.63,Crítico,2775.37,4.04
-case_0649,Volumen Tumoral,mm³,10443.0,Medio-Alto,9453.81,Medio-Alto,989.19,9.47
-case_0509,Volumen Tumoral,mm³,1035.0,Bajo,1014.48,Bajo,20.52,1.98
-case_0039,Volumen Tumoral,mm³,11079.0,Medio-Alto,7788.39,Moderado,3290.61,29.7
-case_0973,Volumen Tumoral,mm³,3097.0,Bajo,8604.16,Moderado,5507.16,177.82
-case_0763,Volumen Tumoral,mm³,21120.0,Crítico,35251.52,Crítico,14131.52,66.91
-case_0818,Volumen Tumoral,mm³,16996.0,Medio-Alto,13062.65,Medio-Alto,3933.35,23.14
-case_0911,Volumen Tumoral,mm³,6443.0,Moderado,7590.91,Moderado,1147.91,17.82
-case_0654,Volumen Tumoral,mm³,15462.0,Medio-Alto,14880.02,Medio-Alto,581.98,3.76
-case_0562,Volumen Tumoral,mm³,12276.0,Medio-Alto,11096.8,Medio-Alto,1179.2,9.61
-case_0484,Volumen Tumoral,mm³,41669.0,Crítico,34427.4,Crítico,7241.6,17.38
-case_0406,Volumen Tumoral,mm³,5019.0,Moderado,6261.44,Moderado,1242.44,24.75
-case_0015,Volumen Tumoral,mm³,45074.0,Crítico,42187.92,Crítico,2886.08,6.4
-case_0985,Volumen Tumoral,mm³,18391.0,Medio-Alto,16931.52,Medio-Alto,1459.48,7.94
-case_0986,Volumen Tumoral,mm³,6975.0,Moderado,7843.64,Moderado,868.64,12.45
-case_0197,Volumen Tumoral,mm³,28578.0,Crítico,12985.07,Medio-Alto,15592.93,54.56
-case_1021,Volumen Tumoral,mm³,54160.0,Crítico,38299.81,Crítico,15860.19,29.28
-case_0820,Volumen Tumoral,mm³,6736.0,Moderado,7056.2,Moderado,320.2,4.75
-case_0980,Volumen Tumoral,mm³,4559.0,Moderado,4852.64,Moderado,293.64,6.44
-case_0591,Volumen Tumoral,mm³,15495.0,Medio-Alto,13387.96,Medio-Alto,2107.04,13.6
-case_0418,Volumen Tumoral,mm³,4995.0,Moderado,8573.31,Moderado,3578.31,71.64
-case_0495,Volumen Tumoral,mm³,19381.0,Crítico,14428.82,Medio-Alto,4952.18,25.55
-case_0040,Volumen Tumoral,mm³,11918.0,Medio-Alto,12426.79,Medio-Alto,508.79,4.27
-case_0466,Volumen Tumoral,mm³,9360.0,Medio-Alto,9563.99,Medio-Alto,203.99,2.18
-case_0324,Volumen Tumoral,mm³,23574.0,Crítico,18568.98,Medio-Alto,5005.02,21.23
-case_0761,Volumen Tumoral,mm³,5510.0,Moderado,4675.42,Moderado,834.58,15.15
-case_0326,Volumen Tumoral,mm³,55145.0,Crítico,36400.62,Crítico,18744.38,33.99
-case_0064,Volumen Tumoral,mm³,2652.0,Bajo,4582.39,Moderado,1930.39,72.79
-case_0017,Volumen Tumoral,mm³,1929.0,Bajo,2170.05,Bajo,241.05,12.5
-case_0136,Volumen Tumoral,mm³,17397.0,Medio-Alto,10684.39,Medio-Alto,6712.61,38.58
-case_0931,Volumen Tumoral,mm³,20856.0,Crítico,28494.09,Crítico,7638.09,36.62
-case_0786,Volumen Tumoral,mm³,4600.0,Moderado,3694.97,Bajo,905.03,19.67
-case_0182,Volumen Tumoral,mm³,2591.0,Bajo,2166.6,Bajo,424.4,16.38
-case_0772,Volumen Tumoral,mm³,19197.0,Medio-Alto,15568.16,Medio-Alto,3628.84,18.9
-case_0463,Volumen Tumoral,mm³,2193.0,Bajo,1630.56,Bajo,562.44,25.65
-case_0556,Volumen Tumoral,mm³,4998.0,Moderado,5403.49,Moderado,405.49,8.11
-case_0125,Volumen Tumoral,mm³,42161.0,Crítico,29334.39,Crítico,12826.61,30.42
-case_1072,Volumen Tumoral,mm³,56883.0,Crítico,46993.93,Crítico,9889.07,17.38
-case_0068,Volumen Tumoral,mm³,2454.0,Bajo,2829.44,Bajo,375.44,15.3
-case_0567,Volumen Tumoral,mm³,8643.0,Moderado,9559.81,Medio-Alto,916.81,10.61
-case_0219,Volumen Tumoral,mm³,11274.0,Medio-Alto,11173.38,Medio-Alto,100.62,0.89
-case_1003,Volumen Tumoral,mm³,20920.0,Crítico,18086.26,Medio-Alto,2833.74,13.55
-case_0837,Volumen Tumoral,mm³,31445.0,Crítico,44864.92,Crítico,13419.92,42.68
-case_0227,Volumen Tumoral,mm³,7827.0,Moderado,9471.03,Medio-Alto,1644.03,21.0
-case_0088,Volumen Tumoral,mm³,3739.0,Bajo,4000.01,Bajo,261.01,6.98
-case_0609,Volumen Tumoral,mm³,20459.0,Crítico,19129.77,Medio-Alto,1329.23,6.5
-case_1067,Volumen Tumoral,mm³,10644.0,Medio-Alto,9711.58,Medio-Alto,932.42,8.76
-case_0449,Volumen Tumoral,mm³,6921.0,Moderado,8333.32,Moderado,1412.32,20.41
-case_0246,Volumen Tumoral,mm³,7050.0,Moderado,13007.49,Medio-Alto,5957.49,84.5
-case_0440,Volumen Tumoral,mm³,11886.0,Medio-Alto,13801.52,Medio-Alto,1915.52,16.12
-case_0301,Volumen Tumoral,mm³,3525.0,Bajo,4519.41,Moderado,994.41,28.21
-case_0922,Volumen Tumoral,mm³,4890.0,Moderado,5095.15,Moderado,205.15,4.2
-case_0380,Volumen Tumoral,mm³,4377.0,Bajo,4613.7,Moderado,236.7,5.41
-case_1013,Volumen Tumoral,mm³,3896.0,Bajo,5946.95,Moderado,2050.95,52.64
-case_0149,Volumen Tumoral,mm³,18657.0,Medio-Alto,15178.33,Medio-Alto,3478.67,18.65
-case_0792,Volumen Tumoral,mm³,10328.0,Medio-Alto,14070.27,Medio-Alto,3742.27,36.23
-case_0456,Volumen Tumoral,mm³,5718.0,Moderado,7340.95,Moderado,1622.95,28.38
-case_0802,Volumen Tumoral,mm³,30605.0,Crítico,25647.71,Crítico,4957.29,16.2
-case_0158,Volumen Tumoral,mm³,2742.0,Bajo,3143.78,Bajo,401.78,14.65
-case_0553,Volumen Tumoral,mm³,8366.0,Moderado,9105.54,Medio-Alto,739.54,8.84
-case_0838,Volumen Tumoral,mm³,2036.0,Bajo,2559.0,Bajo,523.0,25.69
-case_0287,Volumen Tumoral,mm³,4008.0,Bajo,4568.88,Moderado,560.88,13.99
-case_0469,Volumen Tumoral,mm³,2011.0,Bajo,2836.86,Bajo,825.86,41.07
-case_0042,Volumen Tumoral,mm³,693.0,Bajo,1348.41,Bajo,655.41,94.58
-case_0614,Volumen Tumoral,mm³,6714.0,Moderado,7644.69,Moderado,930.69,13.86
-case_0170,Volumen Tumoral,mm³,8565.0,Moderado,10277.88,Medio-Alto,1712.88,20.0
-case_0964,Volumen Tumoral,mm³,17703.0,Medio-Alto,19547.38,Crítico,1844.38,10.42
-case_0740,Volumen Tumoral,mm³,5088.0,Moderado,5949.07,Moderado,861.07,16.92
-case_0663,Volumen Tumoral,mm³,25464.0,Crítico,20628.66,Crítico,4835.34,18.99
-case_1007,Volumen Tumoral,mm³,5827.0,Moderado,6546.11,Moderado,719.11,12.34
-case_0160,Volumen Tumoral,mm³,18693.0,Medio-Alto,14422.37,Medio-Alto,4270.63,22.85
-case_0032,Volumen Tumoral,mm³,3936.0,Bajo,4507.59,Moderado,571.59,14.52
-case_0716,Volumen Tumoral,mm³,64103.0,Crítico,35507.62,Crítico,28595.38,44.61
-case_0906,Volumen Tumoral,mm³,1260.0,Bajo,1291.3,Bajo,31.3,2.48
-case_1018,Volumen Tumoral,mm³,2811.0,Bajo,4490.24,Moderado,1679.24,59.74
-case_0868,Volumen Tumoral,mm³,68523.0,Crítico,55585.44,Crítico,12937.56,18.88
-case_0515,Volumen Tumoral,mm³,1953.0,Bajo,2239.4,Bajo,286.4,14.66
-case_0116,Volumen Tumoral,mm³,12854.0,Medio-Alto,8489.92,Moderado,4364.08,33.95
-case_1100,Volumen Tumoral,mm³,95457.0,Crítico,63123.73,Crítico,32333.27,33.87
-case_0269,Volumen Tumoral,mm³,10451.0,Medio-Alto,9817.84,Medio-Alto,633.16,6.06
-case_0089,Volumen Tumoral,mm³,18167.0,Medio-Alto,8908.5,Moderado,9258.5,50.96
-case_0232,Volumen Tumoral,mm³,22388.0,Crítico,19666.87,Crítico,2721.13,12.15
-case_1034,Volumen Tumoral,mm³,2655.0,Bajo,2986.05,Bajo,331.05,12.47
-case_0018,Volumen Tumoral,mm³,73959.0,Crítico,51751.05,Crítico,22207.95,30.03
-case_0202,Volumen Tumoral,mm³,480.0,Bajo,1206.4,Bajo,726.4,151.33
-case_1062,Volumen Tumoral,mm³,4071.0,Bajo,5829.92,Moderado,1758.92,43.21
-case_0412,Volumen Tumoral,mm³,5871.0,Moderado,4634.26,Moderado,1236.74,21.07
-case_0702,Volumen Tumoral,mm³,21591.0,Crítico,16507.15,Medio-Alto,5083.85,23.55
-case_0738,Volumen Tumoral,mm³,25320.0,Crítico,28945.83,Crítico,3625.83,14.32
-case_0357,Volumen Tumoral,mm³,5490.0,Moderado,6573.79,Moderado,1083.79,19.74
-case_0997,Volumen Tumoral,mm³,14825.0,Medio-Alto,26038.35,Crítico,11213.35,75.64
-case_0519,Volumen Tumoral,mm³,2512.0,Bajo,2914.11,Bajo,402.11,16.01
-case_0512,Volumen Tumoral,mm³,1925.0,Bajo,2124.41,Bajo,199.41,10.36
-case_0583,Volumen Tumoral,mm³,53214.0,Crítico,76529.74,Crítico,23315.74,43.82
-case_0417,Volumen Tumoral,mm³,23232.0,Crítico,15462.47,Medio-Alto,7769.53,33.44
-case_0035,Volumen Tumoral,mm³,10794.0,Medio-Alto,7784.6,Moderado,3009.4,27.88
-case_0239,Volumen Tumoral,mm³,14891.0,Medio-Alto,17602.39,Medio-Alto,2711.39,18.21
-case_0336,Volumen Tumoral,mm³,20131.0,Crítico,23325.04,Crítico,3194.04,15.87
-case_0972,Volumen Tumoral,mm³,2967.0,Bajo,3163.7,Bajo,196.7,6.63
-case_0328,Volumen Tumoral,mm³,12290.0,Medio-Alto,7416.18,Moderado,4873.82,39.66
-case_0021,Volumen Tumoral,mm³,36762.0,Crítico,22691.59,Crítico,14070.41,38.27
-case_1076,Volumen Tumoral,mm³,3614.0,Bajo,5568.67,Moderado,1954.67,54.09
-case_0384,Volumen Tumoral,mm³,20034.0,Crítico,16659.29,Medio-Alto,3374.71,16.84
-case_0745,Volumen Tumoral,mm³,16941.0,Medio-Alto,14861.05,Medio-Alto,2079.95,12.28
-case_0033,Volumen Tumoral,mm³,11249.0,Medio-Alto,8325.89,Moderado,2923.11,25.99
-case_0243,Volumen Tumoral,mm³,8191.0,Moderado,7024.27,Moderado,1166.73,14.24
-case_0808,Volumen Tumoral,mm³,64377.0,Crítico,47691.28,Crítico,16685.72,25.92
-case_0695,Volumen Tumoral,mm³,732.0,Bajo,956.16,Bajo,224.16,30.62
-case_0093,Volumen Tumoral,mm³,17268.0,Medio-Alto,11504.95,Medio-Alto,5763.05,33.37
-case_0356,Volumen Tumoral,mm³,5736.0,Moderado,6608.15,Moderado,872.15,15.2
-case_0256,Volumen Tumoral,mm³,13551.0,Medio-Alto,18769.46,Medio-Alto,5218.46,38.51
-case_0304,Volumen Tumoral,mm³,1380.0,Bajo,1483.14,Bajo,103.14,7.47
-case_0648,Volumen Tumoral,mm³,5760.0,Moderado,6957.86,Moderado,1197.86,20.8
-case_1093,Volumen Tumoral,mm³,25180.0,Crítico,21465.48,Crítico,3714.52,14.75
-case_0989,Volumen Tumoral,mm³,3472.0,Bajo,3510.75,Bajo,38.75,1.12
-case_0319,Volumen Tumoral,mm³,7590.0,Moderado,7785.54,Moderado,195.54,2.58
-case_1085,Volumen Tumoral,mm³,8142.0,Moderado,10831.58,Medio-Alto,2689.58,33.03
-case_1071,Volumen Tumoral,mm³,678.0,Bajo,1009.33,Bajo,331.33,48.87
-case_0009,Volumen Tumoral,mm³,17920.0,Medio-Alto,12268.36,Medio-Alto,5651.64,31.54
-case_0250,Volumen Tumoral,mm³,6891.0,Moderado,7574.82,Moderado,683.82,9.92
-case_0690,Volumen Tumoral,mm³,10937.0,Medio-Alto,9989.1,Medio-Alto,947.9,8.67
-case_1098,Volumen Tumoral,mm³,10419.0,Medio-Alto,10067.1,Medio-Alto,351.9,3.38
-case_0452,Volumen Tumoral,mm³,21533.0,Crítico,20117.81,Crítico,1415.19,6.57
-case_0431,Volumen Tumoral,mm³,5314.0,Moderado,4624.03,Moderado,689.97,12.98
-case_0475,Volumen Tumoral,mm³,2148.0,Bajo,3356.17,Bajo,1208.17,56.25
-case_0480,Volumen Tumoral,mm³,39473.0,Crítico,35283.45,Crítico,4189.55,10.61
-case_0731,Volumen Tumoral,mm³,951.0,Bajo,1420.81,Bajo,469.81,49.4
-case_0054,Volumen Tumoral,mm³,79290.0,Crítico,58926.7,Crítico,20363.3,25.68
-case_0966,Volumen Tumoral,mm³,23847.0,Crítico,14647.26,Medio-Alto,9199.74,38.58
-case_0052,Volumen Tumoral,mm³,64506.0,Crítico,53112.83,Crítico,11393.17,17.66
-case_0030,Volumen Tumoral,mm³,60434.0,Crítico,48584.84,Crítico,11849.16,19.61
-case_0732,Volumen Tumoral,mm³,8865.0,Moderado,11639.14,Medio-Alto,2774.14,31.29
-case_1060,Volumen Tumoral,mm³,9906.0,Medio-Alto,10017.94,Medio-Alto,111.94,1.13
-case_0941,Volumen Tumoral,mm³,4248.0,Bajo,3670.29,Bajo,577.71,13.6
-case_0281,Volumen Tumoral,mm³,5547.0,Moderado,5877.15,Moderado,330.15,5.95
-case_0423,Volumen Tumoral,mm³,6828.0,Moderado,8601.62,Moderado,1773.62,25.98
-case_0252,Volumen Tumoral,mm³,13678.0,Medio-Alto,17964.04,Medio-Alto,4286.04,31.34
-case_0175,Volumen Tumoral,mm³,9695.0,Medio-Alto,12792.34,Medio-Alto,3097.34,31.95
-case_0210,Volumen Tumoral,mm³,21960.0,Crítico,19703.48,Crítico,2256.52,10.28
-case_0988,Volumen Tumoral,mm³,16532.0,Medio-Alto,27373.3,Crítico,10841.3,65.58
-case_1091,Volumen Tumoral,mm³,3150.0,Bajo,4587.39,Moderado,1437.39,45.63
-case_0686,Volumen Tumoral,mm³,16934.0,Medio-Alto,19082.66,Medio-Alto,2148.66,12.69
-case_0334,Volumen Tumoral,mm³,9915.0,Medio-Alto,10687.16,Medio-Alto,772.16,7.79
-case_0055,Volumen Tumoral,mm³,4904.0,Moderado,5726.91,Moderado,822.91,16.78
-case_0890,Volumen Tumoral,mm³,14368.0,Medio-Alto,11220.68,Medio-Alto,3147.32,21.91
-case_0076,Volumen Tumoral,mm³,2808.0,Bajo,3911.35,Bajo,1103.35,39.29
-case_0773,Volumen Tumoral,mm³,4308.0,Bajo,4910.04,Moderado,602.04,13.97
-case_0222,Volumen Tumoral,mm³,6936.0,Moderado,5214.5,Moderado,1721.5,24.82
-case_0608,Volumen Tumoral,mm³,24274.0,Crítico,18689.93,Medio-Alto,5584.07,23.0
-case_0666,Volumen Tumoral,mm³,22291.0,Crítico,16865.46,Medio-Alto,5425.54,24.34
-case_0662,Volumen Tumoral,mm³,5996.0,Moderado,5584.62,Moderado,411.38,6.86
-case_0765,Volumen Tumoral,mm³,4639.0,Moderado,4751.39,Moderado,112.39,2.42
-case_1064,Volumen Tumoral,mm³,8736.0,Moderado,9361.6,Medio-Alto,625.6,7.16
-case_0514,Volumen Tumoral,mm³,4188.0,Bajo,5991.57,Moderado,1803.57,43.07
-case_0769,Volumen Tumoral,mm³,1886.0,Bajo,2006.53,Bajo,120.53,6.39
-case_0166,Volumen Tumoral,mm³,6778.0,Moderado,9120.5,Medio-Alto,2342.5,34.56
-case_1012,Volumen Tumoral,mm³,7069.0,Moderado,10870.5,Medio-Alto,3801.5,53.78
-case_0651,Volumen Tumoral,mm³,20187.0,Crítico,24833.05,Crítico,4646.05,23.02
-case_0112,Volumen Tumoral,mm³,96385.0,Crítico,65115.84,Crítico,31269.16,32.44
-case_0586,Volumen Tumoral,mm³,4980.0,Moderado,6798.35,Moderado,1818.35,36.51
-case_0442,Volumen Tumoral,mm³,64464.0,Crítico,50450.98,Crítico,14013.02,21.74
-case_0365,Volumen Tumoral,mm³,40410.0,Crítico,42078.95,Crítico,1668.95,4.13
-case_0183,Volumen Tumoral,mm³,8838.0,Moderado,5467.05,Moderado,3370.95,38.14
-case_0793,Volumen Tumoral,mm³,3454.0,Bajo,4004.84,Bajo,550.84,15.95
-case_0897,Volumen Tumoral,mm³,8215.0,Moderado,10699.54,Medio-Alto,2484.54,30.24
-case_0288,Volumen Tumoral,mm³,14064.0,Medio-Alto,10816.22,Medio-Alto,3247.78,23.09
-case_0566,Volumen Tumoral,mm³,5320.0,Moderado,4870.18,Moderado,449.82,8.46
-case_0518,Volumen Tumoral,mm³,1656.0,Bajo,1233.85,Bajo,422.15,25.49
-case_1065,Volumen Tumoral,mm³,15464.0,Medio-Alto,9763.37,Medio-Alto,5700.63,36.86
-case_1022,Volumen Tumoral,mm³,4920.0,Moderado,5122.1,Moderado,202.1,4.11
-case_0688,Volumen Tumoral,mm³,956.0,Bajo,961.97,Bajo,5.97,0.62
-case_0360,Volumen Tumoral,mm³,13347.0,Medio-Alto,18233.64,Medio-Alto,4886.64,36.61
-case_0926,Volumen Tumoral,mm³,9795.0,Medio-Alto,9548.44,Medio-Alto,246.56,2.52
-case_0378,Volumen Tumoral,mm³,52390.0,Crítico,44902.16,Crítico,7487.84,14.29
-case_0129,Volumen Tumoral,mm³,19989.0,Crítico,20197.83,Crítico,208.83,1.04
-case_1017,Volumen Tumoral,mm³,7655.0,Moderado,8950.29,Medio-Alto,1295.29,16.92
-case_0671,Volumen Tumoral,mm³,1008.0,Bajo,1392.01,Bajo,384.01,38.1
-case_0314,Volumen Tumoral,mm³,77644.0,Crítico,57993.96,Crítico,19650.04,25.31
-case_0279,Volumen Tumoral,mm³,5118.0,Moderado,3947.56,Bajo,1170.44,22.87
-case_1045,Volumen Tumoral,mm³,416.0,Bajo,1075.51,Bajo,659.51,158.54
-case_0368,Volumen Tumoral,mm³,5868.0,Moderado,9453.0,Medio-Alto,3585.0,61.09
-case_0531,Volumen Tumoral,mm³,7240.0,Moderado,11111.92,Medio-Alto,3871.92,53.48
-case_0700,Volumen Tumoral,mm³,10202.0,Medio-Alto,11530.27,Medio-Alto,1328.27,13.02
-case_0833,Volumen Tumoral,mm³,8970.0,Medio-Alto,8192.28,Moderado,777.72,8.67
-case_0967,Volumen Tumoral,mm³,4122.0,Bajo,6615.47,Moderado,2493.47,60.49
-case_0691,Volumen Tumoral,mm³,17990.0,Medio-Alto,15747.05,Medio-Alto,2242.95,12.47
-case_0945,Volumen Tumoral,mm³,9152.0,Medio-Alto,10823.59,Medio-Alto,1671.59,18.26
-case_0742,Volumen Tumoral,mm³,14709.0,Medio-Alto,13457.52,Medio-Alto,1251.48,8.51
-case_0333,Volumen Tumoral,mm³,31575.0,Crítico,19696.24,Crítico,11878.76,37.62
-case_0115,Volumen Tumoral,mm³,15699.0,Medio-Alto,15387.63,Medio-Alto,311.37,1.98
-case_0126,Volumen Tumoral,mm³,5571.0,Moderado,9207.13,Medio-Alto,3636.13,65.27
-case_0590,Volumen Tumoral,mm³,4779.0,Moderado,8259.23,Moderado,3480.23,72.82
-case_0092,Volumen Tumoral,mm³,7445.0,Moderado,6866.08,Moderado,578.92,7.78
-case_0708,Volumen Tumoral,mm³,96753.0,Crítico,22678.51,Crítico,74074.49,76.56
-case_0551,Volumen Tumoral,mm³,9194.0,Medio-Alto,6777.03,Moderado,2416.97,26.29
-case_0493,Volumen Tumoral,mm³,2481.0,Bajo,3141.27,Bajo,660.27,26.61
-case_0992,Volumen Tumoral,mm³,1596.0,Bajo,1494.59,Bajo,101.41,6.35
-case_0932,Volumen Tumoral,mm³,7296.0,Moderado,10297.19,Medio-Alto,3001.19,41.13
-case_0132,Volumen Tumoral,mm³,45940.0,Crítico,28516.86,Crítico,17423.14,37.93
-case_0386,Volumen Tumoral,mm³,15806.0,Medio-Alto,13332.19,Medio-Alto,2473.81,15.65
-case_0532,Volumen Tumoral,mm³,8950.0,Medio-Alto,10813.03,Medio-Alto,1863.03,20.82
-case_0645,Volumen Tumoral,mm³,9702.0,Medio-Alto,9722.16,Medio-Alto,20.16,0.21
-case_0421,Volumen Tumoral,mm³,11847.0,Medio-Alto,14416.24,Medio-Alto,2569.24,21.69
-case_0605,Volumen Tumoral,mm³,6987.0,Moderado,8069.72,Moderado,1082.72,15.5
-case_0646,Volumen Tumoral,mm³,1081.0,Bajo,1141.52,Bajo,60.52,5.6
-case_0343,Volumen Tumoral,mm³,9258.0,Medio-Alto,7641.34,Moderado,1616.66,17.46
-case_0048,Volumen Tumoral,mm³,3611.0,Bajo,2438.15,Bajo,1172.85,32.48
-case_0767,Volumen Tumoral,mm³,3155.0,Bajo,2852.83,Bajo,302.17,9.58
-case_0599,Volumen Tumoral,mm³,10505.0,Medio-Alto,11099.7,Medio-Alto,594.7,5.66
-case_0029,Volumen Tumoral,mm³,9278.0,Medio-Alto,8058.22,Moderado,1219.78,13.15
-case_0737,Volumen Tumoral,mm³,9294.0,Medio-Alto,9729.82,Medio-Alto,435.82,4.69
-case_0297,Volumen Tumoral,mm³,13868.0,Medio-Alto,16497.95,Medio-Alto,2629.95,18.96
-case_0244,Volumen Tumoral,mm³,11054.0,Medio-Alto,10511.45,Medio-Alto,542.55,4.91
-case_0194,Volumen Tumoral,mm³,8112.0,Moderado,6070.84,Moderado,2041.16,25.16
-case_0527,Volumen Tumoral,mm³,37950.0,Crítico,23172.37,Crítico,14777.63,38.94
-case_0866,Volumen Tumoral,mm³,23436.0,Crítico,19991.17,Crítico,3444.83,14.7
-case_0058,Volumen Tumoral,mm³,10045.0,Medio-Alto,11454.14,Medio-Alto,1409.14,14.03
-case_1044,Volumen Tumoral,mm³,1350.0,Bajo,1223.97,Bajo,126.03,9.34
-case_0948,Volumen Tumoral,mm³,8327.0,Moderado,8502.38,Moderado,175.38,2.11
-case_0798,Volumen Tumoral,mm³,4060.0,Bajo,4298.26,Bajo,238.26,5.87
-case_0611,Volumen Tumoral,mm³,1569.0,Bajo,1455.45,Bajo,113.55,7.24
-case_0338,Volumen Tumoral,mm³,5086.0,Moderado,5168.87,Moderado,82.87,1.63
-case_1002,Volumen Tumoral,mm³,3683.0,Bajo,3315.79,Bajo,367.21,9.97
-case_0719,Volumen Tumoral,mm³,776.0,Bajo,1608.87,Bajo,832.87,107.33
-case_0628,Volumen Tumoral,mm³,3994.0,Bajo,4115.99,Bajo,121.99,3.05
-case_0292,Volumen Tumoral,mm³,14781.0,Medio-Alto,11799.52,Medio-Alto,2981.48,20.17
-case_0627,Volumen Tumoral,mm³,45510.0,Crítico,35426.36,Crítico,10083.64,22.16
-case_0885,Volumen Tumoral,mm³,3450.0,Bajo,2891.04,Bajo,558.96,16.2
-case_0273,Volumen Tumoral,mm³,10488.0,Medio-Alto,12469.86,Medio-Alto,1981.86,18.9
-case_1088,Volumen Tumoral,mm³,4848.0,Moderado,6552.59,Moderado,1704.59,35.16
-case_0061,Volumen Tumoral,mm³,21365.0,Crítico,16478.37,Medio-Alto,4886.63,22.87
-case_0934,Volumen Tumoral,mm³,1529.0,Bajo,1914.79,Bajo,385.79,25.23
-case_0450,Volumen Tumoral,mm³,12381.0,Medio-Alto,13081.72,Medio-Alto,700.72,5.66
-case_0155,Volumen Tumoral,mm³,6540.0,Moderado,6335.65,Moderado,204.35,3.12
-case_0317,Volumen Tumoral,mm³,18959.0,Medio-Alto,13575.09,Medio-Alto,5383.91,28.4
-case_0715,Volumen Tumoral,mm³,21892.0,Crítico,23676.93,Crítico,1784.93,8.15
-case_0315,Volumen Tumoral,mm³,3024.0,Bajo,3094.23,Bajo,70.23,2.32
-case_0053,Volumen Tumoral,mm³,54945.0,Crítico,55640.7,Crítico,695.7,1.27
-case_0026,Volumen Tumoral,mm³,3330.0,Bajo,6529.18,Moderado,3199.18,96.07
-case_0034,Volumen Tumoral,mm³,7494.0,Moderado,7275.68,Moderado,218.32,2.91
-case_0626,Volumen Tumoral,mm³,10157.0,Medio-Alto,8416.04,Moderado,1740.96,17.14
-case_1051,Volumen Tumoral,mm³,7698.0,Moderado,7916.76,Moderado,218.76,2.84
-case_0419,Volumen Tumoral,mm³,1346.0,Bajo,2032.84,Bajo,686.84,51.03
-case_0946,Volumen Tumoral,mm³,20203.0,Crítico,20157.71,Crítico,45.29,0.22
-case_0682,Volumen Tumoral,mm³,4953.0,Moderado,7583.68,Moderado,2630.68,53.11
-case_0318,Volumen Tumoral,mm³,89610.0,Crítico,54465.7,Crítico,35144.3,39.22
-case_0707,Volumen Tumoral,mm³,2904.0,Bajo,4457.43,Moderado,1553.43,53.49
-case_0180,Volumen Tumoral,mm³,66549.0,Crítico,41560.03,Crítico,24988.97,37.55
-case_0856,Volumen Tumoral,mm³,1721.0,Bajo,1984.32,Bajo,263.32,15.3
-case_0204,Volumen Tumoral,mm³,10449.0,Medio-Alto,7973.48,Moderado,2475.52,23.69
-case_0478,Volumen Tumoral,mm³,33726.0,Crítico,31931.94,Crítico,1794.06,5.32
-case_0618,Volumen Tumoral,mm³,43496.0,Crítico,50738.72,Crítico,7242.72,16.65
-case_0547,Volumen Tumoral,mm³,8159.0,Moderado,8531.53,Moderado,372.53,4.57
-case_0766,Volumen Tumoral,mm³,13344.0,Medio-Alto,15347.6,Medio-Alto,2003.6,15.01
-case_0504,Volumen Tumoral,mm³,4212.0,Bajo,5251.37,Moderado,1039.37,24.68
-case_0189,Volumen Tumoral,mm³,2969.0,Bajo,4423.6,Moderado,1454.6,48.99
-case_0704,Volumen Tumoral,mm³,69470.0,Crítico,49160.04,Crítico,20309.96,29.24
-case_0459,Volumen Tumoral,mm³,13242.0,Medio-Alto,12099.27,Medio-Alto,1142.73,8.63
-case_1084,Volumen Tumoral,mm³,17074.0,Medio-Alto,16688.88,Medio-Alto,385.12,2.26
-case_0006,Volumen Tumoral,mm³,20001.0,Crítico,17239.64,Medio-Alto,2761.36,13.81
-case_0240,Volumen Tumoral,mm³,50555.0,Crítico,64667.69,Crítico,14112.69,27.92
-case_0694,Volumen Tumoral,mm³,25123.0,Crítico,23004.33,Crítico,2118.67,8.43
-case_0823,Volumen Tumoral,mm³,55998.0,Crítico,30832.4,Crítico,25165.6,44.94
-case_0610,Volumen Tumoral,mm³,2404.0,Bajo,2273.41,Bajo,130.59,5.43
-case_0683,Volumen Tumoral,mm³,5240.0,Moderado,4560.93,Moderado,679.07,12.96
-case_0236,Volumen Tumoral,mm³,11925.0,Medio-Alto,5930.82,Moderado,5994.18,50.27
-case_0501,Volumen Tumoral,mm³,28745.0,Crítico,15143.69,Medio-Alto,13601.31,47.32
-case_0803,Volumen Tumoral,mm³,3632.0,Bajo,2953.19,Bajo,678.81,18.69
-case_0995,Volumen Tumoral,mm³,4593.0,Moderado,4754.74,Moderado,161.74,3.52
-case_0993,Volumen Tumoral,mm³,4287.0,Bajo,5050.02,Moderado,763.02,17.8
-case_0596,Volumen Tumoral,mm³,6350.0,Moderado,6106.7,Moderado,243.3,3.83
-case_0164,Volumen Tumoral,mm³,40110.0,Crítico,31682.1,Crítico,8427.9,21.01
-case_0496,Volumen Tumoral,mm³,4108.0,Bajo,3365.04,Bajo,742.96,18.09
-case_0982,Volumen Tumoral,mm³,4221.0,Bajo,7246.2,Moderado,3025.2,71.67
-case_0522,Volumen Tumoral,mm³,471.0,Bajo,915.5,Bajo,444.5,94.37
-case_0109,Volumen Tumoral,mm³,3951.0,Bajo,5229.78,Moderado,1278.78,32.37
-case_0548,Volumen Tumoral,mm³,17973.0,Medio-Alto,11256.7,Medio-Alto,6716.3,37.37
-case_1077,Volumen Tumoral,mm³,3922.0,Bajo,5061.65,Moderado,1139.65,29.06
-case_0656,Volumen Tumoral,mm³,105562.0,Crítico,61478.51,Crítico,44083.49,41.76
-case_0597,Volumen Tumoral,mm³,24677.0,Crítico,23972.94,Crítico,704.06,2.85
-case_0832,Volumen Tumoral,mm³,39070.0,Crítico,25924.97,Crítico,13145.03,33.64
-case_0638,Volumen Tumoral,mm³,10419.0,Medio-Alto,7739.56,Moderado,2679.44,25.72
-case_0758,Volumen Tumoral,mm³,6974.0,Moderado,6465.59,Moderado,508.41,7.29
-case_0401,Volumen Tumoral,mm³,8242.0,Moderado,8039.36,Moderado,202.64,2.46
-case_0308,Volumen Tumoral,mm³,6276.0,Moderado,6562.52,Moderado,286.52,4.57
-case_0228,Volumen Tumoral,mm³,65502.0,Crítico,30908.2,Crítico,34593.8,52.81
-case_0005,Volumen Tumoral,mm³,13185.0,Medio-Alto,11667.62,Medio-Alto,1517.38,11.51
-case_0857,Volumen Tumoral,mm³,26263.0,Crítico,24239.07,Crítico,2023.93,7.71
-case_0191,Volumen Tumoral,mm³,2751.0,Bajo,2481.47,Bajo,269.53,9.8
-case_0270,Volumen Tumoral,mm³,5142.0,Moderado,5750.04,Moderado,608.04,11.83
-case_0177,Volumen Tumoral,mm³,3465.0,Bajo,2946.34,Bajo,518.66,14.97
-case_0977,Volumen Tumoral,mm³,6825.0,Moderado,7685.26,Moderado,860.26,12.6
-case_0013,Volumen Tumoral,mm³,29889.0,Crítico,32015.27,Crítico,2126.27,7.11
-case_0962,Volumen Tumoral,mm³,8920.0,Moderado,10052.58,Medio-Alto,1132.58,12.7
-case_0933,Volumen Tumoral,mm³,3357.0,Bajo,4246.11,Bajo,889.11,26.49
-case_1096,Volumen Tumoral,mm³,69069.0,Crítico,28097.5,Crítico,40971.5,59.32
-case_0398,Volumen Tumoral,mm³,85635.0,Crítico,32904.2,Crítico,52730.8,61.58
-case_0523,Volumen Tumoral,mm³,26971.0,Crítico,19828.52,Crítico,7142.48,26.48
-case_0636,Volumen Tumoral,mm³,9742.0,Medio-Alto,12110.26,Medio-Alto,2368.26,24.31
-case_0448,Volumen Tumoral,mm³,2626.0,Bajo,3797.49,Bajo,1171.49,44.61
-case_0206,Volumen Tumoral,mm³,17201.0,Medio-Alto,19920.65,Crítico,2719.65,15.81
-case_0748,Volumen Tumoral,mm³,5507.0,Moderado,6097.82,Moderado,590.82,10.73
-case_0131,Volumen Tumoral,mm³,30360.0,Crítico,15005.26,Medio-Alto,15354.74,50.58
-case_0283,Volumen Tumoral,mm³,5778.0,Moderado,4975.57,Moderado,802.43,13.89
-case_0622,Volumen Tumoral,mm³,2468.0,Bajo,2427.15,Bajo,40.85,1.66
-case_0668,Volumen Tumoral,mm³,5334.0,Moderado,5029.12,Moderado,304.88,5.72
-case_0327,Volumen Tumoral,mm³,6135.0,Moderado,6494.1,Moderado,359.1,5.85
-case_0296,Volumen Tumoral,mm³,90549.0,Crítico,61911.09,Crítico,28637.91,31.63
-case_0247,Volumen Tumoral,mm³,10156.0,Medio-Alto,9663.05,Medio-Alto,492.95,4.85
-case_0831,Volumen Tumoral,mm³,1590.0,Bajo,1743.92,Bajo,153.92,9.68
-case_0313,Volumen Tumoral,mm³,2596.0,Bajo,4733.41,Moderado,2137.41,82.33
-case_0942,Volumen Tumoral,mm³,57946.0,Crítico,55845.45,Crítico,2100.55,3.63
-case_0775,Volumen Tumoral,mm³,60924.0,Crítico,49765.0,Crítico,11159.0,18.32
-case_0322,Volumen Tumoral,mm³,2170.0,Bajo,3171.39,Bajo,1001.39,46.15
-case_0863,Volumen Tumoral,mm³,3178.0,Bajo,3790.74,Bajo,612.74,19.28
-case_0754,Volumen Tumoral,mm³,17110.0,Medio-Alto,16588.44,Medio-Alto,521.56,3.05
-case_0817,Volumen Tumoral,mm³,2682.0,Bajo,3149.26,Bajo,467.26,17.42
-case_0571,Volumen Tumoral,mm³,16238.0,Medio-Alto,13297.63,Medio-Alto,2940.37,18.11
-case_0784,Volumen Tumoral,mm³,939.0,Bajo,1174.8,Bajo,235.8,25.11
-case_0050,Volumen Tumoral,mm³,15683.0,Medio-Alto,12918.91,Medio-Alto,2764.09,17.62
-case_0513,Volumen Tumoral,mm³,13922.0,Medio-Alto,9074.26,Medio-Alto,4847.74,34.82
-case_0392,Volumen Tumoral,mm³,6974.0,Moderado,6550.8,Moderado,423.2,6.07
-case_0554,Volumen Tumoral,mm³,13782.0,Medio-Alto,22956.01,Crítico,9174.01,66.57
-case_0411,Volumen Tumoral,mm³,10249.0,Medio-Alto,14678.57,Medio-Alto,4429.57,43.22
-case_0225,Volumen Tumoral,mm³,15062.0,Medio-Alto,13481.92,Medio-Alto,1580.08,10.49
-case_0439,Volumen Tumoral,mm³,27037.0,Crítico,19083.24,Medio-Alto,7953.76,29.42
-case_0506,Volumen Tumoral,mm³,3915.0,Bajo,4074.79,Bajo,159.79,4.08
-case_0282,Volumen Tumoral,mm³,28040.0,Crítico,36120.01,Crítico,8080.01,28.82
-case_0159,Volumen Tumoral,mm³,4818.0,Moderado,5060.19,Moderado,242.19,5.03
-case_0444,Volumen Tumoral,mm³,2814.0,Bajo,3646.06,Bajo,832.06,29.57
-case_0329,Volumen Tumoral,mm³,4146.0,Bajo,4982.09,Moderado,836.09,20.17
-case_0271,Volumen Tumoral,mm³,12908.0,Medio-Alto,8868.42,Moderado,4039.58,31.3
-case_1010,Volumen Tumoral,mm³,15845.0,Medio-Alto,17151.09,Medio-Alto,1306.09,8.24
-case_0849,Volumen Tumoral,mm³,5007.0,Moderado,7727.19,Moderado,2720.19,54.33
-case_0140,Volumen Tumoral,mm³,28505.0,Crítico,18883.2,Medio-Alto,9621.8,33.75
-case_0434,Volumen Tumoral,mm³,7374.0,Moderado,7901.03,Moderado,527.03,7.15
-case_0677,Volumen Tumoral,mm³,12201.0,Medio-Alto,15201.43,Medio-Alto,3000.43,24.59
-case_0302,Volumen Tumoral,mm³,13302.0,Medio-Alto,8843.87,Moderado,4458.13,33.51
-case_1081,Volumen Tumoral,mm³,15052.0,Medio-Alto,9220.28,Medio-Alto,5831.72,38.74
-case_0601,Volumen Tumoral,mm³,6463.0,Moderado,8441.94,Moderado,1978.94,30.62
-case_0903,Volumen Tumoral,mm³,2719.0,Bajo,2227.12,Bajo,491.88,18.09
-case_0376,Volumen Tumoral,mm³,4195.0,Bajo,5040.38,Moderado,845.38,20.15
-case_0497,Volumen Tumoral,mm³,18382.0,Medio-Alto,19305.01,Crítico,923.01,5.02
-case_0788,Volumen Tumoral,mm³,22135.0,Crítico,14826.88,Medio-Alto,7308.12,33.02
+case_0311,Volumen,mm³,29150.0,Crítico,28034.92,Crítico,1115.08,3.83
+case_0865,Volumen,mm³,11031.0,Medio-Alto,13448.71,Medio-Alto,2417.71,21.92
+case_0951,Volumen,mm³,7812.0,Moderado,8313.06,Moderado,501.06,6.41
+case_0709,Volumen,mm³,13623.0,Medio-Alto,13678.27,Medio-Alto,55.27,0.41
+case_0669,Volumen,mm³,1539.0,Bajo,2145.13,Bajo,606.13,39.38
+case_0341,Volumen,mm³,16873.0,Medio-Alto,15038.94,Medio-Alto,1834.06,10.87
+case_0621,Volumen,mm³,38869.0,Crítico,41414.53,Crítico,2545.53,6.55
+case_0216,Volumen,mm³,6715.0,Moderado,5646.3,Moderado,1068.7,15.92
+case_0012,Volumen,mm³,2679.0,Bajo,2295.32,Bajo,383.68,14.32
+case_0895,Volumen,mm³,1990.0,Bajo,1906.85,Bajo,83.15,4.18
+case_0655,Volumen,mm³,35907.0,Crítico,34634.66,Crítico,1272.34,3.54
+case_0078,Volumen,mm³,40998.0,Crítico,41162.62,Crítico,164.62,0.4
+case_0685,Volumen,mm³,2004.0,Bajo,2533.87,Bajo,529.87,26.44
+case_0415,Volumen,mm³,23318.0,Crítico,27108.92,Crítico,3790.92,16.26
+case_0023,Volumen,mm³,10994.0,Medio-Alto,8926.48,Medio-Alto,2067.52,18.81
+case_0657,Volumen,mm³,7317.0,Moderado,12625.75,Medio-Alto,5308.75,72.55
+case_0927,Volumen,mm³,5982.0,Moderado,7866.64,Moderado,1884.64,31.51
+case_0354,Volumen,mm³,16589.0,Medio-Alto,15715.9,Medio-Alto,873.1,5.26
+case_1047,Volumen,mm³,8770.0,Moderado,10583.35,Medio-Alto,1813.35,20.68
+case_0958,Volumen,mm³,38204.0,Crítico,29938.97,Crítico,8265.03,21.63
+case_0667,Volumen,mm³,8450.0,Moderado,10466.33,Medio-Alto,2016.33,23.86
+case_0069,Volumen,mm³,5031.0,Moderado,7081.49,Moderado,2050.49,40.76
+case_0203,Volumen,mm³,11787.0,Medio-Alto,8125.77,Moderado,3661.23,31.06
+case_0396,Volumen,mm³,12987.0,Medio-Alto,10610.76,Medio-Alto,2376.24,18.3
+case_0952,Volumen,mm³,2229.0,Bajo,2171.65,Bajo,57.35,2.57
+case_0117,Volumen,mm³,22029.0,Crítico,27996.94,Crítico,5967.94,27.09
+case_0199,Volumen,mm³,91063.0,Crítico,59179.1,Crítico,31883.9,35.01
+case_1057,Volumen,mm³,6777.0,Moderado,5928.73,Moderado,848.27,12.52
+case_0446,Volumen,mm³,5957.0,Moderado,6186.94,Moderado,229.94,3.86
+case_0954,Volumen,mm³,32163.0,Crítico,20171.83,Crítico,11991.17,37.28
+case_0615,Volumen,mm³,1326.0,Bajo,1098.61,Bajo,227.39,17.15
+case_0883,Volumen,mm³,15782.0,Medio-Alto,7018.91,Moderado,8763.09,55.53
+case_0678,Volumen,mm³,12705.0,Medio-Alto,18326.47,Medio-Alto,5621.47,44.25
+case_0364,Volumen,mm³,19145.0,Medio-Alto,26434.76,Crítico,7289.76,38.08
+case_0697,Volumen,mm³,40598.0,Crítico,40294.19,Crítico,303.81,0.75
+case_0774,Volumen,mm³,8108.0,Moderado,8360.57,Moderado,252.57,3.12
+case_0242,Volumen,mm³,5706.0,Moderado,7142.69,Moderado,1436.69,25.18
+case_0499,Volumen,mm³,4470.0,Moderado,3576.27,Bajo,893.73,19.99
+case_0552,Volumen,mm³,30090.0,Crítico,27989.58,Crítico,2100.42,6.98
+case_0489,Volumen,mm³,5280.0,Moderado,6208.11,Moderado,928.11,17.58
+case_0178,Volumen,mm³,17252.0,Medio-Alto,19230.02,Crítico,1978.02,11.47
+case_0113,Volumen,mm³,1413.0,Bajo,2535.06,Bajo,1122.06,79.41
+case_0150,Volumen,mm³,1214.0,Bajo,1632.48,Bajo,418.48,34.47
+case_0491,Volumen,mm³,37830.0,Crítico,39626.87,Crítico,1796.87,4.75
+case_0860,Volumen,mm³,376.0,Bajo,873.58,Bajo,497.58,132.34
+case_0826,Volumen,mm³,4464.0,Moderado,5945.15,Moderado,1481.15,33.18
+case_0437,Volumen,mm³,6983.0,Moderado,8202.59,Moderado,1219.59,17.47
+case_0295,Volumen,mm³,5055.0,Moderado,6544.37,Moderado,1489.37,29.46
+case_0171,Volumen,mm³,70545.0,Crítico,65660.71,Crítico,4884.29,6.92
+case_0790,Volumen,mm³,3123.0,Bajo,3281.02,Bajo,158.02,5.06
+case_0152,Volumen,mm³,5319.0,Moderado,5960.68,Moderado,641.68,12.06
+case_1042,Volumen,mm³,21040.0,Crítico,21810.22,Crítico,770.22,3.66
+case_0782,Volumen,mm³,6956.0,Moderado,8964.76,Medio-Alto,2008.76,28.88
+case_0124,Volumen,mm³,70953.0,Crítico,35940.46,Crítico,35012.54,49.35
+case_0969,Volumen,mm³,10335.0,Medio-Alto,11206.93,Medio-Alto,871.93,8.44
+case_0746,Volumen,mm³,11260.0,Medio-Alto,15081.93,Medio-Alto,3821.93,33.94
+case_0752,Volumen,mm³,17940.0,Medio-Alto,23422.23,Crítico,5482.23,30.56
+case_0002,Volumen,mm³,34790.0,Crítico,20464.24,Crítico,14325.76,41.18
+case_0796,Volumen,mm³,5359.0,Moderado,7089.07,Moderado,1730.07,32.28
+case_0727,Volumen,mm³,9442.0,Medio-Alto,6128.91,Moderado,3313.09,35.09
+case_1082,Volumen,mm³,8091.0,Moderado,8706.9,Moderado,615.9,7.61
+case_0508,Volumen,mm³,16016.0,Medio-Alto,19812.74,Crítico,3796.74,23.71
+case_0909,Volumen,mm³,9106.0,Medio-Alto,10574.91,Medio-Alto,1468.91,16.13
+case_0445,Volumen,mm³,15280.0,Medio-Alto,14478.36,Medio-Alto,801.64,5.25
+case_0524,Volumen,mm³,11917.0,Medio-Alto,11368.49,Medio-Alto,548.51,4.6
+case_0413,Volumen,mm³,55455.0,Crítico,47588.15,Crítico,7866.85,14.19
+case_0259,Volumen,mm³,4026.0,Bajo,3628.69,Bajo,397.31,9.87
+case_0616,Volumen,mm³,5444.0,Moderado,6139.32,Moderado,695.32,12.77
+case_0938,Volumen,mm³,23529.0,Crítico,33100.45,Crítico,9571.45,40.68
+case_0074,Volumen,mm³,25142.0,Crítico,23312.24,Crítico,1829.76,7.28
+case_0474,Volumen,mm³,2640.0,Bajo,2472.15,Bajo,167.85,6.36
+case_0720,Volumen,mm³,51356.0,Crítico,14013.35,Medio-Alto,37342.65,72.71
+case_0717,Volumen,mm³,3422.0,Bajo,4053.78,Bajo,631.78,18.46
+case_0659,Volumen,mm³,5262.0,Moderado,6894.18,Moderado,1632.18,31.02
+case_0939,Volumen,mm³,11650.0,Medio-Alto,13262.35,Medio-Alto,1612.35,13.84
+case_0887,Volumen,mm³,4064.0,Bajo,4714.64,Moderado,650.64,16.01
+case_0607,Volumen,mm³,20445.0,Crítico,17027.29,Medio-Alto,3417.71,16.72
+case_0130,Volumen,mm³,37280.0,Crítico,55888.21,Crítico,18608.21,49.91
+case_0470,Volumen,mm³,17100.0,Medio-Alto,18895.89,Medio-Alto,1795.89,10.5
+case_0979,Volumen,mm³,11416.0,Medio-Alto,12969.76,Medio-Alto,1553.76,13.61
+case_0110,Volumen,mm³,7497.0,Moderado,6450.06,Moderado,1046.94,13.96
+case_0400,Volumen,mm³,1818.0,Bajo,2479.86,Bajo,661.86,36.41
+case_0799,Volumen,mm³,12783.0,Medio-Alto,11729.65,Medio-Alto,1053.35,8.24
+case_1090,Volumen,mm³,2479.0,Bajo,3797.75,Bajo,1318.75,53.2
+case_0395,Volumen,mm³,5603.0,Moderado,5857.05,Moderado,254.05,4.53
+case_0880,Volumen,mm³,5589.0,Moderado,6508.85,Moderado,919.85,16.46
+case_0676,Volumen,mm³,25589.0,Crítico,22807.28,Crítico,2781.72,10.87
+case_0749,Volumen,mm³,1345.0,Bajo,2809.17,Bajo,1464.17,108.86
+case_0024,Volumen,mm³,7632.0,Moderado,7454.22,Moderado,177.78,2.33
+case_0558,Volumen,mm³,5578.0,Moderado,8670.51,Moderado,3092.51,55.44
+case_0804,Volumen,mm³,22877.0,Crítico,18196.65,Medio-Alto,4680.35,20.46
+case_0642,Volumen,mm³,21705.0,Crítico,15336.13,Medio-Alto,6368.87,29.34
+case_0424,Volumen,mm³,1749.0,Bajo,2438.45,Bajo,689.45,39.42
+case_0944,Volumen,mm³,8558.0,Moderado,7220.31,Moderado,1337.69,15.63
+case_0825,Volumen,mm³,4569.0,Moderado,5357.8,Moderado,788.8,17.26
+case_0436,Volumen,mm³,6062.0,Moderado,6041.57,Moderado,20.43,0.34
+case_0577,Volumen,mm³,1527.0,Bajo,2509.06,Bajo,982.06,64.31
+case_0487,Volumen,mm³,9111.0,Medio-Alto,7436.43,Moderado,1674.57,18.38
+case_0955,Volumen,mm³,2790.0,Bajo,4038.05,Bajo,1248.05,44.73
+case_0795,Volumen,mm³,41691.0,Crítico,23376.56,Crítico,18314.44,43.93
+case_0229,Volumen,mm³,15552.0,Medio-Alto,9411.19,Medio-Alto,6140.81,39.49
+case_0468,Volumen,mm³,20838.0,Crítico,13862.5,Medio-Alto,6975.5,33.47
+case_0943,Volumen,mm³,2772.0,Bajo,3583.29,Bajo,811.29,29.27
+case_0573,Volumen,mm³,1479.0,Bajo,1644.72,Bajo,165.72,11.2
+case_0764,Volumen,mm³,5691.0,Moderado,5897.71,Moderado,206.71,3.63
+case_0869,Volumen,mm³,67259.0,Crítico,23646.06,Crítico,43612.94,64.84
+case_0673,Volumen,mm³,27700.0,Crítico,23266.76,Crítico,4433.24,16.0
+case_0974,Volumen,mm³,8040.0,Moderado,9058.74,Medio-Alto,1018.74,12.67
+case_0800,Volumen,mm³,6864.0,Moderado,7773.35,Moderado,909.35,13.25
+case_0102,Volumen,mm³,7203.0,Moderado,9106.97,Medio-Alto,1903.97,26.43
+case_0187,Volumen,mm³,5516.0,Moderado,7863.25,Moderado,2347.25,42.55
+case_0098,Volumen,mm³,4341.0,Bajo,6710.88,Moderado,2369.88,54.59
+case_1023,Volumen,mm³,6438.0,Moderado,5966.35,Moderado,471.65,7.33
+case_0188,Volumen,mm³,46754.0,Crítico,42480.22,Crítico,4273.78,9.14
+case_0935,Volumen,mm³,1941.0,Bajo,2495.04,Bajo,554.04,28.54
+case_0394,Volumen,mm³,584.0,Bajo,1123.99,Bajo,539.99,92.46
+case_0101,Volumen,mm³,8988.0,Medio-Alto,10186.73,Medio-Alto,1198.73,13.34
+case_0320,Volumen,mm³,3323.0,Bajo,5220.7,Moderado,1897.7,57.11
+case_0546,Volumen,mm³,2694.0,Bajo,2481.92,Bajo,212.08,7.87
+case_0057,Volumen,mm³,3165.0,Bajo,2762.62,Bajo,402.38,12.71
+case_0238,Volumen,mm³,6027.0,Moderado,7078.11,Moderado,1051.11,17.44
+case_0482,Volumen,mm³,1008.0,Bajo,1413.62,Bajo,405.62,40.24
+case_0768,Volumen,mm³,2915.0,Bajo,3978.45,Bajo,1063.45,36.48
+case_0949,Volumen,mm³,5037.0,Moderado,7223.48,Moderado,2186.48,43.41
+case_0481,Volumen,mm³,3783.0,Bajo,3227.27,Bajo,555.73,14.69
+case_0858,Volumen,mm³,2013.0,Bajo,2869.57,Bajo,856.57,42.55
+case_0582,Volumen,mm³,3862.0,Bajo,4378.53,Moderado,516.53,13.37
+case_0119,Volumen,mm³,9245.0,Medio-Alto,9443.84,Medio-Alto,198.84,2.15
+case_0267,Volumen,mm³,27906.0,Crítico,37528.15,Crítico,9622.15,34.48
+case_0827,Volumen,mm³,11445.0,Medio-Alto,12983.04,Medio-Alto,1538.04,13.44
+case_1020,Volumen,mm³,8837.0,Moderado,8954.83,Medio-Alto,117.83,1.33
+case_1092,Volumen,mm³,9089.0,Medio-Alto,6241.07,Moderado,2847.93,31.33
+case_0331,Volumen,mm³,4791.0,Moderado,4911.41,Moderado,120.41,2.51
+case_0385,Volumen,mm³,12885.0,Medio-Alto,7232.76,Moderado,5652.24,43.87
+case_1097,Volumen,mm³,9992.0,Medio-Alto,17098.38,Medio-Alto,7106.38,71.12
+case_0111,Volumen,mm³,840.0,Bajo,1505.68,Bajo,665.68,79.25
+case_0593,Volumen,mm³,6374.0,Moderado,11716.73,Medio-Alto,5342.73,83.82
+case_0348,Volumen,mm³,8266.0,Moderado,9706.89,Medio-Alto,1440.89,17.43
+case_1019,Volumen,mm³,42420.0,Crítico,43713.24,Crítico,1293.24,3.05
+case_0193,Volumen,mm³,3317.0,Bajo,3442.04,Bajo,125.04,3.77
+case_0902,Volumen,mm³,25002.0,Crítico,18837.24,Medio-Alto,6164.76,24.66
+case_0441,Volumen,mm³,21420.0,Crítico,19025.36,Medio-Alto,2394.64,11.18
+case_0402,Volumen,mm³,1124.0,Bajo,1082.01,Bajo,41.99,3.74
+case_0872,Volumen,mm³,84244.0,Crítico,54357.78,Crítico,29886.22,35.48
+case_0751,Volumen,mm³,42095.0,Crítico,35103.64,Crítico,6991.36,16.61
+case_0874,Volumen,mm³,21522.0,Crítico,9635.63,Medio-Alto,11886.37,55.23
+case_0847,Volumen,mm³,22893.0,Crítico,20457.97,Crítico,2435.03,10.64
+case_0604,Volumen,mm³,5481.0,Moderado,6228.74,Moderado,747.74,13.64
+case_0044,Volumen,mm³,15260.0,Medio-Alto,15317.57,Medio-Alto,57.57,0.38
+case_0679,Volumen,mm³,14046.0,Medio-Alto,12096.27,Medio-Alto,1949.73,13.88
+case_0223,Volumen,mm³,8763.0,Moderado,7275.34,Moderado,1487.66,16.98
+case_0550,Volumen,mm³,104495.0,Crítico,81708.16,Crítico,22786.84,21.81
+case_0278,Volumen,mm³,16764.0,Medio-Alto,14315.19,Medio-Alto,2448.81,14.61
+case_0725,Volumen,mm³,68733.0,Crítico,72839.44,Crítico,4106.44,5.97
+case_0649,Volumen,mm³,10443.0,Medio-Alto,9422.21,Medio-Alto,1020.79,9.77
+case_0509,Volumen,mm³,1035.0,Bajo,950.87,Bajo,84.13,8.13
+case_0039,Volumen,mm³,11079.0,Medio-Alto,8028.61,Moderado,3050.39,27.53
+case_0973,Volumen,mm³,3097.0,Bajo,7922.3,Moderado,4825.3,155.81
+case_0763,Volumen,mm³,21120.0,Crítico,36585.83,Crítico,15465.83,73.23
+case_0818,Volumen,mm³,16996.0,Medio-Alto,13196.38,Medio-Alto,3799.62,22.36
+case_0911,Volumen,mm³,6443.0,Moderado,7837.44,Moderado,1394.44,21.64
+case_0654,Volumen,mm³,15462.0,Medio-Alto,15133.58,Medio-Alto,328.42,2.12
+case_0562,Volumen,mm³,12276.0,Medio-Alto,10974.95,Medio-Alto,1301.05,10.6
+case_0484,Volumen,mm³,41669.0,Crítico,37205.75,Crítico,4463.25,10.71
+case_0406,Volumen,mm³,5019.0,Moderado,6221.19,Moderado,1202.19,23.95
+case_0015,Volumen,mm³,45074.0,Crítico,43372.41,Crítico,1701.59,3.78
+case_0985,Volumen,mm³,18391.0,Medio-Alto,16578.77,Medio-Alto,1812.23,9.85
+case_0986,Volumen,mm³,6975.0,Moderado,7700.74,Moderado,725.74,10.4
+case_0197,Volumen,mm³,28578.0,Crítico,14916.78,Medio-Alto,13661.22,47.8
+case_1021,Volumen,mm³,54160.0,Crítico,39677.25,Crítico,14482.75,26.74
+case_0820,Volumen,mm³,6736.0,Moderado,6980.84,Moderado,244.84,3.63
+case_0980,Volumen,mm³,4559.0,Moderado,5042.73,Moderado,483.73,10.61
+case_0591,Volumen,mm³,15495.0,Medio-Alto,12975.68,Medio-Alto,2519.32,16.26
+case_0418,Volumen,mm³,4995.0,Moderado,8452.42,Moderado,3457.42,69.22
+case_0495,Volumen,mm³,19381.0,Crítico,14025.21,Medio-Alto,5355.79,27.63
+case_0040,Volumen,mm³,11918.0,Medio-Alto,12583.29,Medio-Alto,665.29,5.58
+case_0466,Volumen,mm³,9360.0,Medio-Alto,9843.88,Medio-Alto,483.88,5.17
+case_0324,Volumen,mm³,23574.0,Crítico,19061.55,Medio-Alto,4512.45,19.14
+case_0761,Volumen,mm³,5510.0,Moderado,4858.89,Moderado,651.11,11.82
+case_0326,Volumen,mm³,55145.0,Crítico,37249.76,Crítico,17895.24,32.45
+case_0064,Volumen,mm³,2652.0,Bajo,4545.86,Moderado,1893.86,71.41
+case_0017,Volumen,mm³,1929.0,Bajo,2134.05,Bajo,205.05,10.63
+case_0136,Volumen,mm³,17397.0,Medio-Alto,10352.47,Medio-Alto,7044.53,40.49
+case_0931,Volumen,mm³,20856.0,Crítico,28659.41,Crítico,7803.41,37.42
+case_0786,Volumen,mm³,4600.0,Moderado,3744.29,Bajo,855.71,18.6
+case_0182,Volumen,mm³,2591.0,Bajo,2225.9,Bajo,365.1,14.09
+case_0772,Volumen,mm³,19197.0,Medio-Alto,15811.14,Medio-Alto,3385.86,17.64
+case_0463,Volumen,mm³,2193.0,Bajo,1734.4,Bajo,458.6,20.91
+case_0556,Volumen,mm³,4998.0,Moderado,5493.46,Moderado,495.46,9.91
+case_0125,Volumen,mm³,42161.0,Crítico,30189.14,Crítico,11971.86,28.4
+case_1072,Volumen,mm³,56883.0,Crítico,51061.88,Crítico,5821.12,10.23
+case_0068,Volumen,mm³,2454.0,Bajo,2759.41,Bajo,305.41,12.45
+case_0567,Volumen,mm³,8643.0,Moderado,9568.54,Medio-Alto,925.54,10.71
+case_0219,Volumen,mm³,11274.0,Medio-Alto,10923.34,Medio-Alto,350.66,3.11
+case_1003,Volumen,mm³,20920.0,Crítico,17916.82,Medio-Alto,3003.18,14.36
+case_0837,Volumen,mm³,31445.0,Crítico,45491.2,Crítico,14046.2,44.67
+case_0227,Volumen,mm³,7827.0,Moderado,9416.53,Medio-Alto,1589.53,20.31
+case_0088,Volumen,mm³,3739.0,Bajo,3993.32,Bajo,254.32,6.8
+case_0609,Volumen,mm³,20459.0,Crítico,19085.88,Medio-Alto,1373.12,6.71
+case_1067,Volumen,mm³,10644.0,Medio-Alto,9504.43,Medio-Alto,1139.57,10.71
+case_0449,Volumen,mm³,6921.0,Moderado,8202.32,Moderado,1281.32,18.51
+case_0246,Volumen,mm³,7050.0,Moderado,12467.23,Medio-Alto,5417.23,76.84
+case_0440,Volumen,mm³,11886.0,Medio-Alto,13131.64,Medio-Alto,1245.64,10.48
+case_0301,Volumen,mm³,3525.0,Bajo,4548.26,Moderado,1023.26,29.03
+case_0922,Volumen,mm³,4890.0,Moderado,4908.41,Moderado,18.41,0.38
+case_0380,Volumen,mm³,4377.0,Bajo,4860.14,Moderado,483.14,11.04
+case_1013,Volumen,mm³,3896.0,Bajo,5900.51,Moderado,2004.51,51.45
+case_0149,Volumen,mm³,18657.0,Medio-Alto,14795.41,Medio-Alto,3861.59,20.7
+case_0792,Volumen,mm³,10328.0,Medio-Alto,14290.36,Medio-Alto,3962.36,38.37
+case_0456,Volumen,mm³,5718.0,Moderado,7191.85,Moderado,1473.85,25.78
+case_0802,Volumen,mm³,30605.0,Crítico,26975.11,Crítico,3629.89,11.86
+case_0158,Volumen,mm³,2742.0,Bajo,3079.75,Bajo,337.75,12.32
+case_0553,Volumen,mm³,8366.0,Moderado,9122.81,Medio-Alto,756.81,9.05
+case_0838,Volumen,mm³,2036.0,Bajo,2579.39,Bajo,543.39,26.69
+case_0287,Volumen,mm³,4008.0,Bajo,4486.01,Moderado,478.01,11.93
+case_0469,Volumen,mm³,2011.0,Bajo,2825.78,Bajo,814.78,40.52
+case_0042,Volumen,mm³,693.0,Bajo,1291.27,Bajo,598.27,86.33
+case_0614,Volumen,mm³,6714.0,Moderado,7328.41,Moderado,614.41,9.15
+case_0170,Volumen,mm³,8565.0,Moderado,10558.92,Medio-Alto,1993.92,23.28
+case_0964,Volumen,mm³,17703.0,Medio-Alto,19329.34,Crítico,1626.34,9.19
+case_0740,Volumen,mm³,5088.0,Moderado,5858.04,Moderado,770.04,15.13
+case_0663,Volumen,mm³,25464.0,Crítico,21050.87,Crítico,4413.13,17.33
+case_1007,Volumen,mm³,5827.0,Moderado,6510.16,Moderado,683.16,11.72
+case_0160,Volumen,mm³,18693.0,Medio-Alto,14754.29,Medio-Alto,3938.71,21.07
+case_0032,Volumen,mm³,3936.0,Bajo,4397.8,Moderado,461.8,11.73
+case_0716,Volumen,mm³,64103.0,Crítico,37017.87,Crítico,27085.13,42.25
+case_0906,Volumen,mm³,1260.0,Bajo,1262.87,Bajo,2.87,0.23
+case_1018,Volumen,mm³,2811.0,Bajo,4360.17,Bajo,1549.17,55.11
+case_0868,Volumen,mm³,68523.0,Crítico,56617.32,Crítico,11905.68,17.37
+case_0515,Volumen,mm³,1953.0,Bajo,2329.58,Bajo,376.58,19.28
+case_0116,Volumen,mm³,12854.0,Medio-Alto,8921.89,Medio-Alto,3932.11,30.59
+case_1100,Volumen,mm³,95457.0,Crítico,66036.41,Crítico,29420.59,30.82
+case_0269,Volumen,mm³,10451.0,Medio-Alto,9699.05,Medio-Alto,751.95,7.19
+case_0089,Volumen,mm³,18167.0,Medio-Alto,9197.74,Medio-Alto,8969.26,49.37
+case_0232,Volumen,mm³,22388.0,Crítico,18001.07,Medio-Alto,4386.93,19.59
+case_1034,Volumen,mm³,2655.0,Bajo,2964.15,Bajo,309.15,11.64
+case_0018,Volumen,mm³,73959.0,Crítico,49958.26,Crítico,24000.74,32.45
+case_0202,Volumen,mm³,480.0,Bajo,1141.39,Bajo,661.39,137.79
+case_1062,Volumen,mm³,4071.0,Bajo,5603.0,Moderado,1532.0,37.63
+case_0412,Volumen,mm³,5871.0,Moderado,4602.18,Moderado,1268.82,21.61
+case_0702,Volumen,mm³,21591.0,Crítico,16327.0,Medio-Alto,5264.0,24.38
+case_0738,Volumen,mm³,25320.0,Crítico,29779.18,Crítico,4459.18,17.61
+case_0357,Volumen,mm³,5490.0,Moderado,6449.34,Moderado,959.34,17.47
+case_0997,Volumen,mm³,14825.0,Medio-Alto,23979.84,Crítico,9154.84,61.75
+case_0519,Volumen,mm³,2512.0,Bajo,3014.93,Bajo,502.93,20.02
+case_0512,Volumen,mm³,1925.0,Bajo,2175.69,Bajo,250.69,13.02
+case_0583,Volumen,mm³,53214.0,Crítico,75847.59,Crítico,22633.59,42.53
+case_0417,Volumen,mm³,23232.0,Crítico,16603.06,Medio-Alto,6628.94,28.53
+case_0035,Volumen,mm³,10794.0,Medio-Alto,7723.34,Moderado,3070.66,28.45
+case_0239,Volumen,mm³,14891.0,Medio-Alto,17080.33,Medio-Alto,2189.33,14.7
+case_0336,Volumen,mm³,20131.0,Crítico,25019.33,Crítico,4888.33,24.28
+case_0972,Volumen,mm³,2967.0,Bajo,3091.37,Bajo,124.37,4.19
+case_0328,Volumen,mm³,12290.0,Medio-Alto,7834.33,Moderado,4455.67,36.25
+case_0021,Volumen,mm³,36762.0,Crítico,22807.77,Crítico,13954.23,37.96
+case_1076,Volumen,mm³,3614.0,Bajo,5434.6,Moderado,1820.6,50.38
+case_0384,Volumen,mm³,20034.0,Crítico,16775.03,Medio-Alto,3258.97,16.27
+case_0745,Volumen,mm³,16941.0,Medio-Alto,15041.51,Medio-Alto,1899.49,11.21
+case_0033,Volumen,mm³,11249.0,Medio-Alto,8350.31,Moderado,2898.69,25.77
+case_0243,Volumen,mm³,8191.0,Moderado,6673.74,Moderado,1517.26,18.52
+case_0808,Volumen,mm³,64377.0,Crítico,48381.56,Crítico,15995.44,24.85
+case_0695,Volumen,mm³,732.0,Bajo,891.43,Bajo,159.43,21.78
+case_0093,Volumen,mm³,17268.0,Medio-Alto,12161.81,Medio-Alto,5106.19,29.57
+case_0356,Volumen,mm³,5736.0,Moderado,6486.05,Moderado,750.05,13.08
+case_0256,Volumen,mm³,13551.0,Medio-Alto,18277.48,Medio-Alto,4726.48,34.88
+case_0304,Volumen,mm³,1380.0,Bajo,1531.48,Bajo,151.48,10.98
+case_0648,Volumen,mm³,5760.0,Moderado,6971.7,Moderado,1211.7,21.04
+case_1093,Volumen,mm³,25180.0,Crítico,21028.78,Crítico,4151.22,16.49
+case_0989,Volumen,mm³,3472.0,Bajo,3504.92,Bajo,32.92,0.95
+case_0319,Volumen,mm³,7590.0,Moderado,7642.45,Moderado,52.45,0.69
+case_1085,Volumen,mm³,8142.0,Moderado,10494.26,Medio-Alto,2352.26,28.89
+case_1071,Volumen,mm³,678.0,Bajo,946.2,Bajo,268.2,39.56
+case_0009,Volumen,mm³,17920.0,Medio-Alto,12748.58,Medio-Alto,5171.42,28.86
+case_0250,Volumen,mm³,6891.0,Moderado,7352.17,Moderado,461.17,6.69
+case_0690,Volumen,mm³,10937.0,Medio-Alto,9806.84,Medio-Alto,1130.16,10.33
+case_1098,Volumen,mm³,10419.0,Medio-Alto,10089.26,Medio-Alto,329.74,3.16
+case_0452,Volumen,mm³,21533.0,Crítico,19514.72,Crítico,2018.28,9.37
+case_0431,Volumen,mm³,5314.0,Moderado,4394.94,Moderado,919.06,17.3
+case_0475,Volumen,mm³,2148.0,Bajo,3325.37,Bajo,1177.37,54.81
+case_0480,Volumen,mm³,39473.0,Crítico,34752.19,Crítico,4720.81,11.96
+case_0731,Volumen,mm³,951.0,Bajo,1311.69,Bajo,360.69,37.93
+case_0054,Volumen,mm³,79290.0,Crítico,62483.26,Crítico,16806.74,21.2
+case_0966,Volumen,mm³,23847.0,Crítico,15733.51,Medio-Alto,8113.49,34.02
+case_0052,Volumen,mm³,64506.0,Crítico,52091.45,Crítico,12414.55,19.25
+case_0030,Volumen,mm³,60434.0,Crítico,50952.04,Crítico,9481.96,15.69
+case_0732,Volumen,mm³,8865.0,Moderado,11418.57,Medio-Alto,2553.57,28.81
+case_1060,Volumen,mm³,9906.0,Medio-Alto,10091.08,Medio-Alto,185.08,1.87
+case_0941,Volumen,mm³,4248.0,Bajo,3501.14,Bajo,746.86,17.58
+case_0281,Volumen,mm³,5547.0,Moderado,5768.3,Moderado,221.3,3.99
+case_0423,Volumen,mm³,6828.0,Moderado,8583.78,Moderado,1755.78,25.71
+case_0252,Volumen,mm³,13678.0,Medio-Alto,18435.29,Medio-Alto,4757.29,34.78
+case_0175,Volumen,mm³,9695.0,Medio-Alto,12000.76,Medio-Alto,2305.76,23.78
+case_0210,Volumen,mm³,21960.0,Crítico,19311.11,Crítico,2648.89,12.06
+case_0988,Volumen,mm³,16532.0,Medio-Alto,27778.31,Crítico,11246.31,68.03
+case_1091,Volumen,mm³,3150.0,Bajo,4601.26,Moderado,1451.26,46.07
+case_0686,Volumen,mm³,16934.0,Medio-Alto,18943.91,Medio-Alto,2009.91,11.87
+case_0334,Volumen,mm³,9915.0,Medio-Alto,10784.7,Medio-Alto,869.7,8.77
+case_0055,Volumen,mm³,4904.0,Moderado,5534.33,Moderado,630.33,12.85
+case_0890,Volumen,mm³,14368.0,Medio-Alto,11636.66,Medio-Alto,2731.34,19.01
+case_0076,Volumen,mm³,2808.0,Bajo,3894.8,Bajo,1086.8,38.7
+case_0773,Volumen,mm³,4308.0,Bajo,4879.25,Moderado,571.25,13.26
+case_0222,Volumen,mm³,6936.0,Moderado,4949.57,Moderado,1986.43,28.64
+case_0608,Volumen,mm³,24274.0,Crítico,19003.15,Medio-Alto,5270.85,21.71
+case_0666,Volumen,mm³,22291.0,Crítico,16219.07,Medio-Alto,6071.93,27.24
+case_0662,Volumen,mm³,5996.0,Moderado,5679.67,Moderado,316.33,5.28
+case_0765,Volumen,mm³,4639.0,Moderado,4673.22,Moderado,34.22,0.74
+case_1064,Volumen,mm³,8736.0,Moderado,9719.75,Medio-Alto,983.75,11.26
+case_0514,Volumen,mm³,4188.0,Bajo,5896.6,Moderado,1708.6,40.8
+case_0769,Volumen,mm³,1886.0,Bajo,2050.55,Bajo,164.55,8.72
+case_0166,Volumen,mm³,6778.0,Moderado,8419.68,Moderado,1641.68,24.22
+case_1012,Volumen,mm³,7069.0,Moderado,10801.81,Medio-Alto,3732.81,52.81
+case_0651,Volumen,mm³,20187.0,Crítico,23703.24,Crítico,3516.24,17.42
+case_0112,Volumen,mm³,96385.0,Crítico,65109.47,Crítico,31275.53,32.45
+case_0586,Volumen,mm³,4980.0,Moderado,6624.15,Moderado,1644.15,33.02
+case_0442,Volumen,mm³,64464.0,Crítico,51256.64,Crítico,13207.36,20.49
+case_0365,Volumen,mm³,40410.0,Crítico,42844.18,Crítico,2434.18,6.02
+case_0183,Volumen,mm³,8838.0,Moderado,6183.92,Moderado,2654.08,30.03
+case_0793,Volumen,mm³,3454.0,Bajo,4053.33,Bajo,599.33,17.35
+case_0897,Volumen,mm³,8215.0,Moderado,10078.26,Medio-Alto,1863.26,22.68
+case_0288,Volumen,mm³,14064.0,Medio-Alto,11598.22,Medio-Alto,2465.78,17.53
+case_0566,Volumen,mm³,5320.0,Moderado,4972.39,Moderado,347.61,6.53
+case_0518,Volumen,mm³,1656.0,Bajo,1142.53,Bajo,513.47,31.01
+case_1065,Volumen,mm³,15464.0,Medio-Alto,10145.04,Medio-Alto,5318.96,34.4
+case_1022,Volumen,mm³,4920.0,Moderado,4901.15,Moderado,18.85,0.38
+case_0688,Volumen,mm³,956.0,Bajo,896.04,Bajo,59.96,6.27
+case_0360,Volumen,mm³,13347.0,Medio-Alto,18347.61,Medio-Alto,5000.61,37.47
+case_0926,Volumen,mm³,9795.0,Medio-Alto,9494.46,Medio-Alto,300.54,3.07
+case_0378,Volumen,mm³,52390.0,Crítico,44901.02,Crítico,7488.98,14.29
+case_0129,Volumen,mm³,19989.0,Crítico,20461.42,Crítico,472.42,2.36
+case_1017,Volumen,mm³,7655.0,Moderado,9236.5,Medio-Alto,1581.5,20.66
+case_0671,Volumen,mm³,1008.0,Bajo,1409.44,Bajo,401.44,39.83
+case_0314,Volumen,mm³,77644.0,Crítico,57624.94,Crítico,20019.06,25.78
+case_0279,Volumen,mm³,5118.0,Moderado,4037.94,Bajo,1080.06,21.1
+case_1045,Volumen,mm³,416.0,Bajo,1018.93,Bajo,602.93,144.93
+case_0368,Volumen,mm³,5868.0,Moderado,9422.54,Medio-Alto,3554.54,60.57
+case_0531,Volumen,mm³,7240.0,Moderado,11333.28,Medio-Alto,4093.28,56.54
+case_0700,Volumen,mm³,10202.0,Medio-Alto,11432.27,Medio-Alto,1230.27,12.06
+case_0833,Volumen,mm³,8970.0,Medio-Alto,8024.61,Moderado,945.39,10.54
+case_0967,Volumen,mm³,4122.0,Bajo,6530.92,Moderado,2408.92,58.44
+case_0691,Volumen,mm³,17990.0,Medio-Alto,15013.89,Medio-Alto,2976.11,16.54
+case_0945,Volumen,mm³,9152.0,Medio-Alto,10734.07,Medio-Alto,1582.07,17.29
+case_0742,Volumen,mm³,14709.0,Medio-Alto,12979.36,Medio-Alto,1729.64,11.76
+case_0333,Volumen,mm³,31575.0,Crítico,20378.23,Crítico,11196.77,35.46
+case_0115,Volumen,mm³,15699.0,Medio-Alto,15132.18,Medio-Alto,566.82,3.61
+case_0126,Volumen,mm³,5571.0,Moderado,9049.76,Medio-Alto,3478.76,62.44
+case_0590,Volumen,mm³,4779.0,Moderado,8216.86,Moderado,3437.86,71.94
+case_0092,Volumen,mm³,7445.0,Moderado,6609.79,Moderado,835.21,11.22
+case_0708,Volumen,mm³,96753.0,Crítico,22790.18,Crítico,73962.82,76.44
+case_0551,Volumen,mm³,9194.0,Medio-Alto,6859.54,Moderado,2334.46,25.39
+case_0493,Volumen,mm³,2481.0,Bajo,3096.62,Bajo,615.62,24.81
+case_0992,Volumen,mm³,1596.0,Bajo,1537.4,Bajo,58.6,3.67
+case_0932,Volumen,mm³,7296.0,Moderado,10598.6,Medio-Alto,3302.6,45.27
+case_0132,Volumen,mm³,45940.0,Crítico,29385.43,Crítico,16554.57,36.04
+case_0386,Volumen,mm³,15806.0,Medio-Alto,13401.16,Medio-Alto,2404.84,15.21
+case_0532,Volumen,mm³,8950.0,Medio-Alto,10905.68,Medio-Alto,1955.68,21.85
+case_0645,Volumen,mm³,9702.0,Medio-Alto,9684.6,Medio-Alto,17.4,0.18
+case_0421,Volumen,mm³,11847.0,Medio-Alto,14295.71,Medio-Alto,2448.71,20.67
+case_0605,Volumen,mm³,6987.0,Moderado,8047.75,Moderado,1060.75,15.18
+case_0646,Volumen,mm³,1081.0,Bajo,1046.45,Bajo,34.55,3.2
+case_0343,Volumen,mm³,9258.0,Medio-Alto,7590.7,Moderado,1667.3,18.01
+case_0048,Volumen,mm³,3611.0,Bajo,2313.14,Bajo,1297.86,35.94
+case_0767,Volumen,mm³,3155.0,Bajo,3093.5,Bajo,61.5,1.95
+case_0599,Volumen,mm³,10505.0,Medio-Alto,10852.95,Medio-Alto,347.95,3.31
+case_0029,Volumen,mm³,9278.0,Medio-Alto,7828.08,Moderado,1449.92,15.63
+case_0737,Volumen,mm³,9294.0,Medio-Alto,9696.71,Medio-Alto,402.71,4.33
+case_0297,Volumen,mm³,13868.0,Medio-Alto,16065.2,Medio-Alto,2197.2,15.84
+case_0244,Volumen,mm³,11054.0,Medio-Alto,10716.5,Medio-Alto,337.5,3.05
+case_0194,Volumen,mm³,8112.0,Moderado,6313.6,Moderado,1798.4,22.17
+case_0527,Volumen,mm³,37950.0,Crítico,23059.39,Crítico,14890.61,39.24
+case_0866,Volumen,mm³,23436.0,Crítico,19467.37,Crítico,3968.63,16.93
+case_0058,Volumen,mm³,10045.0,Medio-Alto,11521.83,Medio-Alto,1476.83,14.7
+case_1044,Volumen,mm³,1350.0,Bajo,1168.84,Bajo,181.16,13.42
+case_0948,Volumen,mm³,8327.0,Moderado,8860.2,Moderado,533.2,6.4
+case_0798,Volumen,mm³,4060.0,Bajo,4259.26,Bajo,199.26,4.91
+case_0611,Volumen,mm³,1569.0,Bajo,1605.72,Bajo,36.72,2.34
+case_0338,Volumen,mm³,5086.0,Moderado,5003.92,Moderado,82.08,1.61
+case_1002,Volumen,mm³,3683.0,Bajo,3405.08,Bajo,277.92,7.55
+case_0719,Volumen,mm³,776.0,Bajo,1538.59,Bajo,762.59,98.27
+case_0628,Volumen,mm³,3994.0,Bajo,4092.76,Bajo,98.76,2.47
+case_0292,Volumen,mm³,14781.0,Medio-Alto,11863.72,Medio-Alto,2917.28,19.74
+case_0627,Volumen,mm³,45510.0,Crítico,36018.71,Crítico,9491.29,20.86
+case_0885,Volumen,mm³,3450.0,Bajo,2950.81,Bajo,499.19,14.47
+case_0273,Volumen,mm³,10488.0,Medio-Alto,12345.11,Medio-Alto,1857.11,17.71
+case_1088,Volumen,mm³,4848.0,Moderado,6060.53,Moderado,1212.53,25.01
+case_0061,Volumen,mm³,21365.0,Crítico,16876.31,Medio-Alto,4488.69,21.01
+case_0934,Volumen,mm³,1529.0,Bajo,1885.9,Bajo,356.9,23.34
+case_0450,Volumen,mm³,12381.0,Medio-Alto,13313.02,Medio-Alto,932.02,7.53
+case_0155,Volumen,mm³,6540.0,Moderado,6198.81,Moderado,341.19,5.22
+case_0317,Volumen,mm³,18959.0,Medio-Alto,13205.55,Medio-Alto,5753.45,30.35
+case_0715,Volumen,mm³,21892.0,Crítico,23989.62,Crítico,2097.62,9.58
+case_0315,Volumen,mm³,3024.0,Bajo,3024.19,Bajo,0.19,0.01
+case_0053,Volumen,mm³,54945.0,Crítico,57891.77,Crítico,2946.77,5.36
+case_0026,Volumen,mm³,3330.0,Bajo,6287.37,Moderado,2957.37,88.81
+case_0034,Volumen,mm³,7494.0,Moderado,7237.66,Moderado,256.34,3.42
+case_0626,Volumen,mm³,10157.0,Medio-Alto,8965.21,Medio-Alto,1191.79,11.73
+case_1051,Volumen,mm³,7698.0,Moderado,7951.65,Moderado,253.65,3.3
+case_0419,Volumen,mm³,1346.0,Bajo,1886.25,Bajo,540.25,40.14
+case_0946,Volumen,mm³,20203.0,Crítico,20341.61,Crítico,138.61,0.69
+case_0682,Volumen,mm³,4953.0,Moderado,7284.61,Moderado,2331.61,47.07
+case_0318,Volumen,mm³,89610.0,Crítico,52170.46,Crítico,37439.54,41.78
+case_0707,Volumen,mm³,2904.0,Bajo,4792.18,Moderado,1888.18,65.02
+case_0180,Volumen,mm³,66549.0,Crítico,43687.54,Crítico,22861.46,34.35
+case_0856,Volumen,mm³,1721.0,Bajo,1950.05,Bajo,229.05,13.31
+case_0204,Volumen,mm³,10449.0,Medio-Alto,8110.56,Moderado,2338.44,22.38
+case_0478,Volumen,mm³,33726.0,Crítico,33162.84,Crítico,563.16,1.67
+case_0618,Volumen,mm³,43496.0,Crítico,50984.84,Crítico,7488.84,17.22
+case_0547,Volumen,mm³,8159.0,Moderado,8324.16,Moderado,165.16,2.02
+case_0766,Volumen,mm³,13344.0,Medio-Alto,14642.7,Medio-Alto,1298.7,9.73
+case_0504,Volumen,mm³,4212.0,Bajo,5242.61,Moderado,1030.61,24.47
+case_0189,Volumen,mm³,2969.0,Bajo,4303.81,Bajo,1334.81,44.96
+case_0704,Volumen,mm³,69470.0,Crítico,49116.54,Crítico,20353.46,29.3
+case_0459,Volumen,mm³,13242.0,Medio-Alto,12332.81,Medio-Alto,909.19,6.87
+case_1084,Volumen,mm³,17074.0,Medio-Alto,16371.44,Medio-Alto,702.56,4.11
+case_0006,Volumen,mm³,20001.0,Crítico,17950.6,Medio-Alto,2050.4,10.25
+case_0240,Volumen,mm³,50555.0,Crítico,61881.73,Crítico,11326.73,22.4
+case_0694,Volumen,mm³,25123.0,Crítico,23938.18,Crítico,1184.82,4.72
+case_0823,Volumen,mm³,55998.0,Crítico,31946.54,Crítico,24051.46,42.95
+case_0610,Volumen,mm³,2404.0,Bajo,2393.73,Bajo,10.27,0.43
+case_0683,Volumen,mm³,5240.0,Moderado,4670.95,Moderado,569.05,10.86
+case_0236,Volumen,mm³,11925.0,Medio-Alto,5816.15,Moderado,6108.85,51.23
+case_0501,Volumen,mm³,28745.0,Crítico,15748.03,Medio-Alto,12996.97,45.21
+case_0803,Volumen,mm³,3632.0,Bajo,3054.88,Bajo,577.12,15.89
+case_0995,Volumen,mm³,4593.0,Moderado,4849.93,Moderado,256.93,5.59
+case_0993,Volumen,mm³,4287.0,Bajo,5156.03,Moderado,869.03,20.27
+case_0596,Volumen,mm³,6350.0,Moderado,6081.77,Moderado,268.23,4.22
+case_0164,Volumen,mm³,40110.0,Crítico,32180.92,Crítico,7929.08,19.77
+case_0496,Volumen,mm³,4108.0,Bajo,3441.1,Bajo,666.9,16.23
+case_0982,Volumen,mm³,4221.0,Bajo,6747.32,Moderado,2526.32,59.85
+case_0522,Volumen,mm³,471.0,Bajo,883.71,Bajo,412.71,87.62
+case_0109,Volumen,mm³,3951.0,Bajo,5194.78,Moderado,1243.78,31.48
+case_0548,Volumen,mm³,17973.0,Medio-Alto,11297.43,Medio-Alto,6675.57,37.14
+case_1077,Volumen,mm³,3922.0,Bajo,4964.13,Moderado,1042.13,26.57
+case_0656,Volumen,mm³,105562.0,Crítico,65887.09,Crítico,39674.91,37.58
+case_0597,Volumen,mm³,24677.0,Crítico,24159.37,Crítico,517.63,2.1
+case_0832,Volumen,mm³,39070.0,Crítico,26608.19,Crítico,12461.81,31.9
+case_0638,Volumen,mm³,10419.0,Medio-Alto,7668.07,Moderado,2750.93,26.4
+case_0758,Volumen,mm³,6974.0,Moderado,6257.68,Moderado,716.32,10.27
+case_0401,Volumen,mm³,8242.0,Moderado,8458.81,Moderado,216.81,2.63
+case_0308,Volumen,mm³,6276.0,Moderado,6583.9,Moderado,307.9,4.91
+case_0228,Volumen,mm³,65502.0,Crítico,32807.98,Crítico,32694.02,49.91
+case_0005,Volumen,mm³,13185.0,Medio-Alto,11552.31,Medio-Alto,1632.69,12.38
+case_0857,Volumen,mm³,26263.0,Crítico,24058.52,Crítico,2204.48,8.39
+case_0191,Volumen,mm³,2751.0,Bajo,2545.2,Bajo,205.8,7.48
+case_0270,Volumen,mm³,5142.0,Moderado,5556.39,Moderado,414.39,8.06
+case_0177,Volumen,mm³,3465.0,Bajo,2882.04,Bajo,582.96,16.82
+case_0977,Volumen,mm³,6825.0,Moderado,7582.74,Moderado,757.74,11.1
+case_0013,Volumen,mm³,29889.0,Crítico,32603.13,Crítico,2714.13,9.08
+case_0962,Volumen,mm³,8920.0,Moderado,10119.67,Medio-Alto,1199.67,13.45
+case_0933,Volumen,mm³,3357.0,Bajo,4347.63,Bajo,990.63,29.51
+case_1096,Volumen,mm³,69069.0,Crítico,27379.85,Crítico,41689.15,60.36
+case_0398,Volumen,mm³,85635.0,Crítico,35896.8,Crítico,49738.2,58.08
+case_0523,Volumen,mm³,26971.0,Crítico,19930.31,Crítico,7040.69,26.1
+case_0636,Volumen,mm³,9742.0,Medio-Alto,11814.73,Medio-Alto,2072.73,21.28
+case_0448,Volumen,mm³,2626.0,Bajo,3767.48,Bajo,1141.48,43.47
+case_0206,Volumen,mm³,17201.0,Medio-Alto,19683.11,Crítico,2482.11,14.43
+case_0748,Volumen,mm³,5507.0,Moderado,5888.1,Moderado,381.1,6.92
+case_0131,Volumen,mm³,30360.0,Crítico,14357.45,Medio-Alto,16002.55,52.71
+case_0283,Volumen,mm³,5778.0,Moderado,5223.84,Moderado,554.16,9.59
+case_0622,Volumen,mm³,2468.0,Bajo,2478.95,Bajo,10.95,0.44
+case_0668,Volumen,mm³,5334.0,Moderado,5090.17,Moderado,243.83,4.57
+case_0327,Volumen,mm³,6135.0,Moderado,6242.71,Moderado,107.71,1.76
+case_0296,Volumen,mm³,90549.0,Crítico,66355.19,Crítico,24193.81,26.72
+case_0247,Volumen,mm³,10156.0,Medio-Alto,9698.69,Medio-Alto,457.31,4.5
+case_0831,Volumen,mm³,1590.0,Bajo,1625.56,Bajo,35.56,2.24
+case_0313,Volumen,mm³,2596.0,Bajo,4640.61,Moderado,2044.61,78.76
+case_0942,Volumen,mm³,57946.0,Crítico,57269.72,Crítico,676.28,1.17
+case_0775,Volumen,mm³,60924.0,Crítico,49073.56,Crítico,11850.44,19.45
+case_0322,Volumen,mm³,2170.0,Bajo,3237.09,Bajo,1067.09,49.17
+case_0863,Volumen,mm³,3178.0,Bajo,3865.55,Bajo,687.55,21.63
+case_0754,Volumen,mm³,17110.0,Medio-Alto,17485.82,Medio-Alto,375.82,2.2
+case_0817,Volumen,mm³,2682.0,Bajo,3122.79,Bajo,440.79,16.44
+case_0571,Volumen,mm³,16238.0,Medio-Alto,14093.58,Medio-Alto,2144.42,13.21
+case_0784,Volumen,mm³,939.0,Bajo,1100.11,Bajo,161.11,17.16
+case_0050,Volumen,mm³,15683.0,Medio-Alto,13471.26,Medio-Alto,2211.74,14.1
+case_0513,Volumen,mm³,13922.0,Medio-Alto,9842.05,Medio-Alto,4079.95,29.31
+case_0392,Volumen,mm³,6974.0,Moderado,6872.96,Moderado,101.04,1.45
+case_0554,Volumen,mm³,13782.0,Medio-Alto,22808.71,Crítico,9026.71,65.5
+case_0411,Volumen,mm³,10249.0,Medio-Alto,13903.26,Medio-Alto,3654.26,35.65
+case_0225,Volumen,mm³,15062.0,Medio-Alto,13762.81,Medio-Alto,1299.19,8.63
+case_0439,Volumen,mm³,27037.0,Crítico,20003.09,Crítico,7033.91,26.02
+case_0506,Volumen,mm³,3915.0,Bajo,3854.94,Bajo,60.06,1.53
+case_0282,Volumen,mm³,28040.0,Crítico,35503.19,Crítico,7463.19,26.62
+case_0159,Volumen,mm³,4818.0,Moderado,4952.31,Moderado,134.31,2.79
+case_0444,Volumen,mm³,2814.0,Bajo,3579.21,Bajo,765.21,27.19
+case_0329,Volumen,mm³,4146.0,Bajo,4871.54,Moderado,725.54,17.5
+case_0271,Volumen,mm³,12908.0,Medio-Alto,8672.72,Moderado,4235.28,32.81
+case_1010,Volumen,mm³,15845.0,Medio-Alto,17453.48,Medio-Alto,1608.48,10.15
+case_0849,Volumen,mm³,5007.0,Moderado,7310.75,Moderado,2303.75,46.01
+case_0140,Volumen,mm³,28505.0,Crítico,19885.8,Crítico,8619.2,30.24
+case_0434,Volumen,mm³,7374.0,Moderado,7899.81,Moderado,525.81,7.13
+case_0677,Volumen,mm³,12201.0,Medio-Alto,15016.45,Medio-Alto,2815.45,23.08
+case_0302,Volumen,mm³,13302.0,Medio-Alto,8621.4,Moderado,4680.6,35.19
+case_1081,Volumen,mm³,15052.0,Medio-Alto,10009.2,Medio-Alto,5042.8,33.5
+case_0601,Volumen,mm³,6463.0,Moderado,8482.15,Moderado,2019.15,31.24
+case_0903,Volumen,mm³,2719.0,Bajo,2288.54,Bajo,430.46,15.83
+case_0376,Volumen,mm³,4195.0,Bajo,4949.67,Moderado,754.67,17.99
+case_0497,Volumen,mm³,18382.0,Medio-Alto,19719.96,Crítico,1337.96,7.28
+case_0788,Volumen,mm³,22135.0,Crítico,14946.06,Medio-Alto,7188.94,32.48

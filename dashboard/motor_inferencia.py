@@ -15,7 +15,7 @@ if ruta_raiz not in sys.path:
     sys.path.insert(0, ruta_raiz)
 
 # Importación absoluta desde la raíz del proyecto
-from regression.scripts.modelo_regresion import crear_features_derivadas
+from regression.scripts.prueba import crear_features_derivadas
 
 
 class MotorInferenciaNodeQuant:

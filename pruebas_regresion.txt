@@ -1,0 +1,739 @@
+gap_20
+
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 53 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7593  MAE=4416.6  Gap=20.7%  (Features finales: 12)
+    Mejores parámetros finales: {'rf_depth': 2, 'rf_min_samples': 24, 'lgbm_lr': 0.039595579583438886, 'lgbm_depth': 3, 'lgbm_min_child_samples': 21, 'lgbm_reg_alpha': 0.6094833266842222, 'gb_lr': 0.03457424086691978, 'gb_depth': 2, 'gb_min_samples_leaf': 25}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3504.4    4419.1   20.7%  OVERFITTING
+
+  Tiempo: 157.2s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9831  MAE=1043.7 mm³  MAPE=7.8%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 12 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+gap_22
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 53 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 13
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7846  MAE=4185.0  Gap=22.1%  (Features finales: 13)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 24, 'lgbm_lr': 0.038818330035816785, 'lgbm_depth': 2, 'lgbm_min_child_samples': 25, 'lgbm_reg_alpha': 7.17199157420279, 'gb_lr': 0.03964483910333131, 'gb_depth': 3, 'gb_min_samples_leaf': 18}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3260.2    4187.7   22.1%  OVERFITTING
+
+  Tiempo: 158.3s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9949  MAE=690.8 mm³  MAPE=5.0%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 13 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+gap_15
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 54 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7394  MAE=4680.4  Gap=15.3%  (Features finales: 12)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 22, 'lgbm_lr': 0.023297493679453562, 'lgbm_depth': 2, 'lgbm_min_child_samples': 16, 'lgbm_reg_alpha': 0.10191774486130428, 'gb_lr': 0.03988759602074901, 'gb_depth': 2, 'gb_min_samples_leaf': 17}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3965.9    4684.5   15.3%  OVERFITTING
+
+  Tiempo: 145.6s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9458  MAE=1946.0 mm³  MAPE=11.1%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 12 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+gap_25
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 55 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 21
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: MINMAX!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7694  MAE=4312.8  Gap=25.1%  (Features finales: 21)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 23, 'lgbm_lr': 0.03917270552817858, 'lgbm_depth': 3, 'lgbm_min_child_samples': 18, 'lgbm_reg_alpha': 0.6676248314797392, 'gb_lr': 0.012163417886036353, 'gb_depth': 3, 'gb_min_samples_leaf': 12}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3233.2    4315.1   25.1%  OVERFITTING
+
+  Tiempo: 181.4s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9887  MAE=1008.1 mm³  MAPE=7.1%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 21 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+
+
+
+gap_23
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 54 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 16
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7919  MAE=4156.2  Gap=23.8%  (Features finales: 16)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 13, 'lgbm_lr': 0.01915966102545474, 'lgbm_depth': 3, 'lgbm_min_child_samples': 13, 'lgbm_reg_alpha': 3.5916318556461877, 'gb_lr': 0.03900891482077771, 'gb_depth': 3, 'gb_min_samples_leaf': 14}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3170.5    4158.9   23.8%  OVERFITTING
+
+  Tiempo: 173.8s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9570  MAE=1382.1 mm³  MAPE=6.3%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 16 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+
+gap_22_5
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 53 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.8039  MAE=3990.9  Gap=22.5%  (Features finales: 12)
+    Mejores parámetros finales: {'rf_depth': 2, 'rf_min_samples': 23, 'lgbm_lr': 0.023226916954116442, 'lgbm_depth': 3, 'lgbm_min_child_samples': 18, 'lgbm_reg_alpha': 0.37214244609788816, 'gb_lr': 0.03955736119803949, 'gb_depth': 3, 'gb_min_samples_leaf': 14}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3094.6    3993.8   22.5%  OVERFITTING
+
+  Tiempo: 139.0s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9827  MAE=1166.8 mm³  MAPE=7.7%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 12 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+
+gap_17
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 54 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 14
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7338  MAE=4654.3  Gap=17.5%  (Features finales: 14)
+    Mejores parámetros finales: {'rf_depth': 2, 'rf_min_samples': 16, 'lgbm_lr': 0.023158342522634892, 'lgbm_depth': 2, 'lgbm_min_child_samples': 21, 'lgbm_reg_alpha': 2.6163652574581344, 'gb_lr': 0.030269839393176328, 'gb_depth': 3, 'gb_min_samples_leaf': 21}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3842.6    4658.2   17.5%  OVERFITTING
+
+  Tiempo: 148.1s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9357  MAE=2142.3 mm³  MAPE=12.3%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 14 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+gap 25_3
+
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 53 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 17
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: MINMAX!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7939  MAE=4113.7  Gap=25.3%  (Features finales: 17)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 19, 'lgbm_lr': 0.02383258559985427, 'lgbm_depth': 3, 'lgbm_min_child_samples': 16, 'lgbm_reg_alpha': 1.4030662695543161, 'gb_lr': 0.039876607813091915, 'gb_depth': 3, 'gb_min_samples_leaf': 15}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3075.2    4116.2   25.3%  OVERFITTING
+
+  Tiempo: 165.4s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9672  MAE=1452.6 mm³  MAPE=8.2%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 17 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+gap_22_2
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 55 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7863  MAE=4203.7  Gap=22.2%  (Features finales: 12)
+    Mejores parámetros finales: {'rf_depth': 3, 'rf_min_samples': 13, 'lgbm_lr': 0.030290831077585668, 'lgbm_depth': 2, 'lgbm_min_child_samples': 24, 'lgbm_reg_alpha': 3.493716670517792, 'gb_lr': 0.038897136627719604, 'gb_depth': 3, 'gb_min_samples_leaf': 12}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3275.2    4207.4   22.2%  OVERFITTING
+
+  Tiempo: 151.1s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9475  MAE=1804.5 mm³  MAPE=10.1%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 12 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+gap_21_6
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 57 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 15
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: MINMAX!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7684  MAE=4356.4  Gap=21.6%  (Features finales: 15)
+    Mejores parámetros finales: {'rf_depth': 3, 'rf_min_samples': 15, 'lgbm_lr': 0.038414298099952476, 'lgbm_depth': 3, 'lgbm_min_child_samples': 19, 'lgbm_reg_alpha': 0.6778386469871847, 'gb_lr': 0.014911581847594998, 'gb_depth': 2, 'gb_min_samples_leaf': 17}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3416.2    4359.6   21.6%  OVERFITTING
+
+  Tiempo: 164.1s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9494  MAE=2008.1 mm³  MAPE=11.8%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 15 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+gap_21_3
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 53 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: STANDARD!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7832  MAE=4192.6  Gap=21.3%  (Features finales: 12)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 18, 'lgbm_lr': 0.014649476619139007, 'lgbm_depth': 2, 'lgbm_min_child_samples': 20, 'lgbm_reg_alpha': 0.10222042119981284, 'gb_lr': 0.03969834188444829, 'gb_depth': 3, 'gb_min_samples_leaf': 23}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3300.7    4195.2   21.3%  OVERFITTING
+
+  Tiempo: 145.0s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9798  MAE=1231.1 mm³  MAPE=7.9%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 12 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+
+
+
+
+gap_23_otro
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 53 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 15
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: MINMAX!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7786  MAE=4305.2  Gap=23.0%  (Features finales: 15)
+    Mejores parámetros finales: {'rf_depth': 4, 'rf_min_samples': 24, 'lgbm_lr': 0.010175627741061155, 'lgbm_depth': 3, 'lgbm_min_child_samples': 20, 'lgbm_reg_alpha': 0.10447508782499253, 'gb_lr': 0.03952255594907066, 'gb_depth': 3, 'gb_min_samples_leaf': 18}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3316.3    4308.1   23.0%  OVERFITTING
+
+  Tiempo: 154.7s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9495  MAE=1802.3 mm³  MAPE=8.9%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 15 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
+
+
+
+gap_19
+MODELADO PREDICTIVO
+  497 filas -> 497 unicas
+  80 features base (16 firstorder + 24 glcm + 14 glrlm + 12 glszm + 11 gldm)
+  + 17 derivadas = 97 total
+  shape eliminadas: 11
+  Validacion: 10-Fold CV x1
+
+  Volumen (mm³) | (LGBM) + GB + RF)
+    Rango: [376.0, 105562.0]  Media: 16079.2
+    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...
+        [RFECV] Evaluando 55 features para encontrar el subset óptimo...
+        [RFECV] ¡Completado! Número óptimo de características: 12
+    [2/3] Buscando hiperparámetros óptimos...
+        [Optuna] Explorando 20 combinaciones inteligentes (Incluyendo Escaladores)...
+        -> ¡Optuna decidió que el mejor escalador es: MINMAX!
+    [Optuna] Listo. Validando modelo definitivo...
+    KFold  R2=0.7827  MAE=4227.1  Gap=19.1%  (Features finales: 12)
+    Mejores parámetros finales: {'rf_depth': 3, 'rf_min_samples': 15, 'lgbm_lr': 0.02847443333147575, 'lgbm_depth': 2, 'lgbm_min_child_samples': 22, 'lgbm_reg_alpha': 1.2609967837691824, 'gb_lr': 0.03880834297686771, 'gb_depth': 3, 'gb_min_samples_leaf': 22}
+
+  Target                 Modelo                  TrainMAE   TestMAE    Gap%
+  -----------------------------------------------------------------------
+  Volumen                (LGBM) + GB + RF)         3420.9    4229.3   19.1%  OVERFITTING
+
+  Tiempo: 147.5s | CSVs en regression/metrics/
+
+  ¡Análisis listo! Residuos graficados y auditoría guardada en: C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\metrics\auditoria_peores_20_casos.csv
+
+  Generando graficas:
+    entrenamiento_01_panel_rendimiento.png
+    entrenamiento_02_tasa_acierto.png
+    entrenamiento_03_scatter_prediccion.png
+    entrenamiento_04_distribucion_error.png
+    entrenamiento_05_top_errores.png
+    entrenamiento_06_validacion_cruzada.png
+    entrenamiento_07_feature_importance.png
+  7 graficas guardadas en regression/metrics/
+
+  Generando gráficas clínicas avanzadas:
+    -> avanzado_01_bland_altman.png
+    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...
+    -> avanzado_02_learning_curve.png
+
+  VERIFICACION CASOS DE PRUEBA (5 casos)
+    Volumen: R2=0.9936  MAE=751.9 mm³  MAPE=6.4%
+    Guardado: regression/metrics/verificacion_casos_prueba.csv
+    entrenamiento_08_casos_prueba.png
+
+  EXPORTANDO MODELOS A PRODUCCIÓN (C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib):
+    [OK] Volumen: 12 features requeridas.
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\modelo_volumen.joblib
+         -> C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\regression\joblib\metadata_volumen.json
