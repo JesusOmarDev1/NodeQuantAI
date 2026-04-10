@@ -92,7 +92,7 @@ os.makedirs(CARPETA_METRICAS, exist_ok=True)
 
 
 # ---------------------------------------------------------------------------
-#  Configuracion
+#  Configuración
 # ---------------------------------------------------------------------------
 N_SPLITS = 10
 N_REPEATS = 1
@@ -145,18 +145,17 @@ plt.rcParams.update({
 def _obtener_config_modelo(target_slug):
     if target_slug == "volumen":
         estimators = [
-            # Bajamos a 80 estimadores y usamos el 80% de los datos para forzar generalización
+            # bajamos a 80 estimadores y usamos el 80% de los datos para forzar generalización
             ("lgbm", LGBMRegressor(n_estimators=80, subsample=0.8, random_state=42, verbose=-1, n_jobs=None)),
             ("gb", GradientBoostingRegressor(n_estimators=80, subsample=0.8, random_state=42)),
             ("rf", RandomForestRegressor(n_estimators=80, max_samples=0.8, random_state=42, n_jobs=None))
         ]
         nombre = "(LGBM) + GB + RF)"
 
-        # [EL CAMBIO MAESTRO]
-        # positive=True: Prohíbe restar predicciones (evita caos)
-        # fit_intercept=False: Prohíbe sumar la base fantasma que está inflando el 80%
-        # Volvemos a Ridge para tener penalización L2 (evita que un modelo se vuelva loco como en el 0545)
-        # Mantenemos positive=True y fit_intercept=False para que sea un promedio estricto.
+        # positive=True: prohíbe restar predicciones (evita caos)
+        # fit_intercept=False: prohíbe sumar la base fantasma que está inflando el 80%
+        # volvemos a ridge para tener penalización L2 porque evita que un modelo se vuelva loco como en el 0545
+        # mantenemos positive=True y fit_intercept=False para que sea un promedio estricto
         meta_learner = Ridge(alpha=10.0, positive=True, fit_intercept=False)
 
     stacking = StackingRegressor(
@@ -166,7 +165,7 @@ def _obtener_config_modelo(target_slug):
         n_jobs=None,
     )
 
-    # Volvemos al log1p: Matemáticamente estable para errores porcentuales
+    # volvemos al log1p porque es estable para errores porcentuales
     pipe = Pipeline([
         ("scaler", StandardScaler()),
         ("model", TransformedTargetRegressor(
@@ -180,14 +179,14 @@ def _obtener_config_modelo(target_slug):
 
 
 def _extraer_importances_stacking(pipe, feature_names):
-    """Extrae las importancias promediadas del pipeline directo."""
-    # [CORRECCIÓN] Como volvió el envoltorio, el Stacking está escondido en .regressor_
+    # extrae las importancias promediadas del pipeline directo
+    # el Stacking está escondido en .regressor_
     stacking = pipe.named_steps["model"].regressor_
 
-    # Obtenemos los coeficientes del meta-learner (Ridge/LinearRegression)
+    # obtenemos los coeficientes del meta-learner (ridge/linearregression)
     coefs = stacking.final_estimator_.coef_
 
-    # Si hay PCA se ajustan los nombres, si no, se usan las variables crudas
+    # si hay PCA se ajustan los nombres, si no, se usan las variables crudas
     if "pca" in pipe.named_steps:
         n_components = pipe.named_steps["pca"].n_components_
         nombres_reales = [f"PCA_Componente_{i + 1}" for i in range(n_components)]
@@ -198,7 +197,7 @@ def _extraer_importances_stacking(pipe, feature_names):
 
     for est, coef in zip(stacking.estimators_, coefs):
         if hasattr(est, "feature_importances_"):
-            # Ponderamos la importancia del árbol por el peso que le dio el meta-learner
+            # ponderamos la importancia del árbol por el peso que le dio el meta-learner
             importances += est.feature_importances_ * abs(coef)
 
     total = importances.sum()
@@ -211,19 +210,18 @@ def _extraer_importances_stacking(pipe, feature_names):
 
 
 # ===========================================================================
-#  Feature engineering
+#  FEATURE ENGINEERING
 # ===========================================================================
 def crear_features_derivadas(X):
-    """
-    Genera ~25 features derivadas a partir de las 42 features originales:
-      - Ratios entre pares informativos
-      - Transformaciones log, cuadrado, raiz cubica
-      - Diferencias e interacciones cruzadas
-      - Coeficiente de variacion y rango inter-percentil
-    """
+    #Genera ~25 features derivadas a partir de las 42 features originales:
+    #  - Ratios entre pares informativos
+    #  - Transformaciones log, cuadrado, raiz cubica
+    #  - Diferencias e interacciones cruzadas
+    #  - Coeficiente de variacion y rango inter-percentil
+
     Xd = X.copy()
 
-    # Ratios informativos (denominador protegido contra division por cero)
+    # ratios informativos (denominador protegido contra division por cero)
     _eps = 1e-9
     if "firstorder_Energy" in X.columns and "firstorder_Entropy" in X.columns:
         Xd["ratio_Energy_Entropy"] = X["firstorder_Energy"] / (X["firstorder_Entropy"].abs() + _eps)
@@ -242,15 +240,15 @@ def crear_features_derivadas(X):
     if "glcm_SumAverage" in X.columns and "glcm_SumEntropy" in X.columns:
         Xd["ratio_SumAvg_SumEnt"] = X["glcm_SumAverage"] / (X["glcm_SumEntropy"].abs() + _eps)
 
-    # Coeficiente de variacion
+    # coeficiente de variacion
     if "firstorder_Variance" in X.columns and "firstorder_Mean" in X.columns:
         Xd["cv_intensidad"] = np.sqrt(X["firstorder_Variance"].abs()) / (X["firstorder_Mean"].abs() + _eps)
 
-    # Rango inter-percentil
+    # rango inter-percentil
     if "firstorder_90Percentile" in X.columns and "firstorder_10Percentile" in X.columns:
         Xd["rango_interpercentil"] = X["firstorder_90Percentile"] - X["firstorder_10Percentile"]
 
-    # Log transforms
+    # log transforms
     if "firstorder_Energy" in X.columns:
         Xd["log_Energy"] = np.log1p(X["firstorder_Energy"].abs())
     if "firstorder_TotalEnergy" in X.columns:
@@ -260,7 +258,7 @@ def crear_features_derivadas(X):
     if "firstorder_Range" in X.columns:
         Xd["log_Range"] = np.log1p(X["firstorder_Range"].abs())
 
-    # Squared
+    # squared
     if "firstorder_Energy" in X.columns:
         Xd["sq_Energy"] = X["firstorder_Energy"] ** 2
     if "firstorder_RootMeanSquared" in X.columns:
@@ -270,19 +268,19 @@ def crear_features_derivadas(X):
     if "glcm_SumAverage" in X.columns:
         Xd["sq_SumAverage"] = X["glcm_SumAverage"] ** 2
 
-    # Cube roots
+    # cube roots
     if "firstorder_TotalEnergy" in X.columns:
         Xd["cbrt_TotalEnergy"] = np.cbrt(X["firstorder_TotalEnergy"])
     if "firstorder_Energy" in X.columns:
         Xd["cbrt_Energy"] = np.cbrt(X["firstorder_Energy"])
 
-    # Diferencias
+    # diferencias
     if "firstorder_Median" in X.columns and "firstorder_10Percentile" in X.columns:
         Xd["diff_Median_10p"] = X["firstorder_Median"] - X["firstorder_10Percentile"]
     if "firstorder_Maximum" in X.columns and "firstorder_Minimum" in X.columns:
         Xd["diff_Max_Min"] = X["firstorder_Maximum"] - X["firstorder_Minimum"]
 
-    # Interacciones cruzadas
+    # interacciones cruzadas
     if "firstorder_Energy" in X.columns and "glcm_JointEnergy" in X.columns:
         Xd["inter_Energy_JointEnergy"] = X["firstorder_Energy"] * X["glcm_JointEnergy"]
     if "firstorder_TotalEnergy" in X.columns and "glcm_Autocorrelation" in X.columns:
@@ -292,10 +290,10 @@ def crear_features_derivadas(X):
     if "firstorder_Entropy" in X.columns and "glcm_JointEntropy" in X.columns:
         Xd["inter_Entropy_JEntropy"] = X["firstorder_Entropy"] * X["glcm_JointEntropy"]
 
-    # Flag Clínico: Detección de Necrosis / Conglomerado Masivo
-    # Usando percentiles relativos a la distribución del dataset
+    # Flag: detección de posible necrosis /
+    # usando percentiles relativos a la distribución del dataset
     if "firstorder_Minimum" in X.columns and "glszm_ZoneVariance" in X.columns:
-        # [CORRECCIÓN] Valores estáticos (Usa los de tu dataset o estos aproximados)
+        # valores estáticos aproximados del dataset
         min_umbral = -30.0
         var_umbral = 15000.0
 
@@ -303,29 +301,27 @@ def crear_features_derivadas(X):
             (X["firstorder_Minimum"] <= min_umbral) & (X["glszm_ZoneVariance"] >= var_umbral),1, 0
         )
 
-    # Reemplazar inf/NaN
+    # reemplazar inf/NaN
     Xd = Xd.replace([np.inf, -np.inf], np.nan).fillna(0)
 
     return Xd
 
 
 # ===========================================================================
-#  Feature selection (por target)
+#  FEATURE SELECTION
 # ===========================================================================
 def seleccionar_features(X, y_target, usar_rfecv=True):
-    """
-    Selecciona features en tres pasos:
-      1. Filtro grueso (Pearson + MI) para descartar ruido total.
-      2. Poda de Colinealidad (INTER_CORR_UMBRAL) para eliminar variables gemelas.
-      3. RFECV para encontrar el subset óptimo.
-    """
-    # ELIMINADO: y_1d = np.cbrt(y_target)
-    # Ahora usamos y_target directamente en todo el bloque.
+      # 1. Filtro Pearson + MI para descartar ruido total
+      # 2. Poda de colinealidad (INTER_CORR_UMBRAL) para eliminar variables gemelas
+      # 3. RFECV para encontrar el subset óptimo
 
-    # ¡CRÍTICO: Transformar el target para estabilizar la varianza!
+    # ELIMINADO: y_1d = np.cbrt(y_target)
+    # Ahora usamos y_target directamente en todo el bloque
+
+    # TRANSFORMAR EL TARGET PARA ESTABILIZAR LA VARIANZA
     y_transformado = np.log1p(y_target)
 
-    # --- PASO 1: FILTRO GRUESO (Ruido) ---
+    #  filtro de ruido
     corrs = X.corrwith(pd.Series(y_transformado, index=X.index)).abs().fillna(0)
     cols_corr = set(corrs[corrs > CORR_UMBRAL].index)
 
@@ -336,7 +332,7 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 
     cols_ok = list(cols_corr | cols_mi)
 
-    # --- EL SALVAVIDAS DE LA BANDERA ---
+    # bandera de necrosis
     if "flag_conglomerado_necrotico" in X.columns and "flag_conglomerado_necrotico" not in cols_ok:
         cols_ok.append("flag_conglomerado_necrotico")
 
@@ -345,7 +341,7 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 
     X_filt = X[cols_ok].copy()
 
-    # --- PASO 2: PODA DE COLINEALIDAD ---
+    # poda de colienalidad
     corr_matrix = X_filt.corr().abs()
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
     to_drop = [column for column in upper.columns if any(upper[column] > INTER_CORR_UMBRAL)]
@@ -353,7 +349,7 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 
     cols_ok = list(X_filt.columns)
 
-    # --- PASO 3: RFECV (EL QUIRÓFANO) ---
+    # RFECV
     if usar_rfecv and len(cols_ok) > 12:
         resultado_rfecv = seleccionar_features_rfecv(X_filt, y_transformado, cv=3, min_features=12)
         cols_finales = resultado_rfecv["columnas_seleccionadas"]
@@ -363,13 +359,12 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 
 
 # ===========================================================================
-#  Preparacion de datos
+#  PREPARACIÓN DE LOS DATOS
 # ===========================================================================
 def preparar_datos(df_raw):
-    """
-    Deduplica, crea targets desde shape_*, elimina shape_* y
-    BLOQUEA variables radiómicas con Fuga de Datos (Volume-Confounded).
-    """
+    # Deduplica, crea targets desde shape_*, elimina shape_* y
+    # BLOQUEA variables radiómicas con Fuga de Datos (Volume-Confounded).
+
     n_raw = len(df_raw)
     df_raw = df_raw.drop_duplicates(subset="Paciente_ID")
     n_dedup = len(df_raw)
@@ -379,34 +374,35 @@ def preparar_datos(df_raw):
     for t in TARGETS:
         df[t["col"]] = df_raw[t["origen"]]
 
-    # --- TODO ESTO SALIÓ DEL BUCLE FOR ---
-    # 1. Escudo contra tamaño, pero SALVAMOS las proporciones morfológicas (No tienen fuga de datos)
+    # solo salvamos las proporciones morfológicas
     shape_cols = [c for c in df.columns if
                   c.startswith("shape_") and c not in ["shape_Sphericity", "shape_Elongation", "shape_Flatness"]]
 
-    # 2. ESCUDO DINÁMICO DE SPEARMAN (Anti-Leakage)
+    # spearman para anti-leakage
     y_temp_vol = df_raw["shape_VoxelVolume"].values
     fuga_cols = []
 
-    # Excluimos las columnas que ya sabemos que son targets o shape
+    # excluimos las columnas que ya sabemos que son targets o shape
     cols_a_evaluar = [c for c in df.columns if
                       c not in COLS_TARGET + COLS_CLINICAS + shape_cols and c != "Paciente_ID"]
 
     for col in cols_a_evaluar:
         coef, _ = spearmanr(df[col], y_temp_vol)
-        # Tu regla de oro: Si Spearman > 0.75, a la basura
+        # si spearman > 0.75, a la basura para limitar la colinealidad
         if abs(coef) > 0.75:
             fuga_cols.append(col)
 
-    # Juntamos todas las columnas prohibidas
+    # juntamos todas las columnas eliminadas
     cols_drop = ["Paciente_ID", "target_riesgo"] + COLS_TARGET + COLS_CLINICAS + shape_cols + fuga_cols
     X = df.drop(columns=[c for c in cols_drop if c in df.columns])
     # -------------------------------------
 
+
+
     ids = df_raw["Paciente_ID"].values
     targets = {t["col"]: df[t["col"]].values for t in TARGETS}
 
-    # Desglose por familia radiómica
+    # desglose por familia radiómica
     familias = {
         "firstorder": len([c for c in X.columns if c.startswith("firstorder_")]),
         "glcm": len([c for c in X.columns if c.startswith("glcm_")]),
@@ -420,14 +416,14 @@ def preparar_datos(df_raw):
         "n_muestras": n_dedup,
         "n_features": X.shape[1],
         "shape_eliminadas": len(shape_cols),
-        "fugas_eliminadas": len(fuga_cols),  # Para tener registro
+        "fugas_eliminadas": len(fuga_cols),  # rara tener registro
         "familias": familias,
     }
     return X, targets, ids, info
 
 
 def calcular_metricas(y_real, y_pred):
-    """8 metricas de regresion."""
+    # 8 metricas de regresion
     mse = mean_squared_error(y_real, y_pred)
     return {
         "MAE":    round(mean_absolute_error(y_real, y_pred), 4),
@@ -442,7 +438,7 @@ def calcular_metricas(y_real, y_pred):
 
 
 def categorizar_nivel(valor, y_total):
-    """Clasifica en Bajo/Moderado/Medio-Alto/Alto por cuartiles."""
+    #clasifica en Bajo/Moderado/Medio-Alto/Alto por cuartiles
     q1, q2, q3 = np.percentile(y_total, [25, 50, 75])
     if valor <= q1:
         return "Bajo"
@@ -454,15 +450,12 @@ def categorizar_nivel(valor, y_total):
 
 
 def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
-    """Utiliza Optimización Bayesiana para encontrar los hiperparámetros perfectos."""
-
+    # optimización bayesiana para encontrar los hiperparámetros perfectos
     def objective(trial):
         from sklearn.base import clone
         pipe = clone(pipe_tmpl)
 
-        # =========================================================
-        # [EXPERIMENTO ACADÉMICO]: Optuna elige el escalador al azar
-        # =========================================================
+        # optuna elige el escalador
         scaler_name = trial.suggest_categorical("scaler", ["standard", "minmax", "normalizer"])
         if scaler_name == "standard":
             nuevo_scaler = StandardScaler()
@@ -471,11 +464,9 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
         else:
             nuevo_scaler = Normalizer()
 
-        # Como el scaler es el primer paso en tu Pipeline, lo reemplazamos directamente
         pipe.steps[0] = ('scaler', nuevo_scaler)
-        # =========================================================
 
-        # RANGOS ANTI-MEMORIZACIÓN (AÚN MÁS ESTRICTOS)
+        # rangos anti-memorización
         rf_depth = trial.suggest_int("rf_depth", 2, 4)
         rf_min_samples = trial.suggest_int("rf_min_samples", 12, 25)
 
@@ -519,11 +510,11 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
             print(f"\n[!] ERROR EN CROSS VAL OPTUNA: {e}")
             return -999999.0
 
-    # Limpiamos los fantasmas duplicados de Optuna aquí afuera
+    # limpiando duplicados
     optuna.logging.set_verbosity(optuna.logging.WARNING)
     estudio = optuna.create_study(direction="maximize")
 
-    print(f"        [Optuna] Explorando {n_trials} combinaciones inteligentes (Incluyendo Escaladores)...")
+    print(f"        [Optuna] Explorando {n_trials} combinaciones inteligentes...")
     estudio.optimize(objective, n_trials=n_trials)
 
     mejor_pipe = clone(pipe_tmpl)
@@ -554,33 +545,32 @@ def optimizar_con_optuna_regresion(X_train, y_train, pipe_tmpl, n_trials=30):
         model__regressor__lgbm__reg_alpha=estudio.best_params["lgbm_reg_alpha"]
     )
 
-    # Devolvemos el pipeline ganador y eliminamos 'scaler' del dict params para no romper código externo
+    # devolvemos el pipeline ganador y eliminamos scaler del dict params para no romper código externo
     params_limpios = {k: v for k, v in estudio.best_params.items() if k != "scaler"}
     return mejor_pipe, params_limpios
 
 
 # ===========================================================================
-#  Entrenamiento y evaluacion
+#  ENTRENAMIENTO Y EVALUACIÓN
 # ===========================================================================
 def entrenar_y_evaluar():
-    """
-    Entrena StackingRegressor por target con 10-Fold CV.
-    Returns: df_pred, resultados_globales, informacion_modelos
-    """
+    # entrena StackingRegressor por target con 10-Fold CV
+    # returns: df_pred, resultados_globales, informacion_modelos
+
     df_raw = pd.read_csv(RUTA_CSV)
 
     # =======================================================================
     # ELIMINACIÓN DE OUTLIERS SUAVIZADA (Percentil 98 en lugar de IQR)
     # =======================================================================
     col_volumen = "shape_VoxelVolume"
-    limite_superior = df_raw[col_volumen].quantile(0.98)  # Conserva el 98% de los datos
+    limite_superior = df_raw[col_volumen].quantile(0.98)  # conserva el 98% de los datos
 
     df_raw = df_raw[df_raw[col_volumen] <= limite_superior].copy()
     # =======================================================================
 
     X_all, targets_dict, ids, info = preparar_datos(df_raw)
 
-    # Feature engineering: agregar ratios e interacciones
+    # agregar ratios e interacciones
     n_orig = X_all.shape[1]
     X_all = crear_features_derivadas(X_all)
     n_derivadas = X_all.shape[1] - n_orig
@@ -605,10 +595,10 @@ def entrenar_y_evaluar():
     for t in TARGETS:
         slug = t["slug"]
         y_orig = targets_dict[t["col"]]
-        y_train_space = y_orig  # Ya no transformamos aquí
+        y_train_space = y_orig  # ya no transformamos aquí
         u = t["u"]
 
-        # [CAMBIO AQUI]: Llamamos a la nueva función que devuelve TODO adaptado al target
+        # llamamos a la nueva función que devuelve TODO adaptado al target
         pipe_tmpl, nombre_modelo, param_grid_dinamico = _obtener_config_modelo(slug)
 
         print(f"\n  {t['nombre']} ({u}) | {nombre_modelo}")
@@ -621,24 +611,25 @@ def entrenar_y_evaluar():
         features_seleccionadas_por_fold = []
 
         # -------------------------------------------------------------------
-        # 1. ENCONTRAR LAS FEATURES MAESTRAS (RFECV GLOBAL)
+        # ENCONTRAR LAS FEATURES MAESTRAS (RFECV GLOBAL)
         # -------------------------------------------------------------------
         print(f"    [1/3] Extrayendo la crema y nata de las features (Filtro + RFECV)...")
         cols_sel_final = seleccionar_features(X_all, y_train_space, usar_rfecv=True)
         X_final = X_all[cols_sel_final]
 
         # -------------------------------------------------------------------
-        # 2. ENCONTRAR LOS HIPERPARÁMETROS MAESTROS
+        # ENCONTRAR LOS HIPERPARÁMETROS MAESTROS
         # -------------------------------------------------------------------
         print(f"    [2/3] Buscando hiperparámetros óptimos...")
-        # [CORRECCIÓN] Pasamos la variable cruda. El TransformedTargetRegressor del pipeline hace el resto.
+        # pasamos la variable cruda
+        # # el TransformedTargetRegressor hace el resto
         pipe_optimo, mejores_params = optimizar_con_optuna_regresion(
             X_final, y_train_space, clone(pipe_tmpl), n_trials=20
         )
         print(f"    [Optuna] Listo. Validando modelo definitivo...")
 
         # -------------------------------------------------------------------
-        # 3. VALIDACIÓN K-FOLD LIGERA (El examen final de la arquitectura)
+        # VALIDACIÓN K-FOLD LIGERA
         # -------------------------------------------------------------------
         for rep in range(N_REPEATS):
             kf = KFold(n_splits=N_SPLITS, shuffle=True, random_state=42 + rep)
@@ -647,7 +638,7 @@ def entrenar_y_evaluar():
                 y_tr_space_fold = y_train_space[train_idx]
                 y_te_orig = y_orig[test_idx]
 
-                # Usamos el pipeline podado e inteligente con las features exactas
+                # usamos el pipeline podado e inteligente con las features exactas
                 fold_pipe = clone(pipe_optimo)
                 fold_pipe.fit(X_tr, y_tr_space_fold)
 
@@ -672,7 +663,7 @@ def entrenar_y_evaluar():
               f"Gap={kf_gap:.1f}%  (Features finales: {len(cols_sel_final)})")
 
         # ---------------------------------------------------------------
-        # 4. ENTRENAMIENTO PARA PRODUCCIÓN
+        # ENTRENAMIENTO PARA PRODUCCIÓN
         # ---------------------------------------------------------------
         pipe_final = clone(pipe_optimo)
         pipe_final.fit(X_final, y_train_space)
@@ -711,7 +702,7 @@ def entrenar_y_evaluar():
             "Gap_%": round(kf_gap, 2),
         })
 
-        # Predicciones KFold por paciente
+        # predicciones KFold por paciente
         for i in range(N):
             err_abs = abs(y_orig[i] - y_pred_kf[i])
             err_pct = err_abs / max(abs(y_orig[i]), 1e-9) * 100
@@ -752,7 +743,7 @@ def entrenar_y_evaluar():
 
 
 # ===========================================================================
-#  GRAFICAS PROFESIONALES (8 PNGs)
+#  GRAFICAS FINALES
 # ===========================================================================
 
 def _guardar(fig, nombre):
@@ -794,16 +785,13 @@ def _dibujar_gauge(ax, valor, titulo, subtitulo, color_val):
 
 
 def generar_graficas(df_pred, informacion_modelos):
-    """Genera 7 graficas profesionales y las guarda como PNG."""
     plt.close("all")
 
     targets = [t for t in TARGETS]
     n = len(targets)
     print("\n  Generando graficas:")
 
-    # ===================================================================
-    #  GRAFICA 1: Panel de rendimiento (gauges R2)
-    # ===================================================================
+    #  GRAFICA 1: PANEL DE RENDIMIENTO
     fig1, axes1 = plt.subplots(1, n, figsize=(6 * n, 4))
     if n == 1:
         axes1 = [axes1]
@@ -837,9 +825,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig1.tight_layout()
     _guardar(fig1, "entrenamiento_01_panel_rendimiento.png")
 
-    # ===================================================================
-    #  GRAFICA 2: Tasa de acierto
-    # ===================================================================
+
+    #  GRAFICA 2: TASA DE ACIERTO
     umbrales = [10, 15, 25, 50]
     fig2, ax2 = plt.subplots(figsize=(10, 5.5))
 
@@ -875,9 +862,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig2.tight_layout()
     _guardar(fig2, "entrenamiento_02_tasa_acierto.png")
 
-    # ===================================================================
-    #  GRAFICA 3: Scatter real vs predicho con bandas
-    # ===================================================================
+
+    #  Scatter real vs predicho con bandas
     fig3, axes3 = plt.subplots(1, n, figsize=(6.5 * n, 6))
     if n == 1:
         axes3 = [axes3]
@@ -934,9 +920,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig3.tight_layout()
     _guardar(fig3, "entrenamiento_03_scatter_prediccion.png")
 
-    # ===================================================================
-    #  GRAFICA 4: Distribucion del error (histogramas)
-    # ===================================================================
+
+    # Distribucion del error
     fig4, axes4 = plt.subplots(1, n, figsize=(6 * n, 5))
     if n == 1:
         axes4 = [axes4]
@@ -994,9 +979,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig4.tight_layout()
     _guardar(fig4, "entrenamiento_04_distribucion_error.png")
 
-    # ===================================================================
-    #  GRAFICA 5: Top 20 pacientes con mayor error
-    # ===================================================================
+
+    #  Top 20 pacientes con mayor error
     fig5, axes5 = plt.subplots(1, n, figsize=(6 * n, 7))
     if n == 1:
         axes5 = [axes5]
@@ -1031,9 +1015,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig5.tight_layout()
     _guardar(fig5, "entrenamiento_05_top_errores.png")
 
-    # ===================================================================
-    #  GRAFICA 6: Comparacion KFold vs LOO + overfitting
-    # ===================================================================
+
+    #  Comparacion KFold vs LOO + overfitting
     metricas_keys = ["R2", "MAE", "RMSE"]
     fig6, axes6 = plt.subplots(1, n, figsize=(6 * n, 5))
     if n == 1:
@@ -1088,9 +1071,8 @@ def generar_graficas(df_pred, informacion_modelos):
     fig6.tight_layout()
     _guardar(fig6, "entrenamiento_06_validacion_cruzada.png")
 
-    # ===================================================================
-    #  GRAFICA 7: Feature importance (top 10)
-    # ===================================================================
+
+    #  Feature importance (top 10)
     fig7, axes7 = plt.subplots(1, n, figsize=(6 * n, 5.5))
     if n == 1:
         axes7 = [axes7]
@@ -1150,10 +1132,9 @@ def generar_graficas(df_pred, informacion_modelos):
 
 
 # ===========================================================================
-#  Prediccion sobre casos de prueba
+#  PREDICCIÓN HOLDOUT
 # ===========================================================================
 def predecir_casos_prueba(informacion_modelos):
-    """Predice sobre casos_prueba.csv y guarda verificacion."""
     if not os.path.exists(RUTA_PRUEBA):
         print("\n  casos_prueba.csv no encontrado, omitiendo verificacion")
         return None
@@ -1161,7 +1142,7 @@ def predecir_casos_prueba(informacion_modelos):
     df_prueba = pd.read_csv(RUTA_PRUEBA)
     print(f"\n  VERIFICACION CASOS DE PRUEBA ({len(df_prueba)} casos)")
 
-    # [CORRECCIÓN CRÍTICA] Salvar las proporciones morfológicas de ser borradas
+    # salvar las proporciones morfológicas de ser borradas
     shape_cols = [c for c in df_prueba.columns if
                   c.startswith("shape_") and c not in ["shape_Sphericity", "shape_Elongation", "shape_Flatness"]]
 
@@ -1183,14 +1164,14 @@ def predecir_casos_prueba(informacion_modelos):
         cols_sel = info.get("cols_selected")
 
         if cols_sel:
-            # Garantiza que X_pred tenga exactamente las columnas que espera el modelo
+            # garantiza que X_pred tenga exactamente las columnas que espera el modelo
             X_pred = X_prueba.reindex(columns=cols_sel, fill_value=0)
         else:
             X_pred = X_prueba
 
         y_real = df_prueba[t["origen"]].values
 
-        # El modelo ya devuelve el volumen en mm3 reales automáticamente
+        # el modelo ya devuelve el volumen en mm3 reales automáticamente
         y_pred = pipe.predict(X_pred)
 
         metricas = calcular_metricas(y_real, y_pred)
@@ -1225,7 +1206,7 @@ def predecir_casos_prueba(informacion_modelos):
 
 
 def generar_grafica_casos_prueba(df_verif, informacion_modelos):
-    """Grafica 8: scatter + tabla visual de casos de prueba."""
+    # graficar scatter + tabla visual de casos de prueba
     if df_verif is None or df_verif.empty:
         return
 
@@ -1249,7 +1230,7 @@ def generar_grafica_casos_prueba(df_verif, informacion_modelos):
         info = informacion_modelos.get(t["nombre"], {})
         modelo = info.get("nombre_modelo", "?")
 
-        # -- Scatter (fila superior) --
+        # scatter (fila superior)
         ax_s = axes[0, i]
         all_v = np.concatenate([real, pred])
         vmin, vmax = all_v.min(), all_v.max()
@@ -1266,7 +1247,7 @@ def generar_grafica_casos_prueba(df_verif, informacion_modelos):
         ax_s.scatter(real, pred, c=colores_pts, s=80, edgecolors="white",
                      linewidth=1, zorder=3)
 
-        # Etiquetas
+        # etiquetas
         for _, row in sub.iterrows():
             pac = row["Paciente_ID"].replace("case_", "")
             ax_s.annotate(pac, (row["Real"], row["Predicho"]),
@@ -1282,7 +1263,7 @@ def generar_grafica_casos_prueba(df_verif, informacion_modelos):
         ax_s.set_title(f"{_NOMBRES_CORTOS.get(t['nombre'], t['nombre'])}"
                        f"  ({modelo})", fontsize=11, pad=8)
 
-        # -- Tabla (fila inferior) --
+        # tabla (fila inferior)
         ax_t = axes[1, i]
         ax_t.axis("off")
         tabla_data = []
@@ -1323,13 +1304,12 @@ def generar_grafica_casos_prueba(df_verif, informacion_modelos):
 
 
 # ===========================================================================
-#  Exportación a Producción (Joblib)
+#  EXPORTAR A PRODUCCIÓN (JOBLIB)
 # ===========================================================================
 def exportar_modelos_produccion(informacion_modelos):
-    """
-    Guarda los pipelines definitivos en formato .joblib y genera un archivo .json
-    con los metadatos necesarios para predecir nuevos pacientes (features exactas, log_transform).
-    """
+    # guarda los pipelines definitivos en formato .joblib y genera un archivo .json
+    # con los metadatos necesarios para predecir nuevos pacientes (features exactas, log_transform).
+
     carpeta_produccion = os.path.join(base_dir, "regression", "joblib")
     os.makedirs(carpeta_produccion, exist_ok=True)
 
@@ -1338,13 +1318,13 @@ def exportar_modelos_produccion(informacion_modelos):
     for target_nombre, info in informacion_modelos.items():
         slug = info["slug"]
         modelo_final = info["mejor_pipe"]
-        features_requeridas = info["cols_selected"]  # Las columnas que sobrevivieron al RFECV
+        features_requeridas = info["cols_selected"]  # las columnas que sobrevivieron al RFECV
 
-        # 1. Guardar el modelo compilado (Pipeline completo)
+        # guardar el modelo compilado (pipeline completo)
         ruta_joblib = os.path.join(carpeta_produccion, f"modelo_{slug}.joblib")
         joblib.dump(modelo_final, ruta_joblib)
 
-        # 2. Guardar el "Manual de Instrucciones" (Metadatos)
+        # guardar los metadatos
         metadata = {
             "target": target_nombre,
             "unidad": info["unidad"],
@@ -1365,30 +1345,30 @@ def exportar_modelos_produccion(informacion_modelos):
 
 
 # ===========================================================================
-#  Torneo de Algoritmos
+#  TORNEO DE ALGORITMOS
 # ===========================================================================
 def gran_torneo_volumen():
     print("\n" + "=" * 80)
     print("GRAN TORNEO DE ALGORITMOS: PREDICCIÓN DE VOLUMEN")
     print("=" * 80)
 
-    # 1. Preparar datos
+    # preparar datos
     df_raw = pd.read_csv(RUTA_CSV)
     X_all_raw, targets_dict, ids, info = preparar_datos(df_raw)
     X_all = crear_features_derivadas(X_all_raw)
 
-    # Nos concentramos SOLO en el volumen
+    # nos concentramos SOLO en el volumen
     y_orig = targets_dict["target_regresion"]
     y_train_space = y_orig
 
-    # 2. Selección de Características
+    # selección de características
     print("\n  [1/3] Seleccionando las mejores características (RFECV)...")
     cols_sel = seleccionar_features(X_all, y_train_space, usar_rfecv=True)
     X_filt = X_all[cols_sel]
     p = X_filt.shape[1]
     print(f"        -> Se seleccionaron {p} variables clave.")
 
-    # 3. Catálogo Masivo de Modelos de Regresión
+    # catalogo de modelos
     from sklearn.linear_model import (LinearRegression, Ridge, Lasso, ElasticNet,
                                       PoissonRegressor, HuberRegressor, BayesianRidge)
     from sklearn.svm import SVR
@@ -1435,7 +1415,7 @@ def gran_torneo_volumen():
             X_tr, X_te = X_filt.iloc[train_idx], X_filt.iloc[test_idx]
             y_tr_space, y_te_orig = y_train_space[train_idx], y_orig[test_idx]
 
-            # Estandarizamos para modelos sensibles (SVM, KNN, Redes Neuronales)
+            # estandarizamos para svm, knn, mlp
             scaler = StandardScaler()
             X_tr_sc = scaler.fit_transform(X_tr)
             X_te_sc = scaler.transform(X_te)
@@ -1443,14 +1423,14 @@ def gran_torneo_volumen():
             clon = clone(modelo)
 
             try:
-                # Entrenamiento
+                # entrenamiento
                 clon.fit(X_tr_sc, y_tr_space)
 
-                # Predicciones
+                # predicciones
                 pred_tr_space = clon.predict(X_tr_sc)
                 pred_te_space = clon.predict(X_te_sc)
 
-                # Revertir raíz cúbica para calcular métricas en mm³ reales
+                # revertir raíz cúbica para calcular métricas en mm^3 reales
                 pred_tr = np.maximum(0, pred_tr_space)
                 pred_te = np.maximum(0, pred_te_space)
                 y_tr_orig = y_tr_space
@@ -1467,7 +1447,7 @@ def gran_torneo_volumen():
         all_y_real = np.array(all_y_real)
         all_y_pred = np.array(all_y_pred)
 
-        # Calcular todas tus métricas solicitadas
+        # calcular métricas
         mae = mean_absolute_error(all_y_real, all_y_pred)
         rmse = np.sqrt(mean_squared_error(all_y_real, all_y_pred))
         mape = mean_absolute_percentage_error(all_y_real, all_y_pred) * 100
@@ -1485,11 +1465,11 @@ def gran_torneo_volumen():
         })
         print(f"    • {nombre_mod:<20} -> MAE: {mae:>8.1f} | R2: {r2:>6.3f} | Gap: {gap:>5.1f}%")
 
-    # 4. Generar Reporte Visual
+    # generar reporte visual
     print("\n  [3/3] Generando gráficas del torneo...")
     df_res = pd.DataFrame(resultados).sort_values(by="MAE", ascending=True)
 
-    # Gráfica 1: MAE
+    # MAE
     plt.figure(figsize=(12, 8))
     bars = plt.barh(df_res["Modelo"][::-1], df_res["MAE"][::-1], color='#3498db', edgecolor='white')
     plt.xlabel('Error Medio Absoluto (MAE) en mm³')
@@ -1500,7 +1480,7 @@ def gran_torneo_volumen():
     plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_masivo_mae_volumen.png"), dpi=150)
     plt.close()
 
-    # Gráfica 2: Overfitting Gap
+    # Overfitting Gap
     df_res_gap = df_res.sort_values(by="Gap_Overfitting", ascending=True)
     plt.figure(figsize=(12, 8))
     colores_gap = ['#27ae60' if g < 15 else '#f39c12' if g < 30 else '#e74c3c' for g in
@@ -1528,29 +1508,29 @@ def auditar_fuga_de_datos():
     X_all = crear_features_derivadas(X_all_raw)
     y_vol = targets_dict["target_regresion"]
 
-    # 1. Calcular Pearson (Relaciones lineales)
+    # calcular pearson para relaciones lineales
     corrs_pearson = X_all.corrwith(pd.Series(y_vol, index=X_all.index)).abs()
 
-    # 2. Calcular Spearman (Relaciones No-Lineales)
+    # calcular spearman para relaciones no lineales
     corrs_spearman = {}
     for col in X_all.columns:
         coef, _ = spearmanr(X_all[col], y_vol)
         corrs_spearman[col] = abs(coef)
     corrs_spearman = pd.Series(corrs_spearman)
 
-    # Unir resultados
+    # unir resultados
     df_fuga = pd.DataFrame({
         "Pearson": corrs_pearson,
         "Spearman": corrs_spearman
     }).sort_values(by="Spearman", ascending=False)
 
-    # Imprimir a los mayores sospechosos
+    # imprimir a los mayores sospechosos de colinealidad
     print("\n  [TOP 10 VARIABLES MÁS CORRELACIONADAS CON EL VOLUMEN]")
     for idx, row in df_fuga.head(10).iterrows():
         alerta = " 🚨 ¡POSIBLE FUGA!" if row['Spearman'] > 0.85 else ""
         print(f"  • {idx:<30} | Spearman: {row['Spearman']:.3f} | Pearson: {row['Pearson']:.3f}{alerta}")
 
-    # Generar Heatmap de los sospechosos
+    # generar heatmap de los sospechosos
     top_cols = df_fuga.head(15).index.tolist()
     df_plot = X_all[top_cols].copy()
     df_plot["TARGET_VOLUMEN"] = y_vol
@@ -1566,14 +1546,14 @@ def auditar_fuga_de_datos():
 
 
 def analizar_residuos(df_pred, X_raw):
-    """Genera gráfico de residuos y extrae un CSV con los 20 peores casos y sus texturas."""
+    # genera gráfico de residuos y extrae un csv con los 20 peores casos y sus texturas
     import matplotlib.pyplot as plt
     import seaborn as sns
 
     sub = df_pred[df_pred["Target"] == "Volumen"].copy()
     sub["Residuo"] = sub["Predicho"] - sub["Real"]
 
-    # 1. Gráfico de Residuos
+    # gráfico de residuos
     plt.figure(figsize=(10, 6))
     sns.scatterplot(x="Real", y="Residuo", data=sub, alpha=0.7, color="#3498db")
     plt.axhline(0, color="red", linestyle="--")
@@ -1583,10 +1563,10 @@ def analizar_residuos(df_pred, X_raw):
     plt.savefig(os.path.join(CARPETA_METRICAS, "residuos_volumen.png"), dpi=150)
     plt.close()
 
-    # 2. Extracción de los 20 peores casos
+    # extracción de los 20 peores casos
     peores_20 = sub.assign(Error_Abs=sub["Residuo"].abs()).nlargest(20, "Error_Abs")
 
-    # Cruzar con las features crudas originales
+    # cruzar con las features crudas originales
     peores_20_features = peores_20.merge(X_raw, on="Paciente_ID", how="left")
 
     ruta_csv = os.path.join(CARPETA_METRICAS, "auditoria_peores_20_casos.csv")
@@ -1595,7 +1575,7 @@ def analizar_residuos(df_pred, X_raw):
 
 
 def generar_graficas_avanzadas(df_pred, informacion_modelos):
-    """Genera Gráfico de Bland-Altman y Curvas de Aprendizaje para validación clínica."""
+    # genera gráfico de bland-altman y curvas de aprendizaje para validación clínica
     plt.close("all")
     print("\n  Generando gráficas clínicas avanzadas:")
 
@@ -1609,9 +1589,7 @@ def generar_graficas_avanzadas(df_pred, informacion_modelos):
     pred = sub["Predicho"].values
     residuos = pred - real
 
-    # ===================================================================
-    #  1. Gráfico de Bland-Altman (Concordancia Clínica)
-    # ===================================================================
+    #  GRAFICO DE BLAND-ALTMAN
     media_medidas = (real + pred) / 2
     mean_diff = np.mean(residuos)
     std_diff = np.std(residuos)
@@ -1619,7 +1597,7 @@ def generar_graficas_avanzadas(df_pred, informacion_modelos):
     fig1, ax1 = plt.subplots(figsize=(8, 6))
     ax1.scatter(media_medidas, residuos, alpha=0.7, color="#8e44ad", edgecolors="white", s=50)
 
-    # Líneas de sesgo y límites de acuerdo (95%)
+    # líneas de sesgo y límites de acuerdo (95%)
     ax1.axhline(mean_diff, color="black", linestyle="-", linewidth=2, label=f"Sesgo Medio: {mean_diff:.1f}")
     ax1.axhline(mean_diff + 1.96 * std_diff, color="#e74c3c", linestyle="--",
                 label=f"+1.96 SD ({mean_diff + 1.96 * std_diff:.1f})")
@@ -1631,7 +1609,7 @@ def generar_graficas_avanzadas(df_pred, informacion_modelos):
     ax1.set_title("Gráfico de Bland-Altman (Concordancia Clínica)", fontsize=12, fontweight="bold")
     ax1.legend(loc="upper right")
 
-    # Ajuste de límites simétricos para mayor legibilidad
+    # ajuste de límites simétricos para mayor legibilidad
     max_diff = max(abs(residuos.max()), abs(residuos.min())) * 1.2
     ax1.set_ylim(-max_diff, max_diff)
 
@@ -1640,12 +1618,11 @@ def generar_graficas_avanzadas(df_pred, informacion_modelos):
     plt.close(fig1)
     print("    -> avanzado_01_bland_altman.png")
 
-    # ===================================================================
-    #  2. Curvas de Aprendizaje (Learning Curves)
-    # ===================================================================
+
+    #  2. CURVA DE APRENDIZAJE
     print("    -> Calculando Curvas de Aprendizaje (esto tomará unos segundos)...")
 
-    # Usamos un KFold rápido para ver cómo mejora el modelo al inyectarle más datos
+    # usamos un kfold rápido para ver cómo mejora el modelo al inyectarle más datos
     kf_lc = KFold(n_splits=5, shuffle=True, random_state=42)
 
     modelo = info["mejor_pipe"]
@@ -1659,7 +1636,7 @@ def generar_graficas_avanzadas(df_pred, informacion_modelos):
         train_sizes=np.linspace(0.2, 1.0, 6)  # 6 puntos de evaluación progresivos
     )
 
-    # Convertimos los scores negativos de sklearn a MAE positivo
+    # convertimos los scores negativos de sklearn a mae positivo
     train_scores_mean = -np.mean(train_scores, axis=1)
     test_scores_mean = -np.mean(test_scores, axis=1)
 
@@ -1688,15 +1665,15 @@ if __name__ == "__main__":
     df_raw = pd.read_csv(RUTA_CSV)
     analizar_residuos(df_pred, df_raw)
 
-    # 1. Generamos TODAS las gráficas de entrenamiento
+    # generar TODAS las gráficas de entrenamiento
     generar_graficas(df_pred, info_modelos)
 
-    # 1.5. Generar gráficas clínicas avanzadas (NUEVO)
+    # generar gráficas clínicas avanzadas
     generar_graficas_avanzadas(df_pred, info_modelos)
 
-    # 2. Predecimos los casos de prueba y generamos su gráfica
+    # predecir los casos de prueba y generamos su gráfica
     df_verif = predecir_casos_prueba(info_modelos)
     generar_grafica_casos_prueba(df_verif, info_modelos)
 
-    # 3. EXPORTAMOS A PRODUCCIÓN (Joblib + JSON)
+    # exportar a producción
     exportar_modelos_produccion(info_modelos)

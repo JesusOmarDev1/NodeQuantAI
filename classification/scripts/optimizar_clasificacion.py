@@ -15,7 +15,7 @@ from sklearn.metrics import f1_score
 
 
 def evaluar_varianza(pipe, X, y, cv=5):
-    """Cross-validation F1 stats con múltiples métricas."""
+    # cross-validation f1 stats
     skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
     f1 = cross_val_score(pipe, X, y, cv=skf, scoring="f1_weighted")
     acc = cross_val_score(pipe, X, y, cv=skf, scoring="accuracy")
@@ -31,16 +31,13 @@ def evaluar_varianza(pipe, X, y, cv=5):
 
 
 def detectar_overfitting(pipe, X, y, n_splits=5, umbral=15.0):
-    """
-    Compara F1-Score train vs test en Stratified K-Fold para detectar overfitting.
-    En clasificación, el Gap% mide cuánto CAE el rendimiento en test.
-    Gap% = (train_f1 - test_f1) / train_f1 * 100
-    """
+    # Compara f1-score train vs test en stratified k-fold para detectar overfitting
+    # gap% = (train_f1 - test_f1) / train_f1 * 100
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     train_f1s = []
     test_f1s = []
 
-    # Ajuste para manejar DataFrames y Series de Pandas correctamente
+    # configuración para dataframes
     X_arr = X.values if hasattr(X, "values") else X
     y_arr = y.values if hasattr(y, "values") else y
 
@@ -55,14 +52,14 @@ def detectar_overfitting(pipe, X, y, n_splits=5, umbral=15.0):
         pred_tr = p.predict(X_tr)
         pred_te = p.predict(X_te)
 
-        # Calculamos el F1-Score ponderado
+        # f1-score
         train_f1s.append(f1_score(y_tr, pred_tr, average='weighted'))
         test_f1s.append(f1_score(y_te, pred_te, average='weighted'))
 
     train_f1 = np.mean(train_f1s)
     test_f1 = np.mean(test_f1s)
 
-    # Gap% en clasificación: % de caída del rendimiento de Train a Test
+    # caída del rendimiento de train a test
     gap = ((train_f1 - test_f1) / train_f1 * 100) if train_f1 != 0 else 0.0
 
     if gap > umbral:
@@ -80,36 +77,33 @@ def detectar_overfitting(pipe, X, y, n_splits=5, umbral=15.0):
     }
 
 # =====================================================================
-#  Selección de Características Avanzada (Wrapper Method para Clasificación)
+#  FEATURE SELECTION (WRAPPER METHOD)
 # =====================================================================
 def seleccionar_features_rfecv(X, y, cv=3, min_features=5):
-    """
-    Utiliza RFECV con un RandomForestClassifier para encontrar el subconjunto
-    óptimo de características que maximiza el F1-Score ponderado.
-    """
+    # usa RFECV con un RF para encontrar el subconjunto
+    # para características que maximiza el F1-Score
     print(f"        [RFECV] Evaluando {X.shape[1]} features para encontrar el subset óptimo (F1-Score)...")
 
-    # 1. Definir el "Cirujano" (El estimador base ahora es un CLASIFICADOR)
-    # class_weight='balanced' es crucial aquí para que no ignore las clases críticas
+    # class_weight='balanced' para que no ignore las clases críticas
     estimador_base = RandomForestClassifier(n_estimators=50, max_depth=5, class_weight='balanced', random_state=42, n_jobs=None)
 
-    # 2. Configurar el esquema de validación cruzada ESTRATIFICADA
+    # configurar el esquema de validación cruzada estratificada
     skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
 
-    # 3. Configurar el RFECV
+    # configurar el rfecv
     selector = RFECV(
         estimator=estimador_base,
         step=1,
         cv=skf,
-        scoring='f1_weighted',             # Objetivo: maximizar F1-Score
+        scoring='f1_weighted', # OBJETIVO: MAXIMIZAR F1-SCORE
         min_features_to_select=min_features,
         n_jobs=-1
     )
 
-    # 4. Entrenar y seleccionar
+    # entrenar y seleccionar
     selector.fit(X, y)
 
-    # 5. Extraer los nombres de las columnas ganadoras
+    # extraer los nombres de las columnas ganadoras
     if hasattr(X, 'columns'):
         features_optimas = X.columns[selector.support_].tolist()
     else:

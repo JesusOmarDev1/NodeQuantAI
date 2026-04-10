@@ -3,7 +3,7 @@ import os
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin, clone
 
-# Convertir el clasificador en un modelo ordinal
+# convertir el clasificador en un modelo ordinal
 class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
     def __init__(self, estimator):
         self.estimator = estimator
@@ -31,7 +31,7 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
 
-ruta_modelo = os.path.join(r"C:\Users\korev\Documents\Cursos\Samsung Innovation Campus\NodeQuantAI\classification\joblib\modelo_riesgo.joblib")
+ruta_modelo = os.path.join("classification", "joblib", "modelo_clasificacion.joblib")
 
 if os.path.exists(ruta_modelo):
     modelo = joblib.load(ruta_modelo)
@@ -40,23 +40,23 @@ if os.path.exists(ruta_modelo):
     print("EXTRACCIÓN DE PARÁMETROS DEL MODELO CAMPEÓN DE CLASIFICACIÓN (JOBLIB)")
     print("=" * 80)
 
-    # 1. Rompemos la primera capa: El Calibrador (Tomamos el primer fold calibrado)
+    # tomamos el primer fold calibrado
     pipeline_interno = modelo.calibrated_classifiers_[0].estimator
 
-    # 2. Extraer el Preprocesamiento (Scaler)
+    # extraer el preprocesamiento
     escalador = pipeline_interno.named_steps['scaler']
     print(f"\nPREPROCESAMIENTO:")
     print(f"    Escalador        : {escalador.__class__.__name__}")
 
-    # 3. Extraer el Filtro Lasso (Para ver qué fuerza de penalización 'C' usó)
+    # extraer lasso
     lasso_filter = pipeline_interno.named_steps['lasso_filter'].estimator
     print(f"\nFILTRO DE CARACTERÍSTICAS (LASSO):")
     print(f"    Clase            : {lasso_filter.__class__.__name__}")
     print(f"    Parámetro (C)    : {lasso_filter.get_params().get('C')}")
 
-    # 4. Rompemos la capa Ordinal para llegar al Stacking
+    # romper capa ordinal para llegar al stackng
     ordinal_clf = pipeline_interno.named_steps['model']
-    # Tomamos el primer clasificador binario del Ordinal (todos comparten hiperparámetros)
+    # tomamos el primer clasificador binario del ordinal
     stacking = ordinal_clf.estimators_[0]
 
     print("\nMODELOS BASE:")
@@ -64,16 +64,16 @@ if os.path.exists(ruta_modelo):
         print(f"\n  --- {nombre.upper()} ({estimador.__class__.__name__}) ---")
         params = estimador.get_params()
 
-        # Iteramos e imprimimos todos los parámetros
+        # iteramos todos los parámetros
         for param in sorted(params.keys()):
-            # Ocultamos variables internas gigantes que ensucian la consola
+            # ocultamos variables internas que ensucian la consola
             if param not in ['monotone_constraints', 'interaction_constraints', 'cat_features', 'text_features']:
                 valor = params[param]
-                # Para limpiar un poco la salida de CatBoost que tiene listas enormes
+                # limpiar la salida de catboost
                 if not isinstance(valor, (list, tuple, dict)) or len(str(valor)) < 50:
                     print(f"      {param:<25}: {valor}")
 
-    # 5. Extraemos el Meta-Learner
+    # extraer el meta-leaner
     meta = stacking.final_estimator_
     print(f"\nMETA-LEARNER:")
     print(f"  --- {meta.__class__.__name__} ---")

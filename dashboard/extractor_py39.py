@@ -4,7 +4,7 @@ from radiomics import featureextractor
 
 
 def main():
-    # Verificamos que se hayan pasado las dos rutas (imagen y máscara)
+    # verificamos que se hayan pasado las dos rutas (imagen y máscara)
     if len(sys.argv) != 3:
         print(json.dumps({"error": "Se requieren exactamente 2 argumentos: imagen y máscara"}))
         sys.exit(1)
@@ -13,7 +13,7 @@ def main():
     ruta_mascara = sys.argv[2]
 
     try:
-        # Configuramos PyRadiomics
+        # configurar PyRadiomics
         extractor = featureextractor.RadiomicsFeatureExtractor()
         extractor.disableAllFeatures()
         extractor.enableFeatureClassByName('firstorder')
@@ -22,15 +22,15 @@ def main():
         extractor.enableFeatureClassByName('glszm')
         extractor.enableFeatureClassByName('gldm')
 
-        # Extraemos diciéndole que el tumor tiene el valor 255
+        # extraer diciéndole que el tumor tiene el valor 255
         resultado = extractor.execute(ruta_imagen, ruta_mascara, label=255)
 
-        # Limpiamos y dejamos solo números (quitamos metadatos)
+        # quitar metadatos
         features_limpias = {k.replace("original_", ""): float(v)
                             for k, v in resultado.items()
                             if not k.startswith("diagnostics_")}
 
-        # Escupimos el diccionario como un string JSON directo a la consola
+        # retornar diccionario como un string json directo a la consola
         print(json.dumps(features_limpias))
 
     except Exception as e:

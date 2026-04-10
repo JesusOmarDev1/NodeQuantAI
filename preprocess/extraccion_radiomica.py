@@ -7,22 +7,20 @@ from radiomics import featureextractor
 def extraer_radiomica(carpeta_origen, archivo_salida):
     print("Iniciando motor PyRadiomics...")
 
-    # 1. Configurar el Extractor
-    # Usamos un ancho de bin (binWidth) de 25, que es el estándar recomendado
-    # para tomografías (CT) al calcular características de textura.
+    # configurar el extractor
+    # usamos un ancho de bin (binWidth) de 25
+    # calcular características de textura
     configuracion = {'binWidth': 25, 'resampledPixelSpacing': None, 'interpolator': sitk.sitkNearestNeighbor}
     extractor = featureextractor.RadiomicsFeatureExtractor(**configuracion)
 
-    # Decidimos qué familias de características queremos extraer:
-    extractor.disableAllFeatures()  # Apagamos todo primero para tener control
-    extractor.enableFeatureClassByName('shape')  # Volumen, Diámetros, Esfericidad
-    extractor.enableFeatureClassByName('firstorder')  # Media, Mediana, Asimetría (HU)
-    extractor.enableFeatureClassByName('glcm')  # Textura (Homogeneidad, Contraste)
-
-    # Habilitar las nuevas familias de texturas avanzadas
-    extractor.enableFeatureClassByName('glrlm')
-    extractor.enableFeatureClassByName('glszm')
-    extractor.enableFeatureClassByName('gldm')
+    # familias de carzteristicas
+    extractor.disableAllFeatures()  # apagamos todo primero para tener control
+    extractor.enableFeatureClassByName('shape') # forma 3D
+    extractor.enableFeatureClassByName('firstorder') # distribución de intensidades de vóxeles
+    extractor.enableFeatureClassByName('glcm') # co-ocurrencia de pares de niveles de gris
+    extractor.enableFeatureClassByName('glrlm') # corridas de niveles de gris
+    extractor.enableFeatureClassByName('glszm') # grupos contiguos de vóxeles con el mismo nivel de gris
+    extractor.enableFeatureClassByName('gldm') # dependencia de niveles de gris
 
     lista_resultados = []
     pacientes = [p for p in os.listdir(carpeta_origen) if os.path.isdir(os.path.join(carpeta_origen, p))]
@@ -36,23 +34,22 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
         if not (os.path.exists(ruta_ct) and os.path.exists(ruta_seg)):
             continue
 
-        # 2. Validación crítica: ¿Hay un ganglio en esta máscara?
-        # PyRadiomics falla si le pasamos una máscara vacía (puros 0s)
+        # valisando que sí haya una máscara
         mask_arr = sitk.GetArrayFromImage(sitk.ReadImage(ruta_seg))
         if mask_arr.sum() == 0:
             print(f"  [Aviso] Paciente {paciente} no tiene ganglios anotados. Saltando...")
             continue
 
         try:
+            # extrayendo características
             print(f" -> Procesando paciente: {paciente}")
-            # 3. La magia de PyRadiomics
             resultado = extractor.execute(ruta_ct, ruta_seg, label=255)
 
-            # Limpiamos el diccionario (PyRadiomics devuelve mucha metadata que no necesitamos ahora)
+            # limpiar diccionario, no es necesario conservarlo
             caracteristicas_limpias = {'Paciente_ID': paciente}
             for llave, valor in resultado.items():
-                if llave.startswith('original_'):  # Solo nos interesan las métricas calculadas
-                    # Renombramos para que sea más legible en Excel/Pandas
+                if llave.startswith('original_'):
+                    # renombrar para que sea más legible en excel
                     nombre_corto = llave.replace('original_', '')
                     caracteristicas_limpias[nombre_corto] = float(valor)
 
@@ -61,7 +58,7 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
         except Exception as e:
             print(f"  [Error] Fallo al procesar {paciente}: {e}")
 
-    # 4. Convertir a DataFrame y guardar en Excel/CSV
+    # convertir a dataframe y guardar en csv
     if lista_resultados:
         df = pd.DataFrame(lista_resultados)
         df.to_csv(archivo_salida, index=False)
@@ -72,7 +69,7 @@ def extraer_radiomica(carpeta_origen, archivo_salida):
 
 
 # ==========================================
-# EJECUCIÓN
+# MAIN
 # ==========================================
 if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

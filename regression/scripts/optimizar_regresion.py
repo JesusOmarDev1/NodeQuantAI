@@ -13,7 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 
 def evaluar_varianza(pipe, X, y, cv=5):
-    """Cross-validation R² stats con múltiples métricas."""
+    # cross-validation R^2
     r2 = cross_val_score(pipe, X, y, cv=cv, scoring="r2")
     mae = -cross_val_score(pipe, X, y, cv=cv, scoring="neg_mean_absolute_error")
     return {
@@ -29,10 +29,8 @@ def evaluar_varianza(pipe, X, y, cv=5):
 
 
 def evaluar_kfold(pipe, X, y, n_splits=9, n_repeats=3):
-    """
-    9-Fold CV × n repeticiones (90% train, 10% test).
-    Retorna métricas promediadas y por fold.
-    """
+    #9-Fold CV × n repeticiones (90% train, 10% test)
+    #retorna métricas promediadas y por fold
     all_r2 = []
     all_mae = []
 
@@ -60,7 +58,7 @@ def evaluar_kfold(pipe, X, y, n_splits=9, n_repeats=3):
 
 
 def evaluar_loo(pipe, X, y):
-    """LOO-CV exhaustivo (N folds, 1 muestra test)."""
+    #loo-cv exhaustivo (n folds, 1 muestra test)
     loo = LeaveOneOut()
     r2 = cross_val_score(pipe, X, y, cv=loo, scoring="r2")
     mae = -cross_val_score(pipe, X, y, cv=loo, scoring="neg_mean_absolute_error")
@@ -75,10 +73,8 @@ def evaluar_loo(pipe, X, y):
 
 
 def detectar_overfitting(pipe, X, y, n_splits=9, umbral=15.0):
-    """
-    Compara MAE train vs test en K-Fold para detectar overfitting.
-    Gap% = (test_mae - train_mae) / test_mae × 100
-    """
+    # compara MAE train vs test en K-Fold para detectar overfitting
+    # gap% = (test_mae - train_mae) / test_mae × 100
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     train_maes = []
     test_maes = []
@@ -117,31 +113,28 @@ def detectar_overfitting(pipe, X, y, n_splits=9, umbral=15.0):
     }
 
 # =====================================================================
-#  Selección de Características Avanzada (Wrapper Method)
+#  FEATURE SELECTION (WRAPPER METHOD)
 # =====================================================================
 def seleccionar_features_rfecv(X, y, cv=3, min_features=12):
-    """
-    Utiliza RFECV con un RandomForestRegressor para encontrar el subconjunto
-    óptimo de características que minimiza el error absoluto medio (MAE).
+    #utiliza RFECV con un RFRegressor para encontrar el subconjunto
+    #óptimo de características que minimiza el mae
+
+    #X: dataframe con las features después del filtro
+    #y: array/series con el target
+    #cv: número de particiones para la validación cruzada interna
+    #min_features: número mínimo de columnas a conservar
     
-    Parámetros:
-    - X: DataFrame con las features (después del filtro grueso).
-    - y: Array/Series con el target (ej. Volumen Tumoral).
-    - cv: Número de particiones para la validación cruzada interna.
-    - min_features: Número mínimo de columnas a conservar.
-    
-    Retorna un diccionario con las columnas seleccionadas y el modelo entrenado.
-    """
+    # retorna un diccionario con las columnas seleccionadas y el modelo entrenado.
     print(f"        [RFECV] Evaluando {X.shape[1]} features para encontrar el subset óptimo...")
 
-    # 1. Definir el "Cirujano" (El estimador base)
+    # 1. definir el estimador base
     # Usamos Random Forest porque maneja muy bien las relaciones no lineales
     estimador_base = RandomForestRegressor(n_estimators=50, max_depth=5, random_state=42, n_jobs=2) # Probar None en lugar de -1 por si la compu se congela o tarda mucho
 
-    # 2. Configurar el esquema de validación cruzada
+    # configurar el esquema de validación cruzada
     kf = KFold(n_splits=cv, shuffle=True, random_state=42)
 
-    # 3. Configurar el RFECV
+    # configurar el RFECV
     selector = RFECV(
         estimator=estimador_base,
         step=2,
@@ -151,10 +144,10 @@ def seleccionar_features_rfecv(X, y, cv=3, min_features=12):
         n_jobs=None
     )
 
-    # 4. Entrenar y seleccionar
+    # entrenar y seleccionar
     selector.fit(X, y)
 
-    # 5. Extraer los nombres de las columnas ganadoras
+    # extraer los nombres de las columnas ganadoras
     if hasattr(X, 'columns'):
         features_optimas = X.columns[selector.support_].tolist()
     else:

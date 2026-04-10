@@ -59,7 +59,7 @@ warnings.filterwarnings("ignore")
 #  PARADIGMA ORDINAL (Frank & Hall)
 # ===========================================================================
 class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
-    """Convierte cualquier clasificador en un modelo Ordinal de gravedad clínica."""
+    # convierte cualquier clasificador en un modelo ordinal de gravedad clínica
     def __init__(self, estimator):
         self.estimator = estimator
 
@@ -67,7 +67,7 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
         self.classes_ = np.sort(np.unique(y))
         self.estimators_ = []
         
-        # Entrenar K-1 clasificadores binarios (Ej: P(Riesgo > Bajo), P(Riesgo > Intermedio))
+        # entrenar k-1 clasificadores binarios
         for i in range(len(self.classes_) - 1):
             y_binario = (y > self.classes_[i]).astype(int)
             clon = clone(self.estimator)
@@ -76,25 +76,25 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
         return self
 
     def predict_proba(self, X):
-        # Obtener las probabilidades de "ser mayor que" cada escalón
+        # obtener las probabilidades de ser mayor que cada escalón
         probs_mayor_que = [est.predict_proba(X)[:, 1] for est in self.estimators_]
         probs = np.zeros((X.shape[0], len(self.classes_)))
         
-        # Matemáticas Ordinales de Frank & Hall
-        probs[:, 0] = 1.0 - probs_mayor_que[0] # P(Bajo)
+        # matemáticas ordinales de frank & hall
+        probs[:, 0] = 1.0 - probs_mayor_que[0] # P(bajo)
         for i in range(1, len(self.classes_) - 1):
-            probs[:, i] = probs_mayor_que[i-1] - probs_mayor_que[i] # P(Intermedio)
-        probs[:, -1] = probs_mayor_que[-1] # P(Crítico)
+            probs[:, i] = probs_mayor_que[i-1] - probs_mayor_que[i] # P(intermedio)
+        probs[:, -1] = probs_mayor_que[-1] # P(crítico)
         
-        # Limpieza de ruido matemático (evitar probabilidades negativas minúsculas)
+        # limpieza de ruido matemático para evitar probabilidades negativas minúsculas
         probs = np.clip(probs, 0.0, 1.0)
-        return probs / probs.sum(axis=1, keepdims=True) # Normalizar al 100%
+        return probs / probs.sum(axis=1, keepdims=True) # normalizar al 100%
 
     def predict(self, X):
         return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
 
 # ---------------------------------------------------------------------------
-#  Rutas
+#  RUTAS
 # ---------------------------------------------------------------------------
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RUTA_CSV = os.path.join(base_dir, "db", "ganglios_master.csv")
@@ -105,16 +105,16 @@ os.makedirs(CARPETA_METRICAS, exist_ok=True)
 os.makedirs(CARPETA_PRODUCCION, exist_ok=True)
 
 # ---------------------------------------------------------------------------
-#  Configuracion
+#  CONFIGURACIÓN
 # ---------------------------------------------------------------------------
-N_SPLITS = 5 # Usamos 5 en clasificación para asegurar suficientes casos por clase
+N_SPLITS = 5 # usamos 5 en clasificación para asegurar suficientes casos por clase
 CORR_UMBRAL = 0.03
 INTER_CORR_UMBRAL = 0.98
 
 COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
 NOMBRES_CLASES = ["Bajo", "Intermedio", "Crítico"]
 
-# Estilo global matplotlib
+# estilo global matplotlib
 plt.rcParams.update({
     "figure.facecolor": "white",
     "axes.facecolor": "#FAFAFA",
@@ -125,7 +125,7 @@ plt.rcParams.update({
 
 
 # ===========================================================================
-#  Soft Voting + Red Neuronal
+#  SOFT VOTING + RED NEURONAL
 # ===========================================================================
 def _crear_ordinal_stacking_pipeline():
     estimators = [
@@ -137,17 +137,17 @@ def _crear_ordinal_stacking_pipeline():
         ("cat", CatBoostClassifier(iterations=200, depth=4, learning_rate=0.05, auto_class_weights='Balanced', verbose=0, random_state=42))
     ]
     
-    # El Meta-Algoritmo que aprenderá cuándo confiar en qué modelo
+    # meta-algoritmo
     meta_learner = LogisticRegression(class_weight='balanced', random_state=42)
     
-    # 1. Creamos el Stacking
+    # crear stacking
     stacking = StackingClassifier(
         estimators=estimators,
         final_estimator=meta_learner,
         cv=3, n_jobs=-1
     )
     
-    # 2. Envolvemos el Stacking en la mente Ordinal
+    # evolver el stacking en la mente ordinal
     modelo_ordinal = ClasificadorOrdinalFrankHall(estimator=stacking)
     
     pipe = Pipeline([
@@ -157,18 +157,18 @@ def _crear_ordinal_stacking_pipeline():
         ("model", modelo_ordinal),
     ])
     
-    return pipe, "Stacking Ordinal (XGB+RF+LGBM+CAT -> LR)"
+    return pipe, "Stacking Ordinal (XGB+RF+LGBM -> LR)"
 
 def _extraer_importances_ordinal_stacking(pipe, feature_names):
-    """Extrae la importancia promediando los árboles base dentro del Stacking Ordinal."""
+    # extraee la importancia promediando los árboles base dentro del stacking ordinal
     lasso_step = pipe.named_steps["lasso_filter"]
     surviving_features = np.array(feature_names)[lasso_step.get_support()]
     ordinal_model = pipe.named_steps["model"]
     
     importances = np.zeros(len(surviving_features))
-    # Recorremos cada clasificador binario del Ordinal (P(y>0) y P(y>1))
+    # recorremos cada clasificador binario del ordinal (P(y>0) y P(y>1))
     for stack_clf in ordinal_model.estimators_:
-        # Recorremos los estimadores base del Stacking
+        # recorremos los estimadores base del stacking
         for base_est in stack_clf.estimators_:
             if hasattr(base_est, "feature_importances_"):
                 importances += base_est.feature_importances_
@@ -183,7 +183,7 @@ def _extraer_importances_ordinal_stacking(pipe, feature_names):
 
 
 # ===========================================================================
-#  Feature engineering
+#  FEATURE ENGINEERING
 # ===========================================================================
 def crear_features_derivadas(X):
     Xd = X.copy()
@@ -213,20 +213,20 @@ def crear_features_derivadas(X):
     return Xd
 
 # ===========================================================================
-#  Feature selection (Clasificación)
+#  FEATURE SELECTION
 # ===========================================================================
 def seleccionar_features(X, y_target, usar_rfecv=True):
-    # 1. Filtro grueso (Mutual Information para Clasificación)
+    # mutual informatione
     mi = mutual_info_classif(X, y_target, random_state=42)
     mi_series = pd.Series(mi, index=X.columns)
-    mi_umbral = np.percentile(mi_series.values, 20) # Mantiene el top 80%
+    mi_umbral = np.percentile(mi_series.values, 20) # mantiene el top 80%
     cols_mi = set(mi_series[mi_series > mi_umbral].index)
 
     cols_ok = list(cols_mi)
     if not cols_ok: cols_ok = list(X.columns)
     X_filt = X[cols_ok].copy()
 
-    # 2. Poda de Colinealidad
+    # poda de colinealidad
     corr_matrix = X_filt.corr().abs()
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
     to_drop = [c for c in upper.columns if any(upper[c] > INTER_CORR_UMBRAL)]
@@ -234,24 +234,25 @@ def seleccionar_features(X, y_target, usar_rfecv=True):
 
     cols_ok = list(X_filt.columns)
 
-    # 3. RFECV
+    # RFECV
     if usar_rfecv and len(cols_ok) > 5:
         resultado_rfecv = seleccionar_features_rfecv(X_filt, y_target, cv=3, min_features=5)
         return resultado_rfecv["columnas_seleccionadas"]
     else:
         return cols_ok
 
+
 # ===========================================================================
-#  Preparacion de datos
+#  PRPEPARACIÓN DE LOS DATOS
 # ===========================================================================
 def preparar_datos(df_raw):
     df_raw = df_raw.drop_duplicates(subset="Paciente_ID").reset_index(drop=True)
-    # Fusionamos Moderado (1) y Medio-Alto (2) en "Intermedio" (1), y bajamos Crítico (3) a (2)
+    # fusionamos moderado 1 y medio-alto 2 en intermedio 1, y bajamos crítico 3 a 2
     y_orig = df_raw["target_riesgo"].values
     y = np.where(y_orig == 3, 2, np.where(y_orig >= 1, 1, 0))
     ids = df_raw["Paciente_ID"].values
 
-    # ANTI-DATA LEAKAGE: Eliminar features de forma y targets de regresión continuos
+    # eliminar features de forma y targets de regresión continuos
     shape_cols = [c for c in df_raw.columns if c.startswith("shape_")]
     cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto", "target_eje_largo"] + shape_cols + COLS_CLINICAS
 
@@ -261,15 +262,14 @@ def preparar_datos(df_raw):
 
 
 # ===========================================================================
-#  Entrenamiento y evaluacion
+#  ENTRENAMIENTO Y EVALUACIÓN
 # ===========================================================================
 def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
-    """Utiliza Optimización Bayesiana para encontrar los hiperparámetros perfectos."""
-
+    # pptimización bayesiana para encontrar los hiperparámetros perfectos
     def objective(trial):
         pipe = clone(pipe_tmpl)
 
-        # Optuna afina a los 4 titanes navegando a través del Ordinal y el Stacking
+        # optuna afina a los 4 algoritmos navegando a través del srdinal y el stacking
         pipe.set_params(
             lasso_filter__estimator__C=trial.suggest_float("lasso_C", 0.05, 5.0, log=True),
             model__estimator__rf__max_depth=trial.suggest_int("rf_depth", 3, 7),
@@ -278,7 +278,7 @@ def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
             model__estimator__cat__depth=trial.suggest_int("cat_depth", 3, 6)
         )
 
-        # Try-Except para evitar que Optuna crashee si una combinación destruye los datos
+        # evita que optuna truene si una combinación destruye los datos
         try:
             score = cross_val_score(pipe, X_train, y_train, cv=2, scoring="f1_weighted", n_jobs=-1).mean()
             if np.isnan(score):
@@ -290,7 +290,7 @@ def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
     estudio = optuna.create_study(direction="maximize")
     estudio.optimize(objective, n_trials=n_trials)
 
-    # Reconstruimos el pipeline con los parámetros ganadores (AQUÍ ESTABA EL ERROR)
+    # recosntruimos el pipeline con los parámetros ganadores
     mejor_pipe = clone(pipe_tmpl)
     mejor_pipe.set_params(
         lasso_filter__estimator__C=estudio.best_params["lasso_C"],
@@ -312,7 +312,7 @@ def entrenar_y_evaluar():
 
     pipe_tmpl, nombre_modelo = _crear_ordinal_stacking_pipeline()
 
-    # Variables para guardar predicciones de todo el K-Fold
+    # variables para guardar predicciones de todo el kfold
     all_y_true = []
     all_y_pred = []
     all_y_proba = []
@@ -332,23 +332,21 @@ def entrenar_y_evaluar():
 
         fold_pipe = clone(pipe_tmpl)
 
-        # 1. Búsqueda Inteligente con Optuna (5 intentos precisos por doblez)
+        # búsqueda inteligente con optuna (5 intentos precisos por doblez)
         mejor_pipe_base = optimizar_con_optuna(X_tr, y_tr, fold_pipe, n_trials=5)
 
-        # 2. Calibración de Probabilidades (Platt Scaling / Sigmoid)
-        # Esto afina las probabilidades para que sean clínicamente exactas
+        # calibración de probabilidades (platt scaling / sigmoid)
+        # para afinar las probabilidades para que sean clínicamente exactas
         calibrador = CalibratedClassifierCV(estimator=mejor_pipe_base, method='sigmoid', cv=2)
         calibrador.fit(X_tr, y_tr)
-
-        # El calibrador se convierte en nuestro nuevo fold_pipe
         fold_pipe = calibrador
 
-        # Predicciones de clase y probabilidades
+        # predicciones de clase y probabilidades
         pred_tr = fold_pipe.predict(X_tr)
         pred_te = fold_pipe.predict(X_te)
         proba_te = fold_pipe.predict_proba(X_te)
 
-        # Guardamos para el reporte final global
+        # reporte final global
         all_y_true.extend(y_te)
         all_y_pred.extend(pred_te)
         all_y_proba.extend(proba_te)
@@ -357,19 +355,19 @@ def entrenar_y_evaluar():
         train_accs.append(accuracy_score(y_tr, pred_tr))
 
     # ==========================================================
-    # CÁLCULO DE MÉTRICAS CLÍNICAS GLOBALES (Sobre los 508 casos)
+    # CÁLCULO DE MÉTRICAS CLÍNICAS GLOBALES
     # ==========================================================
     all_y_true = np.array(all_y_true)
     all_y_pred = np.array(all_y_pred)
     all_y_proba = np.array(all_y_proba)
 
-    # 1. Métricas Estándar Multiclase
+    # estándar multiclase
     acc_global = accuracy_score(all_y_true, all_y_pred)
     prec_global = precision_score(all_y_true, all_y_pred, average='weighted')
     rec_global = recall_score(all_y_true, all_y_pred, average='weighted')
     f1_global = f1_score(all_y_true, all_y_pred, average='weighted')
 
-    # 2. Especificidad y NPV (Métricas Clínicas derivadas de Matriz Confusión)
+    # especificidad y NPV derivadas de matriz confusión
     cm = confusion_matrix(all_y_true, all_y_pred)
     FP = cm.sum(axis=0) - np.diag(cm)
     FN = cm.sum(axis=1) - np.diag(cm)
@@ -378,16 +376,16 @@ def entrenar_y_evaluar():
     especificidad = np.mean(TN / np.maximum(TN + FP, 1))
     npv = np.mean(TN / np.maximum(TN + FN, 1))
 
-    # 3. Métricas Probabilísticas y de Calibración
+    # probabilísticas y de calibración
     auc_global = roc_auc_score(all_y_true, all_y_proba, multi_class='ovr', average='weighted')
     mcc_global = matthews_corrcoef(all_y_true, all_y_pred)
     log_loss_global = log_loss(all_y_true, all_y_proba, labels=[0, 1, 2])
 
-    # 4. Métricas de Orden / Severidad
+    # orden / severidad
     kappa_global = cohen_kappa_score(all_y_true, all_y_pred, weights='quadratic')
     mae_ordinal = mean_absolute_error(all_y_true, all_y_pred)
 
-    # 5. Overfitting y Estabilidad
+    # overfitting y estabilidad
     train_f1_mean = np.mean(train_f1s)
     train_acc_mean = np.mean(train_accs)
     gap_f1 = ((train_f1_mean - f1_global) / train_f1_mean * 100) if train_f1_mean > 0 else 0.0
@@ -424,27 +422,27 @@ def entrenar_y_evaluar():
     print(classification_report(all_y_true, all_y_pred, target_names=NOMBRES_CLASES))
 
     # ---------------------------------------------------------------
-    #  Modelo final (Producción)
+    #  MODELO FINAL
     # ---------------------------------------------------------------
     cols_sel_final = seleccionar_features(X_all, y_orig)
     X_final = X_all[cols_sel_final]
 
     pipe_base_final = clone(pipe_tmpl)
 
-    # 1. Optuna exhaustivo para el modelo final (20 intentos de alta precisión)
+    # optuna exhaustivo para el modelo final (20 intentos de alta precisión)
     print("\n  [Optuna] Buscando hiperparámetros óptimos para producción...")
     mejor_pipe_final_base = optimizar_con_optuna(X_final, y_orig, pipe_base_final, n_trials=20)
 
-    # 2. Calibración del modelo maestro
+    # calibración del modelo maestro
     pipe_final = CalibratedClassifierCV(estimator=mejor_pipe_final_base, method='sigmoid', cv=3)
     pipe_final.fit(X_final, y_orig)
 
-    # 3. Extracción de Importancias (Atravesando la envoltura del Calibrador)
+    # extracción de importancias a tráves del calibrador
     pipeline_interno = pipe_final.calibrated_classifiers_[0].estimator
     imp_dict = _extraer_importances_ordinal_stacking(pipeline_interno, list(X_final.columns))
     top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
 
-    # 4. Generación de Gráficas Globales
+    # gráficas globales
     generar_matriz_confusion(all_y_true, all_y_pred)
     generar_grafica_importancias(top_features)
     generar_curvas_roc(all_y_true, all_y_proba)
@@ -453,7 +451,7 @@ def entrenar_y_evaluar():
 
 
     # ---------------------------------------------------------------
-    #  Exportación Joblib
+    #  EXPORTACIÓN JOBLIB
     # ---------------------------------------------------------------
     print(f"\nEXPORTANDO MODELO A PRODUCCIÓN ({CARPETA_PRODUCCION}):")
     ruta_joblib = os.path.join(CARPETA_PRODUCCION, "modelo_riesgo.joblib")
@@ -472,10 +470,10 @@ def entrenar_y_evaluar():
 
     print(f"  [OK] modelo_riesgo.joblib guardado ({len(cols_sel_final)} features)")
 
-    # Generamos el gráfico del árbol
+    # gráfico de árbol
     generar_grafico_arbol(pipe_final, cols_sel_final)
 
-    # Evaluamos pasando el f1 del train para que calcule el Overfitting Holdout
+    # evaluamos pasando el f1 del train para que calcule el overfitting holdout
     predecir_casos_prueba(pipe_final, cols_sel_final, train_f1_mean)
 
 
@@ -504,7 +502,7 @@ def generar_grafica_importancias(top_features):
     plt.close()
 
 def generar_curvas_roc(y_true, y_proba):
-    # Binarizamos las etiquetas para el enfoque Uno-vs-Resto (OVR)
+    # binarizar las etiquetas para el enfoque Uno-vs-Resto (OVR)
     y_bin = label_binarize(y_true, classes=[0, 1, 2])
     plt.figure(figsize=(8, 6))
     colores = ['#2ecc71', '#f1c40f', '#e74c3c']
@@ -580,21 +578,21 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
     y_real = np.where(y_orig_holdout == 3, 2, np.where(y_orig_holdout >= 1, 1, 0))
     ids = df_prueba["Paciente_ID"].values
 
-    # 1. Limpieza anti-data leakage
+    # limpieza anti-data leakage
     shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
     cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto",
                  "target_eje_largo"] + shape_cols + COLS_CLINICAS
     X_prueba = df_prueba.drop(columns=[c for c in cols_drop if c in df_prueba.columns])
 
-    # 2. Magia matemática (Derivadas) y Filtro
+    # features derivadas y filtro
     X_prueba = crear_features_derivadas(X_prueba)
     X_pred = X_prueba.reindex(columns=cols_sel, fill_value=0)
 
-    # 3. Predicciones y Probabilidades
+    # predicciones y probabilidades
     y_pred = modelo.predict(X_pred)
     y_proba = modelo.predict_proba(X_pred)
 
-    # 4. Métricas Holdout
+    # métricas holdout
     acc = accuracy_score(y_real, y_pred)
     f1 = f1_score(y_real, y_pred, average='weighted')
     mae = mean_absolute_error(y_real, y_pred)
@@ -617,7 +615,7 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
         marca = "ACIERTO" if real == pred else "FALLO"
         error_local = abs(real - pred)
 
-        # Formatear las probabilidades
+        # formatear las probabilidades
         p = y_proba[i] * 100
         str_probs = f"Bajo:{p[0]:.0f}% | Int:{p[1]:.0f}% | Cri:{p[2]:.0f}%"
 
@@ -626,11 +624,11 @@ def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
 
 
 def generar_grafico_arbol(modelo, cols_sel):
-    """Extrae y grafica un árbol de decisión del Random Forest dentro del Stacking"""
+    # Extraer y graficar un árbol de decisión del RF
     plt.figure(figsize=(22, 12))
 
     try:
-        # Calibrador -> Pipeline -> Ordinal -> Stacking(Binario 0) -> Random Forest -> Árbol 0
+        # calibrador -> pipeline -> ordinal -> stacking (binario 0) -> RF -> árbol 0
         pipeline_interno = modelo.calibrated_classifiers_[0].estimator
         ordinal_clf = pipeline_interno.named_steps['model']
         stacking_clf = ordinal_clf.estimators_[0] 
@@ -642,7 +640,7 @@ def generar_grafico_arbol(modelo, cols_sel):
                   class_names=NOMBRES_CLASES,
                   filled=True,
                   rounded=True,
-                  max_depth=3,  # Limitamos a 3 niveles para que sea legible
+                  max_depth=3,  # 3 niveles para que sea legible
                   fontsize=10)
 
         plt.title("Lógica de Decisión Radiómica (Voting Classifier)", fontweight="bold", fontsize=16)
@@ -651,7 +649,7 @@ def generar_grafico_arbol(modelo, cols_sel):
     except Exception as e:
         print(f"  [ALERTA] No se pudo generar el gráfico de árbol: {e}")
     finally:
-        plt.close()  # [MEJORA]: Cierre absoluto y seguro de la gráfica en memoria
+        plt.close()  # Cierre seguro
 
 
 def comparar_modelos_individuales():
@@ -659,7 +657,7 @@ def comparar_modelos_individuales():
     print(" TORNEO DE MODELOS BASELINES ")
     print("=" * 70)
 
-    # 1. Preparar datos una sola vez para que la competencia sea justa
+    # preparar datos una sola vez
     df_raw = pd.read_csv(RUTA_CSV)
     X_all, y_orig, ids = preparar_datos(df_raw)
     X_all = crear_features_derivadas(X_all)
@@ -668,7 +666,7 @@ def comparar_modelos_individuales():
     cols_sel = seleccionar_features(X_all, y_orig, usar_rfecv=True)
     X_filt = X_all[cols_sel]
 
-    # Preparar Casos de Prueba (Holdout)
+    # preparar holdout
     if os.path.exists(RUTA_PRUEBA):
         df_prueba = pd.read_csv(RUTA_PRUEBA)
         y_orig_h = df_prueba["target_riesgo"].values
@@ -682,7 +680,7 @@ def comparar_modelos_individuales():
     else:
         df_prueba = None
 
-    # 2. Definir los contendientes
+    #definir los algoritmos baseline
     modelos = {
         "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=7, class_weight='balanced',
                                                 random_state=42, n_jobs=-1),
@@ -700,7 +698,7 @@ def comparar_modelos_individuales():
     diccionario_roc = {}
     diccionario_mae = {}
 
-    # 3. Entrenar y Evaluar cada modelo
+    # entrenar y evaluar cada modelo
     for nombre, modelo in modelos.items():
         print(f"\n\n{'*' * 50}")
         print(f" EVALUANDO: {nombre}")
@@ -715,7 +713,7 @@ def comparar_modelos_individuales():
             X_tr, X_te = X_filt.iloc[train_idx], X_filt.iloc[test_idx]
             y_tr, y_te = y_orig[train_idx], y_orig[test_idx]
 
-            # Escalar datos (vital para SVM, KNN, RegLog)
+            # escalar datos para svm, knn, reglog
             scaler = StandardScaler()
             X_tr_sc = scaler.fit_transform(X_tr)
             X_te_sc = scaler.transform(X_te)
@@ -735,7 +733,7 @@ def comparar_modelos_individuales():
             test_f1s.append(f1_score(y_te, pred_te, average='weighted'))
             train_accs.append(accuracy_score(y_tr, pred_tr))
 
-        # Métricas Globales K-Fold
+        # métricas globales k-fold
         acc = accuracy_score(all_y_true, all_y_pred)
         prec = precision_score(all_y_true, all_y_pred, average='weighted')
         rec = recall_score(all_y_true, all_y_pred, average='weighted')
@@ -751,11 +749,11 @@ def comparar_modelos_individuales():
         t_acc = np.mean(train_accs)
         gap = ((t_f1 - f1) / t_f1 * 100) if t_f1 > 0 else 0.0
 
-        # Guardar para gráficas combinadas
+        # guardar para gráficas combinadas
         diccionario_mae[nombre] = mae
         y_bin = label_binarize(all_y_true, classes=[0, 1, 2])
         all_y_proba = np.array(all_y_proba)
-        # ROC micro-average (ideal para comparar múltiples modelos multiclase de un vistazo)
+        #roc micro-average
         fpr, tpr, _ = roc_curve(y_bin.ravel(), all_y_proba.ravel())
         diccionario_roc[nombre] = (fpr, tpr, auc(fpr, tpr))
 
@@ -776,9 +774,9 @@ def comparar_modelos_individuales():
         print("\nREPORTE DETALLADO POR CATEGORÍA:")
         print(classification_report(all_y_true, all_y_pred, target_names=NOMBRES_CLASES))
 
-        # Evaluación Holdout (Casos de prueba)
+        #evaluación oldout
         if df_prueba is not None:
-            # Entrenar con todo el dataset para la prueba final
+            #entrenar con todo el dataset para la prueba final
             scaler_final = StandardScaler()
             X_filt_sc = scaler_final.fit_transform(X_filt)
             X_prueba_sc = scaler_final.transform(X_prueba)
@@ -801,8 +799,7 @@ def comparar_modelos_individuales():
                 p = y_proba_h[i] * 100
                 print(f"   {marca} {pac}: Real={NOMBRES_CLASES[int(real)]:<10} | Pred={NOMBRES_CLASES[int(pred)]:<10} | Err: {err} | Probs: B:{p[0]:.0f}% Int:{p[1]:.0f}% C:{p[2]:.0f}%")
 
-    # 4. Generar Gráficas Combinadas
-    # Gráfica ROC Combinada
+    #gráfica roc combinada
     plt.figure(figsize=(10, 8))
     for nombre, (fpr, tpr, roc_auc) in diccionario_roc.items():
         plt.plot(fpr, tpr, lw=2, label=f'{nombre} (AUC = {roc_auc:.3f})')
@@ -816,7 +813,7 @@ def comparar_modelos_individuales():
     plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_roc_combinado.png"), dpi=200)
     plt.close()
 
-    # Gráfica MAE Combinada
+    # gráfica mae combinada
     plt.figure(figsize=(10, 6))
     nombres_ordenados = sorted(diccionario_mae, key=diccionario_mae.get)
     maes_ordenados = [diccionario_mae[n] for n in nombres_ordenados]
@@ -835,5 +832,5 @@ def comparar_modelos_individuales():
 
 
 if __name__ == "__main__":
+    comparar_modelos_individuales()
     entrenar_y_evaluar()
-    #comparar_modelos_individuales()

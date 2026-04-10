@@ -136,6 +136,7 @@ Code/
 Mediastinal_Data_Sample/
 Dataset_NIFIT/
 Local/
+cnn/
 
 # Archivos 
 Mediastinal-Lymph-Node-SEG-DA-RAD-nbia-digest.xlsx

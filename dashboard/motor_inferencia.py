@@ -9,30 +9,26 @@ import tempfile
 import SimpleITK as sitk
 from typing import List, Tuple
 
-# --- AJUSTE DE RUTAS ---
 ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ruta_raiz not in sys.path:
     sys.path.insert(0, ruta_raiz)
 
-# Importación absoluta desde la raíz del proyecto
-from regression.scripts.prueba import crear_features_derivadas
+from regression.scripts.modelo_regresion import crear_features_derivadas
 
 
 class MotorInferenciaNodeQuant:
     def __init__(self, ruta_reg, ruta_clf):
-        """
-        Carga los modelos de ambas carpetas de forma independiente.
-        """
+        # carga los modelos de ambas carpetas
         self.ruta_reg = ruta_reg
         self.ruta_clf = ruta_clf
         self.modelos_regresion = {}
         self.modelo_clasificacion = None
         self.python_radiomics_exe = self._resolver_python_radiomics()
 
-        print("Cargando cerebro de NodeQuant AI...")
+        print("Cargando modelos de NodeQuant AI...")
         print(f"  [OK] Intérprete radiomics seleccionado: {self.python_radiomics_exe}")
 
-        # 1. Cargar el modelo de regresión (AHORA SOLO VOLUMEN)
+        # cargar el modelo de regresión
         targets = ["volumen"]
         for t in targets:
             ruta_joblib = os.path.join(self.ruta_reg, f"modelo_{t}.joblib")
@@ -50,7 +46,7 @@ class MotorInferenciaNodeQuant:
             else:
                 print(f"  [ALERTA] Faltan archivos para '{t}' en {self.ruta_reg}")
 
-        # 2. Cargar modelo de Clasificación de Riesgo (Independiente del bucle anterior)
+        # cargar modelo de clasificación
         ruta_clf_joblib = os.path.join(self.ruta_clf, "modelo_riesgo.joblib")
         ruta_clf_json = os.path.join(self.ruta_clf, "metadata_riesgo.json")
 
@@ -66,7 +62,7 @@ class MotorInferenciaNodeQuant:
             print(f"  [ALERTA] Faltan archivos para clasificación en {self.ruta_clf}")
 
     def _probar_radiomics_en_interprete(self, ruta_python: str) -> Tuple[bool, str]:
-        """Verifica que un intérprete pueda importar radiomics."""
+        #verificar que el interprete pueda importar radiomics
         if not ruta_python or not os.path.exists(ruta_python):
             return False, "No existe"
 
@@ -83,32 +79,21 @@ class MotorInferenciaNodeQuant:
         return False, detalle
 
     def _resolver_python_radiomics(self) -> str:
-        """
-        Resuelve el intérprete con fallback para equipos con venv o Anaconda.
-
-        Prioridad:
-        1) Variable de entorno NODEQUANT_PYTHON_RADIOMICS
-        2) venv9 del repositorio
-        3) Python del entorno Conda activo
-        4) Rutas comunes de Anaconda/Miniconda
-        5) Intérprete actual (sys.executable)
-        """
+        #resuelve el intérprete
         candidatos: List[str] = []
 
-        # 1) Override explícito por variable de entorno (evita interferir entre equipos)
+        # override explícito por variable de entorno
         exe_env = os.environ.get("NODEQUANT_PYTHON_RADIOMICS", "").strip()
         if exe_env:
             candidatos.append(exe_env)
 
-        # 2) venv9 local del repositorio
+        # buscando al interprete
         candidatos.append(os.path.join(ruta_raiz, "sic_9", "Scripts", "python.exe"))
 
-        # 3) Entorno Conda activo
         conda_prefix = os.environ.get("CONDA_PREFIX", "").strip()
         if conda_prefix:
             candidatos.append(os.path.join(conda_prefix, "python.exe"))
 
-        # 4) Rutas comunes de Anaconda/Miniconda por usuario actual
         user_home = os.path.expanduser("~")
         bases_conda = ["anaconda3", "miniconda3"]
         envs_conda = ["sic_9", "py39", "venv9", "nodequant", "radiomics", "base"]
@@ -117,10 +102,10 @@ class MotorInferenciaNodeQuant:
             for env_name in envs_conda:
                 candidatos.append(os.path.join(user_home, base, "envs", env_name, "python.exe"))
 
-        # 5) Intérprete actual como último recurso
+        # interprete actual como último recurso
         candidatos.append(sys.executable)
 
-        # Mantener orden y eliminar duplicados
+        # mantener orden y eliminar duplicados
         candidatos_unicos: List[str] = []
         vistos = set()
         for c in candidatos:
@@ -137,16 +122,13 @@ class MotorInferenciaNodeQuant:
             errores.append(f"- {candidato}: {detalle}")
 
         raise RuntimeError(
-            "No se encontró un intérprete válido para PyRadiomics. "
-            "Configura NODEQUANT_PYTHON_RADIOMICS con la ruta de python.exe.\n"
+            "No se encontró un intérprete válido para PyRadiomics"
             + "\n".join(errores)
         )
 
     def generar_visualizacion(self, ruta_imagen, ruta_mascara):
-        """
-        Genera imágenes CT (original + overlay) mediante un subproceso con Python 3.9.
-        Retorna dict con imágenes base64 y metadata, o None si falla.
-        """
+        # genera imágenes CT (original + overlay) con un subproceso con Python 3.9
+        # retorna dict con imágenes base64 y metadata, o None si falla
         script_viz = os.path.join(os.path.dirname(__file__), "visualizador_nifti.py")
 
         if not os.path.exists(script_viz):
@@ -181,9 +163,7 @@ class MotorInferenciaNodeQuant:
             return None
 
     def extraer_radiomica(self, ruta_imagen, ruta_mascara):
-        """
-        Llama al extractor de PyRadiomics mediante un subproceso.
-        """
+        # llama al extractor de PyRadiomics con un subproceso
         script_extractor = os.path.join(os.path.dirname(__file__), "extractor_py39.py")
 
         if not os.path.exists(script_extractor):
@@ -219,7 +199,7 @@ class MotorInferenciaNodeQuant:
         return pd.DataFrame([resultado_json])
 
     def _resamplear_fantasma(self, ruta_in, ruta_out, es_mascara=False):
-        """Re-muestreo a 1x1x1 mm exclusivo para la matemática interna del modelo."""
+        #re-muestreo a 1x1x1 mm para la matemática interna del modelo
         imagen = sitk.ReadImage(ruta_in)
         espaciado_original = imagen.GetSpacing()
         tamano_original = imagen.GetSize()
@@ -248,26 +228,26 @@ class MotorInferenciaNodeQuant:
         sitk.WriteImage(imagen_resampleada, ruta_out)
 
     def predecir_paciente(self, ruta_imagen, ruta_mascara):
-        """Ejecuta todo el pipeline usando copias temporales resampleadas a 1x1x1mm."""
+        #ejecuta todo el pipeline usando copias temporales resampleadas a 1x1x1mm
 
-        # 1. Crear entorno temporal (se autodestruye al terminar)
+        # crear entorno temporal
         with tempfile.TemporaryDirectory() as tmpdir:
             ruta_img_res = os.path.join(tmpdir, "img_1x1x1.nii.gz")
             ruta_mask_res = os.path.join(tmpdir, "mask_1x1x1.nii.gz")
 
-            # 2. Resampling Fantasma
+            # resampling fantasma
             self._resamplear_fantasma(ruta_imagen, ruta_img_res, es_mascara=False)
             self._resamplear_fantasma(ruta_mascara, ruta_mask_res, es_mascara=True)
 
-            # 3. Extracción (USANDO LOS ARCHIVOS RESAMPLEADOS)
+            # extracción de características
             df_crudo = self.extraer_radiomica(ruta_img_res, ruta_mask_res)
 
-        # 4. Derivadas (ya fuera del entorno temporal porque tenemos el DataFrame)
+        # derivadas
         df_procesado = crear_features_derivadas(df_crudo)
 
         resultados_finales = {}
 
-        # 5. Predicciones de Regresión (Volumen)
+        # predicciones de volumen
         for target, info in self.modelos_regresion.items():
             modelo = info["modelo"]
             meta = info["metadata"]
@@ -282,7 +262,7 @@ class MotorInferenciaNodeQuant:
                 "unidad": meta["unidad"]
             }
 
-        # 6. Predicción de Clasificación (Riesgo)
+        # predicción de riesgo
         if self.modelo_clasificacion:
             modelo_clf = self.modelo_clasificacion["modelo"]
             meta_clf = self.modelo_clasificacion["metadata"]
@@ -300,13 +280,12 @@ class MotorInferenciaNodeQuant:
 
 # =====================================================================
 if __name__ == "__main__":
-    # Definimos las rutas absolutas a las dos carpetas de modelos
     RUTA_REG = os.path.join(ruta_raiz, "regression", "joblib")
     RUTA_CLF = os.path.join(ruta_raiz, "classification", "joblib")
 
     motor = MotorInferenciaNodeQuant(RUTA_REG, RUTA_CLF)
 
-    # Rutas de prueba
+    # rutas de prueba
     img_test = os.path.join(ruta_raiz, "db", "casos_prueba", "case_0165", "image.nii.gz")
     mask_test = os.path.join(ruta_raiz, "db", "casos_prueba", "case_0165", "mask.nii.gz")
 
@@ -315,7 +294,6 @@ if __name__ == "__main__":
         reporte = motor.predecir_paciente(img_test, mask_test)
 
         print("\n--- REPORTE CLÍNICO NODEQUANT ---")
-        # El diccionario 'reporte' ahora solo contiene la clave 'volumen' y 'riesgo'
         print(f"Volumen Estimado:   {reporte['volumen']['valor']:,.1f} {reporte['volumen']['unidad']}")
         print(f"Nivel de Riesgo:    {reporte['riesgo']}")
         print("---------------------------------")
