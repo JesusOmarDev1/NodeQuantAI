@@ -1,0 +1,836 @@
+"""
+modelo_clasificacion.py - Clasificación de Riesgo Ganglionar (Multiclase)
+======================================================================
+Modelo: StackingClassifier (XGBoost + Random Forest + Gradient Boosting)
+        Meta-learner: LogisticRegression | StandardScaler + L1 Filter
+Features: radiómicas + derivadas - (shape_* y targets continuos eliminados)
+
+Validación: Stratified 5-Fold CV con optimización de F1-Score Ponderado.
+"""
+
+import os
+import warnings
+import json
+import joblib
+
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import StratifiedKFold
+import optuna
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler, label_binarize
+from sklearn.ensemble import (
+    RandomForestClassifier, GradientBoostingClassifier, StackingClassifier,
+)
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_selection import SelectFromModel, mutual_info_classif
+from sklearn.pipeline import Pipeline
+from sklearn.base import clone, BaseEstimator, ClassifierMixin
+from sklearn.metrics import (
+    f1_score, accuracy_score, classification_report, confusion_matrix,
+    precision_score, recall_score, roc_auc_score, cohen_kappa_score,
+    mean_absolute_error, matthews_corrcoef, log_loss,
+    roc_curve, auc, precision_recall_curve, average_precision_score
+)
+
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import VotingClassifier
+
+# Silenciamos Optuna para que no llene la consola de texto
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+#from classification.scripts.optimizar_classification import seleccionar_features_rfecv
+from optimizar_clasificacion import seleccionar_features_rfecv
+warnings.filterwarnings("ignore")
+
+# ===========================================================================
+#  PARADIGMA ORDINAL (Frank & Hall)
+# ===========================================================================
+class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
+    # convierte cualquier clasificador en un modelo ordinal de gravedad clínica
+    def __init__(self, estimator):
+        self.estimator = estimator
+
+    def fit(self, X, y):
+        self.classes_ = np.sort(np.unique(y))
+        self.estimators_ = []
+        
+        # entrenar k-1 clasificadores binarios
+        for i in range(len(self.classes_) - 1):
+            y_binario = (y > self.classes_[i]).astype(int)
+            clon = clone(self.estimator)
+            clon.fit(X, y_binario)
+            self.estimators_.append(clon)
+        return self
+
+    def predict_proba(self, X):
+        # obtener las probabilidades de ser mayor que cada escalón
+        probs_mayor_que = [est.predict_proba(X)[:, 1] for est in self.estimators_]
+        probs = np.zeros((X.shape[0], len(self.classes_)))
+        
+        # matemáticas ordinales de frank & hall
+        probs[:, 0] = 1.0 - probs_mayor_que[0] # P(bajo)
+        for i in range(1, len(self.classes_) - 1):
+            probs[:, i] = probs_mayor_que[i-1] - probs_mayor_que[i] # P(intermedio)
+        probs[:, -1] = probs_mayor_que[-1] # P(crítico)
+        
+        # limpieza de ruido matemático para evitar probabilidades negativas minúsculas
+        probs = np.clip(probs, 0.0, 1.0)
+        return probs / probs.sum(axis=1, keepdims=True) # normalizar al 100%
+
+    def predict(self, X):
+        return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
+
+# ---------------------------------------------------------------------------
+#  RUTAS
+# ---------------------------------------------------------------------------
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+RUTA_CSV = os.path.join(base_dir, "db", "ganglios_master.csv")
+CARPETA_METRICAS = os.path.join(base_dir, "classification", "metrics")
+CARPETA_PRODUCCION = os.path.join(base_dir, "classification", "joblib")
+RUTA_PRUEBA = os.path.join(base_dir, "db", "casos_prueba.csv")
+os.makedirs(CARPETA_METRICAS, exist_ok=True)
+os.makedirs(CARPETA_PRODUCCION, exist_ok=True)
+
+# ---------------------------------------------------------------------------
+#  CONFIGURACIÓN
+# ---------------------------------------------------------------------------
+N_SPLITS = 5 # usamos 5 en clasificación para asegurar suficientes casos por clase
+CORR_UMBRAL = 0.03
+INTER_CORR_UMBRAL = 0.98
+
+COLS_CLINICAS = ["Body Part Examined", "PatientSex", "PrimaryCondition"]
+NOMBRES_CLASES = ["Bajo", "Intermedio", "Crítico"]
+
+# estilo global matplotlib
+plt.rcParams.update({
+    "figure.facecolor": "white",
+    "axes.facecolor": "#FAFAFA",
+    "axes.edgecolor": "#CCCCCC",
+    "axes.grid": True,
+    "grid.alpha": 0.3,
+})
+
+
+# ===========================================================================
+#  SOFT VOTING + RED NEURONAL
+# ===========================================================================
+def _crear_ordinal_stacking_pipeline():
+    estimators = [
+        ("xgb", XGBClassifier(n_estimators=200, max_depth=3, learning_rate=0.05,
+                              subsample=0.8, colsample_bytree=0.8,
+                              random_state=42, eval_metric='logloss')), # Ajustado a binario
+        ("rf", RandomForestClassifier(n_estimators=200, max_depth=7, class_weight='balanced', random_state=42)),
+        ("lgbm", LGBMClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, class_weight='balanced', random_state=42, verbose=-1)),
+        ("cat", CatBoostClassifier(iterations=200, depth=4, learning_rate=0.05, auto_class_weights='Balanced', verbose=0, random_state=42))
+    ]
+    
+    # meta-algoritmo
+    meta_learner = LogisticRegression(class_weight='balanced', random_state=42)
+    
+    # crear stacking
+    stacking = StackingClassifier(
+        estimators=estimators,
+        final_estimator=meta_learner,
+        cv=3, n_jobs=-1
+    )
+    
+    # evolver el stacking en la mente ordinal
+    modelo_ordinal = ClasificadorOrdinalFrankHall(estimator=stacking)
+    
+    pipe = Pipeline([
+        ("scaler", StandardScaler()),
+        ("lasso_filter", SelectFromModel(
+            LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced', random_state=42, max_iter=5000))),
+        ("model", modelo_ordinal),
+    ])
+    
+    return pipe, "Stacking Ordinal (XGB+RF+LGBM -> LR)"
+
+def _extraer_importances_ordinal_stacking(pipe, feature_names):
+    # extraee la importancia promediando los árboles base dentro del stacking ordinal
+    lasso_step = pipe.named_steps["lasso_filter"]
+    surviving_features = np.array(feature_names)[lasso_step.get_support()]
+    ordinal_model = pipe.named_steps["model"]
+    
+    importances = np.zeros(len(surviving_features))
+    # recorremos cada clasificador binario del ordinal (P(y>0) y P(y>1))
+    for stack_clf in ordinal_model.estimators_:
+        # recorremos los estimadores base del stacking
+        for base_est in stack_clf.estimators_:
+            if hasattr(base_est, "feature_importances_"):
+                importances += base_est.feature_importances_
+                
+    total = importances.sum()
+    if total > 0:
+        importances /= total
+    else:
+        importances = np.ones(len(surviving_features)) / len(surviving_features)
+    return dict(zip(surviving_features, importances))
+
+
+
+# ===========================================================================
+#  FEATURE ENGINEERING
+# ===========================================================================
+def crear_features_derivadas(X):
+    Xd = X.copy()
+    _eps = 1e-9
+    if "firstorder_Energy" in X.columns and "firstorder_Entropy" in X.columns:
+        Xd["ratio_Energy_Entropy"] = X["firstorder_Energy"] / (X["firstorder_Entropy"].abs() + _eps)
+    if "firstorder_Mean" in X.columns and "firstorder_Variance" in X.columns:
+        Xd["ratio_Mean_Variance"] = X["firstorder_Mean"] / (X["firstorder_Variance"].abs() + _eps)
+    if "firstorder_90Percentile" in X.columns and "firstorder_10Percentile" in X.columns:
+        Xd["ratio_90p_10p"] = X["firstorder_90Percentile"] / (X["firstorder_10Percentile"].abs() + _eps)
+    if "glcm_Correlation" in X.columns and "glcm_Contrast" in X.columns:
+        Xd["ratio_Corr_Contrast"] = X["glcm_Correlation"] / (X["glcm_Contrast"].abs() + _eps)
+
+    if "firstorder_Variance" in X.columns and "firstorder_Mean" in X.columns:
+        Xd["cv_intensidad"] = np.sqrt(X["firstorder_Variance"].abs()) / (X["firstorder_Mean"].abs() + _eps)
+    if "firstorder_90Percentile" in X.columns and "firstorder_10Percentile" in X.columns:
+        Xd["rango_interpercentil"] = X["firstorder_90Percentile"] - X["firstorder_10Percentile"]
+
+    if "firstorder_Energy" in X.columns:
+        Xd["log_Energy"] = np.log1p(X["firstorder_Energy"].abs())
+    if "firstorder_Variance" in X.columns:
+        Xd["log_Variance"] = np.log1p(X["firstorder_Variance"].abs())
+
+    Xd = Xd.replace([np.inf, -np.inf], np.nan)
+    Xd = Xd.fillna(0)
+
+    return Xd
+
+# ===========================================================================
+#  FEATURE SELECTION
+# ===========================================================================
+def seleccionar_features(X, y_target, usar_rfecv=True):
+    # mutual informatione
+    mi = mutual_info_classif(X, y_target, random_state=42)
+    mi_series = pd.Series(mi, index=X.columns)
+    mi_umbral = np.percentile(mi_series.values, 20) # mantiene el top 80%
+    cols_mi = set(mi_series[mi_series > mi_umbral].index)
+
+    cols_ok = list(cols_mi)
+    if not cols_ok: cols_ok = list(X.columns)
+    X_filt = X[cols_ok].copy()
+
+    # poda de colinealidad
+    corr_matrix = X_filt.corr().abs()
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    to_drop = [c for c in upper.columns if any(upper[c] > INTER_CORR_UMBRAL)]
+    X_filt = X_filt.drop(columns=to_drop)
+
+    cols_ok = list(X_filt.columns)
+
+    # RFECV
+    if usar_rfecv and len(cols_ok) > 5:
+        resultado_rfecv = seleccionar_features_rfecv(X_filt, y_target, cv=3, min_features=5)
+        return resultado_rfecv["columnas_seleccionadas"]
+    else:
+        return cols_ok
+
+
+# ===========================================================================
+#  PRPEPARACIÓN DE LOS DATOS
+# ===========================================================================
+def preparar_datos(df_raw):
+    df_raw = df_raw.drop_duplicates(subset="Paciente_ID").reset_index(drop=True)
+    # fusionamos moderado 1 y medio-alto 2 en intermedio 1, y bajamos crítico 3 a 2
+    y_orig = df_raw["target_riesgo"].values
+    y = np.where(y_orig == 3, 2, np.where(y_orig >= 1, 1, 0))
+    ids = df_raw["Paciente_ID"].values
+
+    # eliminar features de forma y targets de regresión continuos
+    shape_cols = [c for c in df_raw.columns if c.startswith("shape_")]
+    cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto", "target_eje_largo"] + shape_cols + COLS_CLINICAS
+
+    X = df_raw.drop(columns=[c for c in cols_drop if c in df_raw.columns])
+
+    return X, y, ids
+
+
+# ===========================================================================
+#  ENTRENAMIENTO Y EVALUACIÓN
+# ===========================================================================
+def optimizar_con_optuna(X_train, y_train, pipe_tmpl, n_trials=10):
+    # pptimización bayesiana para encontrar los hiperparámetros perfectos
+    def objective(trial):
+        pipe = clone(pipe_tmpl)
+
+        # optuna afina a los 4 algoritmos navegando a través del srdinal y el stacking
+        pipe.set_params(
+            lasso_filter__estimator__C=trial.suggest_float("lasso_C", 0.05, 5.0, log=True),
+            model__estimator__rf__max_depth=trial.suggest_int("rf_depth", 3, 7),
+            model__estimator__xgb__learning_rate=trial.suggest_float("xgb_lr", 0.01, 0.1, log=True),
+            model__estimator__lgbm__learning_rate=trial.suggest_float("lgbm_lr", 0.01, 0.1, log=True),
+            model__estimator__cat__depth=trial.suggest_int("cat_depth", 3, 6)
+        )
+
+        # evita que optuna truene si una combinación destruye los datos
+        try:
+            score = cross_val_score(pipe, X_train, y_train, cv=2, scoring="f1_weighted", n_jobs=-1).mean()
+            if np.isnan(score):
+                return 0.0
+            return score
+        except Exception:
+            return 0.0
+
+    estudio = optuna.create_study(direction="maximize")
+    estudio.optimize(objective, n_trials=n_trials)
+
+    # recosntruimos el pipeline con los parámetros ganadores
+    mejor_pipe = clone(pipe_tmpl)
+    mejor_pipe.set_params(
+        lasso_filter__estimator__C=estudio.best_params["lasso_C"],
+        model__estimator__rf__max_depth=estudio.best_params["rf_depth"],
+        model__estimator__xgb__learning_rate=estudio.best_params["xgb_lr"],
+        model__estimator__lgbm__learning_rate=estudio.best_params["lgbm_lr"],
+        model__estimator__cat__depth=estudio.best_params["cat_depth"]
+    )
+    return mejor_pipe
+
+
+def entrenar_y_evaluar():
+    df_raw = pd.read_csv(RUTA_CSV)
+    X_all, y_orig, ids = preparar_datos(df_raw)
+    X_all = crear_features_derivadas(X_all)
+
+    print(f"\nMODELADO PREDICTIVO (SVoting + MLP + Optuna + PScaling + LGBM + CAT)")
+    print(f"  Dataset: {len(X_all)} pacientes | {X_all.shape[1]} features iniciales")
+
+    pipe_tmpl, nombre_modelo = _crear_ordinal_stacking_pipeline()
+
+    # variables para guardar predicciones de todo el kfold
+    all_y_true = []
+    all_y_pred = []
+    all_y_proba = []
+    train_f1s = []
+    test_f1s = []
+    train_accs = []
+
+    skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=42)
+
+    for train_idx, test_idx in skf.split(X_all, y_orig):
+        X_tr_completo, X_te_completo = X_all.iloc[train_idx], X_all.iloc[test_idx]
+        y_tr, y_te = y_orig[train_idx], y_orig[test_idx]
+
+        cols_sel_fold = seleccionar_features(X_tr_completo, y_tr)
+        X_tr = X_tr_completo[cols_sel_fold]
+        X_te = X_te_completo[cols_sel_fold]
+
+        fold_pipe = clone(pipe_tmpl)
+
+        # búsqueda inteligente con optuna (5 intentos precisos por doblez)
+        mejor_pipe_base = optimizar_con_optuna(X_tr, y_tr, fold_pipe, n_trials=5)
+
+        # calibración de probabilidades (platt scaling / sigmoid)
+        # para afinar las probabilidades para que sean clínicamente exactas
+        calibrador = CalibratedClassifierCV(estimator=mejor_pipe_base, method='sigmoid', cv=2)
+        calibrador.fit(X_tr, y_tr)
+        fold_pipe = calibrador
+
+        # predicciones de clase y probabilidades
+        pred_tr = fold_pipe.predict(X_tr)
+        pred_te = fold_pipe.predict(X_te)
+        proba_te = fold_pipe.predict_proba(X_te)
+
+        # reporte final global
+        all_y_true.extend(y_te)
+        all_y_pred.extend(pred_te)
+        all_y_proba.extend(proba_te)
+        train_f1s.append(f1_score(y_tr, pred_tr, average='weighted'))
+        test_f1s.append(f1_score(y_te, pred_te, average='weighted'))
+        train_accs.append(accuracy_score(y_tr, pred_tr))
+
+    # ==========================================================
+    # CÁLCULO DE MÉTRICAS CLÍNICAS GLOBALES
+    # ==========================================================
+    all_y_true = np.array(all_y_true)
+    all_y_pred = np.array(all_y_pred)
+    all_y_proba = np.array(all_y_proba)
+
+    # estándar multiclase
+    acc_global = accuracy_score(all_y_true, all_y_pred)
+    prec_global = precision_score(all_y_true, all_y_pred, average='weighted')
+    rec_global = recall_score(all_y_true, all_y_pred, average='weighted')
+    f1_global = f1_score(all_y_true, all_y_pred, average='weighted')
+
+    # especificidad y NPV derivadas de matriz confusión
+    cm = confusion_matrix(all_y_true, all_y_pred)
+    FP = cm.sum(axis=0) - np.diag(cm)
+    FN = cm.sum(axis=1) - np.diag(cm)
+    TP = np.diag(cm)
+    TN = cm.sum() - (FP + FN + TP)
+    especificidad = np.mean(TN / np.maximum(TN + FP, 1))
+    npv = np.mean(TN / np.maximum(TN + FN, 1))
+
+    # probabilísticas y de calibración
+    auc_global = roc_auc_score(all_y_true, all_y_proba, multi_class='ovr', average='weighted')
+    mcc_global = matthews_corrcoef(all_y_true, all_y_pred)
+    log_loss_global = log_loss(all_y_true, all_y_proba, labels=[0, 1, 2])
+
+    # orden / severidad
+    kappa_global = cohen_kappa_score(all_y_true, all_y_pred, weights='quadratic')
+    mae_ordinal = mean_absolute_error(all_y_true, all_y_pred)
+
+    # overfitting y estabilidad
+    train_f1_mean = np.mean(train_f1s)
+    train_acc_mean = np.mean(train_accs)
+    gap_f1 = ((train_f1_mean - f1_global) / train_f1_mean * 100) if train_f1_mean > 0 else 0.0
+
+    print(f"\n" + "=" * 65)
+    print(f"       PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS (10-Fold)")
+    print(f"=" * 65)
+    print(f" [Métricas de Clasificación Médica]")
+    print(f"  • Exactitud (Accuracy)      : {acc_global:.4f} ")
+    print(f"  • Precisión Ponderada       : {prec_global:.4f} ")
+    print(f"  • Sensibilidad (Recall)     : {rec_global:.4f} ")
+    print(f"  • Especificidad Macro       : {especificidad:.4f} ")
+    print(f"  • Valor Predictivo Neg. NPV : {npv:.4f}")
+    print(f"  • F1-Score Ponderado        : {f1_global:.4f}")
+    print(f"")
+    print(f" [Métricas de Probabilidad y Robustez Estadistica]")
+    print(f"  • ROC-AUC (OVR)             : {auc_global:.4f}")
+    print(f"  • Coeficiente Matthews (MCC): {mcc_global:.4f}")
+    print(f"  • Log Loss (Cross-Entropy)  : {log_loss_global:.4f}")
+    print(f"")
+    print(f" [Métricas de Gravedad Ordinal]")
+    print(f"  • Índice Kappa Cuadrático   : {kappa_global:.4f}")
+    print(f"  • MAE Categórico (Escalones): {mae_ordinal:.4f}")
+    print(f"")
+    print(f" [Diagnóstico de Aprendizaje y Sobreajuste]")
+    print(f"  • Train F1-Score            : {train_f1_mean:.4f}")
+    print(f"  • Test F1-Score             : {f1_global:.4f}")
+    print(f"  • Train Accuracy            : {train_acc_mean:.4f}")
+    print(f"  • Test Accuracy             : {acc_global:.4f}")
+    print(f"  • Gap de Sobreajuste (F1)   : {gap_f1:.1f}%")
+    print(f"=" * 65)
+
+    print("\nREPORTE DETALLADO POR CATEGORÍA:")
+    print(classification_report(all_y_true, all_y_pred, target_names=NOMBRES_CLASES))
+
+    # ---------------------------------------------------------------
+    #  MODELO FINAL
+    # ---------------------------------------------------------------
+    cols_sel_final = seleccionar_features(X_all, y_orig)
+    X_final = X_all[cols_sel_final]
+
+    pipe_base_final = clone(pipe_tmpl)
+
+    # optuna exhaustivo para el modelo final (20 intentos de alta precisión)
+    print("\n  [Optuna] Buscando hiperparámetros óptimos para producción...")
+    mejor_pipe_final_base = optimizar_con_optuna(X_final, y_orig, pipe_base_final, n_trials=20)
+
+    # calibración del modelo maestro
+    pipe_final = CalibratedClassifierCV(estimator=mejor_pipe_final_base, method='sigmoid', cv=3)
+    pipe_final.fit(X_final, y_orig)
+
+    # extracción de importancias a tráves del calibrador
+    pipeline_interno = pipe_final.calibrated_classifiers_[0].estimator
+    imp_dict = _extraer_importances_ordinal_stacking(pipeline_interno, list(X_final.columns))
+    top_features = sorted(imp_dict.items(), key=lambda x: x[1], reverse=True)[:10]
+
+    # gráficas globales
+    generar_matriz_confusion(all_y_true, all_y_pred)
+    generar_grafica_importancias(top_features)
+    generar_curvas_roc(all_y_true, all_y_proba)
+    generar_curvas_pr(all_y_true, all_y_proba)
+    generar_grafica_overfitting(train_f1s, test_f1s)
+
+
+    # ---------------------------------------------------------------
+    #  EXPORTACIÓN JOBLIB
+    # ---------------------------------------------------------------
+    print(f"\nEXPORTANDO MODELO A PRODUCCIÓN ({CARPETA_PRODUCCION}):")
+    ruta_joblib = os.path.join(CARPETA_PRODUCCION, "modelo_riesgo.joblib")
+    joblib.dump(pipe_final, ruta_joblib)
+
+    metadata = {
+        "target": "riesgo",
+        "unidad": "Categoria",
+        "use_log": False,
+        "n_features_esperadas": len(cols_sel_final),
+        "features_entrada": cols_sel_final
+    }
+    ruta_json = os.path.join(CARPETA_PRODUCCION, "metadata_riesgo.json")
+    with open(ruta_json, 'w') as f:
+        json.dump(metadata, f, indent=4)
+
+    print(f"  [OK] modelo_riesgo.joblib guardado ({len(cols_sel_final)} features)")
+
+    # gráfico de árbol
+    generar_grafico_arbol(pipe_final, cols_sel_final)
+
+    # evaluamos pasando el f1 del train para que calcule el overfitting holdout
+    predecir_casos_prueba(pipe_final, cols_sel_final, train_f1_mean)
+
+
+
+def generar_matriz_confusion(y_true, y_pred):
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=NOMBRES_CLASES, yticklabels=NOMBRES_CLASES)
+    plt.title("Matriz de Confusión - Predicción de Riesgo Ganglionar", fontweight="bold")
+    plt.ylabel('Valor Real')
+    plt.xlabel('Predicción del Modelo')
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "matriz_confusion.png"), dpi=150)
+    plt.close()
+
+def generar_grafica_importancias(top_features):
+    nombres = [f for f, v in top_features]
+    valores = [v for f, v in top_features]
+    plt.figure(figsize=(10, 6))
+    plt.barh(nombres[::-1], valores[::-1], color='#3498db', edgecolor='white')
+    plt.title("Top 10 Características Radiómicas para predecir Riesgo", fontweight="bold")
+    plt.xlabel("Importancia Ponderada")
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "feature_importance_class.png"), dpi=150)
+    plt.close()
+
+def generar_curvas_roc(y_true, y_proba):
+    # binarizar las etiquetas para el enfoque Uno-vs-Resto (OVR)
+    y_bin = label_binarize(y_true, classes=[0, 1, 2])
+    plt.figure(figsize=(8, 6))
+    colores = ['#2ecc71', '#f1c40f', '#e74c3c']
+
+    for i, color in zip(range(3), colores):
+        fpr, tpr, _ = roc_curve(y_bin[:, i], y_proba[:, i])
+        roc_auc = auc(fpr, tpr)
+        plt.plot(fpr, tpr, color=color, lw=2,
+                 label=f'{NOMBRES_CLASES[i]} (AUC = {roc_auc:.2f})')
+
+    plt.plot([0, 1], [0, 1], 'k--', lw=1.5, alpha=0.5)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Tasa de Falsos Positivos (FPR)')
+    plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
+    plt.title('Curvas ROC Multiclase (OVR)', fontweight="bold")
+    plt.legend(loc="lower right")
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "curvas_roc.png"), dpi=150)
+    plt.close()
+
+
+def generar_curvas_pr(y_true, y_proba):
+    y_bin = label_binarize(y_true, classes=[0, 1, 2])
+    plt.figure(figsize=(8, 6))
+    colores = ['#2ecc71', '#f1c40f', '#e74c3c']
+
+    for i, color in zip(range(3), colores):
+        precision, recall, _ = precision_recall_curve(y_bin[:, i], y_proba[:, i])
+        avg_pr = average_precision_score(y_bin[:, i], y_proba[:, i])
+        plt.plot(recall, precision, color=color, lw=2,
+                 label=f'{NOMBRES_CLASES[i]} (Avg PR = {avg_pr:.2f})')
+
+    plt.xlabel('Recall (Sensibilidad)')
+    plt.ylabel('Precisión')
+    plt.title('Curvas Precision-Recall', fontweight="bold")
+    plt.legend(loc="lower left")
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "curvas_pr.png"), dpi=150)
+    plt.close()
+
+
+def generar_grafica_overfitting(train_f1s, test_f1s):
+    folds = np.arange(1, len(train_f1s) + 1)
+    plt.figure(figsize=(8, 5))
+    plt.plot(folds, train_f1s, 'o-', color='#2ecc71', linewidth=2, label='Train F1-Score')
+    plt.plot(folds, test_f1s, 's-', color='#e74c3c', linewidth=2, label='Test F1-Score')
+
+    plt.fill_between(folds, train_f1s, test_f1s, color='#e74c3c', alpha=0.1, label='Gap (Sobreajuste)')
+    plt.title('Análisis de Sobreajuste por K-Fold', fontweight="bold")
+    plt.xlabel('Número de Fold')
+    plt.ylabel('F1-Score Ponderado')
+    plt.xticks(folds)
+    plt.ylim([0.4, 1.05])
+    plt.legend(loc="lower left")
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "analisis_overfitting.png"), dpi=150)
+    plt.close()
+
+
+def predecir_casos_prueba(modelo, cols_sel, train_f1=None):
+    if not os.path.exists(RUTA_PRUEBA):
+        print(f"\n[!] Archivo de casos de prueba no encontrado en: {RUTA_PRUEBA}")
+        return
+
+    df_prueba = pd.read_csv(RUTA_PRUEBA)
+    print(f"\n" + "=" * 70)
+    print(f" VERIFICACIÓN HOLDOUT EN CASOS DE PRUEBA ({len(df_prueba)} pacientes)")
+    print(f"======================================================================")
+
+    y_orig_holdout = df_prueba["target_riesgo"].values
+    y_real = np.where(y_orig_holdout == 3, 2, np.where(y_orig_holdout >= 1, 1, 0))
+    ids = df_prueba["Paciente_ID"].values
+
+    # limpieza anti-data leakage
+    shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
+    cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto",
+                 "target_eje_largo"] + shape_cols + COLS_CLINICAS
+    X_prueba = df_prueba.drop(columns=[c for c in cols_drop if c in df_prueba.columns])
+
+    # features derivadas y filtro
+    X_prueba = crear_features_derivadas(X_prueba)
+    X_pred = X_prueba.reindex(columns=cols_sel, fill_value=0)
+
+    # predicciones y probabilidades
+    y_pred = modelo.predict(X_pred)
+    y_proba = modelo.predict_proba(X_pred)
+
+    # métricas holdout
+    acc = accuracy_score(y_real, y_pred)
+    f1 = f1_score(y_real, y_pred, average='weighted')
+    mae = mean_absolute_error(y_real, y_pred)
+    logloss = log_loss(y_real, y_proba, labels=[0, 1, 2])
+
+    print(f"  [Métricas de Rendimiento Global Holdout]")
+    print(f"  • Exactitud (Accuracy) : {acc:.4f}")
+    print(f"  • F1-Score Ponderado   : {f1:.4f}")
+    print(f"  • Log Loss (Certeza)   : {logloss:.4f}")
+    print(f"  • Error Medio Global   : {mae:.6f} escalones de riesgo en promedio")
+
+    if train_f1 is not None:
+        gap_holdout = ((train_f1 - f1) / train_f1) * 100
+        print(f"  • Overfitting Holdout  : {gap_holdout:.1f}% (Caída respecto al Train)")
+
+    print("\n  [Análisis Forense por Paciente]")
+    for i, (pac, real, pred) in enumerate(zip(ids, y_real, y_pred)):
+        r_nom = NOMBRES_CLASES[int(real)]
+        p_nom = NOMBRES_CLASES[int(pred)]
+        marca = "ACIERTO" if real == pred else "FALLO"
+        error_local = abs(real - pred)
+
+        # formatear las probabilidades
+        p = y_proba[i] * 100
+        str_probs = f"Bajo:{p[0]:.0f}% | Int:{p[1]:.0f}% | Cri:{p[2]:.0f}%"
+
+        print(f"   {pac} -> {marca} | Real: {r_nom:<10} | Pred: {p_nom:<10}")
+        print(f"        ↳ Error: {error_local} escalón(es) | {str_probs}")
+
+
+def generar_grafico_arbol(modelo, cols_sel):
+    # Extraer y graficar un árbol de decisión del RF
+    plt.figure(figsize=(22, 12))
+
+    try:
+        # calibrador -> pipeline -> ordinal -> stacking (binario 0) -> RF -> árbol 0
+        pipeline_interno = modelo.calibrated_classifiers_[0].estimator
+        ordinal_clf = pipeline_interno.named_steps['model']
+        stacking_clf = ordinal_clf.estimators_[0] 
+        rf_clf = stacking_clf.named_estimators_['rf']
+        arbol_ejemplo = rf_clf.estimators_[0]
+
+        plot_tree(arbol_ejemplo,
+                  feature_names=cols_sel,
+                  class_names=NOMBRES_CLASES,
+                  filled=True,
+                  rounded=True,
+                  max_depth=3,  # 3 niveles para que sea legible
+                  fontsize=10)
+
+        plt.title("Lógica de Decisión Radiómica (Voting Classifier)", fontweight="bold", fontsize=16)
+        plt.tight_layout()
+        plt.savefig(os.path.join(CARPETA_METRICAS, "arbol_decision.png"), dpi=200)
+    except Exception as e:
+        print(f"  [ALERTA] No se pudo generar el gráfico de árbol: {e}")
+    finally:
+        plt.close()  # Cierre seguro
+
+
+def comparar_modelos_individuales():
+    print("\n" + "=" * 70)
+    print(" TORNEO DE MODELOS BASELINES ")
+    print("=" * 70)
+
+    # preparar datos una sola vez
+    df_raw = pd.read_csv(RUTA_CSV)
+    X_all, y_orig, ids = preparar_datos(df_raw)
+    X_all = crear_features_derivadas(X_all)
+
+    print("Seleccionando las mejores características (RFECV) para el torneo...")
+    cols_sel = seleccionar_features(X_all, y_orig, usar_rfecv=True)
+    X_filt = X_all[cols_sel]
+
+    # preparar holdout
+    if os.path.exists(RUTA_PRUEBA):
+        df_prueba = pd.read_csv(RUTA_PRUEBA)
+        y_orig_h = df_prueba["target_riesgo"].values
+        y_real_holdout = np.where(y_orig_h == 3, 2, np.where(y_orig_h >= 1, 1, 0))
+        ids_holdout = df_prueba["Paciente_ID"].values
+        shape_cols = [c for c in df_prueba.columns if c.startswith("shape_")]
+        cols_drop = ["Paciente_ID", "target_riesgo", "target_regresion", "target_eje_corto",
+                     "target_eje_largo"] + shape_cols + COLS_CLINICAS
+        X_prueba = df_prueba.drop(columns=[c for c in cols_drop if c in df_prueba.columns])
+        X_prueba = crear_features_derivadas(X_prueba).reindex(columns=cols_sel, fill_value=0)
+    else:
+        df_prueba = None
+
+    #definir los algoritmos baseline
+    modelos = {
+        "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=7, class_weight='balanced',
+                                                random_state=42, n_jobs=-1),
+        "Decision Tree": DecisionTreeClassifier(max_depth=7, class_weight='balanced', random_state=42),
+        "SVM (SVC)": SVC(kernel='rbf', probability=True, class_weight='balanced', random_state=42),
+        "Reg. Logística": LogisticRegression(max_iter=2000, class_weight='balanced', solver='saga', random_state=42),
+        "XGBoost": XGBClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, random_state=42,
+                                 eval_metric='mlogloss', n_jobs=-1),
+        "Gradient Boost": GradientBoostingClassifier(n_estimators=200, max_depth=3, learning_rate=0.05,
+                                                     random_state=42),
+        "KNN": KNeighborsClassifier(n_neighbors=5, weights='distance', n_jobs=-1),
+        "Naive Bayes": GaussianNB()
+    }
+
+    diccionario_roc = {}
+    diccionario_mae = {}
+
+    # entrenar y evaluar cada modelo
+    for nombre, modelo in modelos.items():
+        print(f"\n\n{'*' * 50}")
+        print(f" EVALUANDO: {nombre}")
+        print(f"{'*' * 50}")
+
+        skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=42)
+
+        all_y_true, all_y_pred, all_y_proba = [], [], []
+        train_f1s, test_f1s, train_accs = [], [], []
+
+        for train_idx, test_idx in skf.split(X_filt, y_orig):
+            X_tr, X_te = X_filt.iloc[train_idx], X_filt.iloc[test_idx]
+            y_tr, y_te = y_orig[train_idx], y_orig[test_idx]
+
+            # escalar datos para svm, knn, reglog
+            scaler = StandardScaler()
+            X_tr_sc = scaler.fit_transform(X_tr)
+            X_te_sc = scaler.transform(X_te)
+
+            clon = clone(modelo)
+            clon.fit(X_tr_sc, y_tr)
+
+            pred_tr = clon.predict(X_tr_sc)
+            pred_te = clon.predict(X_te_sc)
+            proba_te = clon.predict_proba(X_te_sc)
+
+            all_y_true.extend(y_te)
+            all_y_pred.extend(pred_te)
+            all_y_proba.extend(proba_te)
+
+            train_f1s.append(f1_score(y_tr, pred_tr, average='weighted'))
+            test_f1s.append(f1_score(y_te, pred_te, average='weighted'))
+            train_accs.append(accuracy_score(y_tr, pred_tr))
+
+        # métricas globales k-fold
+        acc = accuracy_score(all_y_true, all_y_pred)
+        prec = precision_score(all_y_true, all_y_pred, average='weighted')
+        rec = recall_score(all_y_true, all_y_pred, average='weighted')
+        f1 = f1_score(all_y_true, all_y_pred, average='weighted')
+        mae = mean_absolute_error(all_y_true, all_y_pred)
+
+        cm = confusion_matrix(all_y_true, all_y_pred)
+        FN = cm.sum(axis=1) - np.diag(cm)
+        TN = cm.sum() - (cm.sum(axis=0) - np.diag(cm) + FN + np.diag(cm))
+        npv = np.mean(TN / np.maximum(TN + FN, 1))
+
+        t_f1 = np.mean(train_f1s)
+        t_acc = np.mean(train_accs)
+        gap = ((t_f1 - f1) / t_f1 * 100) if t_f1 > 0 else 0.0
+
+        # guardar para gráficas combinadas
+        diccionario_mae[nombre] = mae
+        y_bin = label_binarize(all_y_true, classes=[0, 1, 2])
+        all_y_proba = np.array(all_y_proba)
+        #roc micro-average
+        fpr, tpr, _ = roc_curve(y_bin.ravel(), all_y_proba.ravel())
+        diccionario_roc[nombre] = (fpr, tpr, auc(fpr, tpr))
+
+        print(f" [Métricas de Clasificación Médica]")
+        print(f"  • Exactitud (Accuracy)      : {acc:.4f}")
+        print(f"  • Precisión Ponderada       : {prec:.4f}")
+        print(f"  • Sensibilidad (Recall)     : {rec:.4f}")
+        print(f"  • Valor Predictivo Neg. NPV : {npv:.4f}")
+        print(f"  • F1-Score Ponderado        : {f1:.4f}")
+        print(f"  • MAE Categórico (Escalones): {mae:.4f}")
+        print(f"\n [Diagnóstico de Aprendizaje y Sobreajuste]")
+        print(f"  • Train F1-Score            : {t_f1:.4f}")
+        print(f"  • Test F1-Score             : {f1:.4f}")
+        print(f"  • Train Accuracy            : {t_acc:.4f}")
+        print(f"  • Test Accuracy             : {acc:.4f}")
+        print(f"  • Gap de Sobreajuste (F1)   : {gap:.1f}%")
+
+        print("\nREPORTE DETALLADO POR CATEGORÍA:")
+        print(classification_report(all_y_true, all_y_pred, target_names=NOMBRES_CLASES))
+
+        #evaluación oldout
+        if df_prueba is not None:
+            #entrenar con todo el dataset para la prueba final
+            scaler_final = StandardScaler()
+            X_filt_sc = scaler_final.fit_transform(X_filt)
+            X_prueba_sc = scaler_final.transform(X_prueba)
+
+            modelo_final = clone(modelo)
+            modelo_final.fit(X_filt_sc, y_orig)
+
+            y_pred_h = modelo_final.predict(X_prueba_sc)
+            y_proba_h = modelo_final.predict_proba(X_prueba_sc)
+
+            acc_h = accuracy_score(y_real_holdout, y_pred_h)
+            f1_h = f1_score(y_real_holdout, y_pred_h, average='weighted')
+            mae_h = mean_absolute_error(y_real_holdout, y_pred_h)
+
+            print(f"\n [VERIFICACIÓN EN CASOS DE PRUEBA]")
+            print(f"  • Exactitud: {acc_h:.4f} | F1: {f1_h:.4f} | MAE Promedio: {mae_h:.2f} escalones")
+            for i, (pac, real, pred) in enumerate(zip(ids_holdout, y_real_holdout, y_pred_h)):
+                marca = "CORRECTO" if real == pred else "INCORRECTO"
+                err = abs(real - pred)
+                p = y_proba_h[i] * 100
+                print(f"   {marca} {pac}: Real={NOMBRES_CLASES[int(real)]:<10} | Pred={NOMBRES_CLASES[int(pred)]:<10} | Err: {err} | Probs: B:{p[0]:.0f}% Int:{p[1]:.0f}% C:{p[2]:.0f}%")
+
+    #gráfica roc combinada
+    plt.figure(figsize=(10, 8))
+    for nombre, (fpr, tpr, roc_auc) in diccionario_roc.items():
+        plt.plot(fpr, tpr, lw=2, label=f'{nombre} (AUC = {roc_auc:.3f})')
+    plt.plot([0, 1], [0, 1], 'k--', lw=1.5, alpha=0.5)
+    plt.xlabel('Tasa de Falsos Positivos (FPR)')
+    plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
+    plt.title('Comparativa ROC-AUC (Micro-Average) de Todos los Modelos', fontweight="bold")
+    plt.legend(loc="lower right")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_roc_combinado.png"), dpi=200)
+    plt.close()
+
+    # gráfica mae combinada
+    plt.figure(figsize=(10, 6))
+    nombres_ordenados = sorted(diccionario_mae, key=diccionario_mae.get)
+    maes_ordenados = [diccionario_mae[n] for n in nombres_ordenados]
+
+    barras = plt.barh(nombres_ordenados, maes_ordenados, color='#3498db', edgecolor='white')
+    for barra, valor in zip(barras, maes_ordenados):
+        plt.text(valor + 0.005, barra.get_y() + barra.get_height() / 2, f'{valor:.3f}', va='center')
+    plt.xlabel('Error Medio Absoluto (MAE) en Escalones de Riesgo')
+    plt.title('Comparativa de Error de Gravedad', fontweight="bold")
+    plt.tight_layout()
+    plt.savefig(os.path.join(CARPETA_METRICAS, "torneo_mae_combinado.png"), dpi=200)
+    plt.close()
+
+    print(f"\n[!] Torneo finalizado. Gráficas combinadas guardadas en {CARPETA_METRICAS}")
+
+
+
+if __name__ == "__main__":
+    comparar_modelos_individuales()
+    entrenar_y_evaluar()
