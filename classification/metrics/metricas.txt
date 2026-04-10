@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 =================================================================
 	***** GANADOR *****
    PANEL EXHAUSTIVO DE MÉTRICAS CLÍNICAS SVoting + MLP + Optuna + Platt Sigmoid + Frank Hall
