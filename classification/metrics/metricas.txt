@@ -796,5 +796,3 @@ weighted avg       0.71      0.69      0.68       508
    case_0165: Real=Bajo       | Pred=Bajo       | Err: 0 | Probs: B:85% M:15% MA:0% C:0%
    case_0303: Real=Crítico    | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:0% MA:82% C:18%
    case_0545: Real=Moderado   | Pred=Medio-Alto | Err: 1 | Probs: B:0% M:0% MA:100% C:0%
-
->>>>>>> 9015f7c609fa2b4ea4bfb8b397c19d6d54040751

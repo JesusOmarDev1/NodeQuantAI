@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 modelo_clasificacion.py - Clasificación de Riesgo Ganglionar (Multiclase)
 ======================================================================
@@ -67,7 +66,7 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
     def fit(self, X, y):
         self.classes_ = np.sort(np.unique(y))
         self.estimators_ = []
-        
+
         # entrenar k-1 clasificadores binarios
         for i in range(len(self.classes_) - 1):
             y_binario = (y > self.classes_[i]).astype(int)
@@ -80,13 +79,13 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
         # obtener las probabilidades de ser mayor que cada escalón
         probs_mayor_que = [est.predict_proba(X)[:, 1] for est in self.estimators_]
         probs = np.zeros((X.shape[0], len(self.classes_)))
-        
+
         # matemáticas ordinales de frank & hall
         probs[:, 0] = 1.0 - probs_mayor_que[0] # P(bajo)
         for i in range(1, len(self.classes_) - 1):
             probs[:, i] = probs_mayor_que[i-1] - probs_mayor_que[i] # P(intermedio)
         probs[:, -1] = probs_mayor_que[-1] # P(crítico)
-        
+
         # limpieza de ruido matemático para evitar probabilidades negativas minúsculas
         probs = np.clip(probs, 0.0, 1.0)
         return probs / probs.sum(axis=1, keepdims=True) # normalizar al 100%
@@ -137,27 +136,27 @@ def _crear_ordinal_stacking_pipeline():
         ("lgbm", LGBMClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, class_weight='balanced', random_state=42, verbose=-1)),
         ("cat", CatBoostClassifier(iterations=200, depth=4, learning_rate=0.05, auto_class_weights='Balanced', verbose=0, random_state=42))
     ]
-    
+
     # meta-algoritmo
     meta_learner = LogisticRegression(class_weight='balanced', random_state=42)
-    
+
     # crear stacking
     stacking = StackingClassifier(
         estimators=estimators,
         final_estimator=meta_learner,
         cv=3, n_jobs=-1
     )
-    
+
     # evolver el stacking en la mente ordinal
     modelo_ordinal = ClasificadorOrdinalFrankHall(estimator=stacking)
-    
+
     pipe = Pipeline([
         ("scaler", StandardScaler()),
         ("lasso_filter", SelectFromModel(
             LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced', random_state=42, max_iter=5000))),
         ("model", modelo_ordinal),
     ])
-    
+
     return pipe, "Stacking Ordinal (XGB+RF+LGBM -> LR)"
 
 def _extraer_importances_ordinal_stacking(pipe, feature_names):
@@ -165,7 +164,7 @@ def _extraer_importances_ordinal_stacking(pipe, feature_names):
     lasso_step = pipe.named_steps["lasso_filter"]
     surviving_features = np.array(feature_names)[lasso_step.get_support()]
     ordinal_model = pipe.named_steps["model"]
-    
+
     importances = np.zeros(len(surviving_features))
     # recorremos cada clasificador binario del ordinal (P(y>0) y P(y>1))
     for stack_clf in ordinal_model.estimators_:
@@ -173,7 +172,7 @@ def _extraer_importances_ordinal_stacking(pipe, feature_names):
         for base_est in stack_clf.estimators_:
             if hasattr(base_est, "feature_importances_"):
                 importances += base_est.feature_importances_
-                
+
     total = importances.sum()
     if total > 0:
         importances /= total
@@ -632,7 +631,7 @@ def generar_grafico_arbol(modelo, cols_sel):
         # calibrador -> pipeline -> ordinal -> stacking (binario 0) -> RF -> árbol 0
         pipeline_interno = modelo.calibrated_classifiers_[0].estimator
         ordinal_clf = pipeline_interno.named_steps['model']
-        stacking_clf = ordinal_clf.estimators_[0] 
+        stacking_clf = ordinal_clf.estimators_[0]
         rf_clf = stacking_clf.named_estimators_['rf']
         arbol_ejemplo = rf_clf.estimators_[0]
 
@@ -834,7 +833,6 @@ def comparar_modelos_individuales():
 
 if __name__ == "__main__":
     comparar_modelos_individuales()
-=======
 """
 modelo_clasificacion.py - Clasificación de Riesgo Ganglionar (Multiclase)
 ======================================================================
@@ -903,7 +901,7 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
     def fit(self, X, y):
         self.classes_ = np.sort(np.unique(y))
         self.estimators_ = []
-        
+
         # entrenar k-1 clasificadores binarios
         for i in range(len(self.classes_) - 1):
             y_binario = (y > self.classes_[i]).astype(int)
@@ -916,13 +914,13 @@ class ClasificadorOrdinalFrankHall(BaseEstimator, ClassifierMixin):
         # obtener las probabilidades de ser mayor que cada escalón
         probs_mayor_que = [est.predict_proba(X)[:, 1] for est in self.estimators_]
         probs = np.zeros((X.shape[0], len(self.classes_)))
-        
+
         # matemáticas ordinales de frank & hall
         probs[:, 0] = 1.0 - probs_mayor_que[0] # P(bajo)
         for i in range(1, len(self.classes_) - 1):
             probs[:, i] = probs_mayor_que[i-1] - probs_mayor_que[i] # P(intermedio)
         probs[:, -1] = probs_mayor_que[-1] # P(crítico)
-        
+
         # limpieza de ruido matemático para evitar probabilidades negativas minúsculas
         probs = np.clip(probs, 0.0, 1.0)
         return probs / probs.sum(axis=1, keepdims=True) # normalizar al 100%
@@ -973,27 +971,27 @@ def _crear_ordinal_stacking_pipeline():
         ("lgbm", LGBMClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, class_weight='balanced', random_state=42, verbose=-1)),
         ("cat", CatBoostClassifier(iterations=200, depth=4, learning_rate=0.05, auto_class_weights='Balanced', verbose=0, random_state=42))
     ]
-    
+
     # meta-algoritmo
     meta_learner = LogisticRegression(class_weight='balanced', random_state=42)
-    
+
     # crear stacking
     stacking = StackingClassifier(
         estimators=estimators,
         final_estimator=meta_learner,
         cv=3, n_jobs=-1
     )
-    
+
     # evolver el stacking en la mente ordinal
     modelo_ordinal = ClasificadorOrdinalFrankHall(estimator=stacking)
-    
+
     pipe = Pipeline([
         ("scaler", StandardScaler()),
         ("lasso_filter", SelectFromModel(
             LogisticRegression(penalty='l1', solver='saga', C=0.1, class_weight='balanced', random_state=42, max_iter=5000))),
         ("model", modelo_ordinal),
     ])
-    
+
     return pipe, "Stacking Ordinal (XGB+RF+LGBM -> LR)"
 
 def _extraer_importances_ordinal_stacking(pipe, feature_names):
@@ -1001,7 +999,7 @@ def _extraer_importances_ordinal_stacking(pipe, feature_names):
     lasso_step = pipe.named_steps["lasso_filter"]
     surviving_features = np.array(feature_names)[lasso_step.get_support()]
     ordinal_model = pipe.named_steps["model"]
-    
+
     importances = np.zeros(len(surviving_features))
     # recorremos cada clasificador binario del ordinal (P(y>0) y P(y>1))
     for stack_clf in ordinal_model.estimators_:
@@ -1009,7 +1007,7 @@ def _extraer_importances_ordinal_stacking(pipe, feature_names):
         for base_est in stack_clf.estimators_:
             if hasattr(base_est, "feature_importances_"):
                 importances += base_est.feature_importances_
-                
+
     total = importances.sum()
     if total > 0:
         importances /= total
@@ -1468,7 +1466,7 @@ def generar_grafico_arbol(modelo, cols_sel):
         # calibrador -> pipeline -> ordinal -> stacking (binario 0) -> RF -> árbol 0
         pipeline_interno = modelo.calibrated_classifiers_[0].estimator
         ordinal_clf = pipeline_interno.named_steps['model']
-        stacking_clf = ordinal_clf.estimators_[0] 
+        stacking_clf = ordinal_clf.estimators_[0]
         rf_clf = stacking_clf.named_estimators_['rf']
         arbol_ejemplo = rf_clf.estimators_[0]
 
@@ -1670,5 +1668,4 @@ def comparar_modelos_individuales():
 
 if __name__ == "__main__":
     comparar_modelos_individuales()
->>>>>>> 9015f7c609fa2b4ea4bfb8b397c19d6d54040751
     entrenar_y_evaluar()
